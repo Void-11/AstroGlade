@@ -1,6 +1,11 @@
-#include <iostream>
+#include <SFML/Graphics.hpp>
+#include <memory>
+#include "framework/Application.h" 
 
 int main()
 {
-    std::cout << "Hello World!" <<std::endl ;
+    //Heap Alocation
+    // ly::Application* app = new ly::Application();
+    std::unique_ptr<ly::Application> app = std::make_unique<ly::Application>();
+    app->Run();
 }
