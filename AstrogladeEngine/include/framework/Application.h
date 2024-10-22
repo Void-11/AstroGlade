@@ -1,8 +1,10 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "framework/Core.h"
 
 namespace ly
 {
+    class World;
     class Application
     {
     public:
@@ -10,6 +12,9 @@ namespace ly
         Application();
         
         void Run();
+
+        template<typename WorldType>
+        weak<WorldType> LoadWorld();
         
     private:
 
@@ -21,6 +26,16 @@ namespace ly
         void RenderInternal();
         virtual void Tick(float deltaTime);
         virtual void Render();
-        
+
+        shared<World> currentWorld;
     };
+
+    template <typename WorldType>
+    weak<WorldType> Application::LoadWorld()
+    {
+        shared<WorldType> newWorld{new WorldType(this) };
+        currentWorld = newWorld;
+        return newWorld;
+    }
+
 }
