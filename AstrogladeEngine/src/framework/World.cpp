@@ -27,15 +27,15 @@ namespace ly
     World::~World()
     {
         
-    }
+    } 
 
     void World::BeginPlay()
     {
-        LOG("Begin Play")
+       LOG("Begin Play")
     }
 
     void World::Tick(float deltaTime)
     {
-        LOG("Tick at Framerate %f", 1.f/deltaTime)
+        LOG("Tick at Framerate: ", 1.f/deltaTime)
     }
 }

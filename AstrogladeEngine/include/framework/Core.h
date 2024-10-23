@@ -25,5 +25,16 @@ namespace ly
     using dictionary = std::unordered_map<keyType,valType,hasher>;
     
     // Macro
-#define LOG(M, ...) std::cout << M << "\n" << ##__VA_ARGS__ << std::endl;
+    #define LOG(M, ...) std::cout << M; log_helper(__VA_ARGS__);
+
+    inline void log_helper() {
+        std::cout << '\n';
+    }
+
+    template<typename T, typename... Args>
+    void log_helper(T value, Args... args) {
+        std::cout << value << " ";
+        log_helper(args...);
+    }
+
 }
