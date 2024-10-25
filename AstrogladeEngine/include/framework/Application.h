@@ -9,7 +9,7 @@ namespace ly
     {
     public:
 
-        Application();
+        Application(unsigned int windowHeight,unsigned int windowWidth, const std::string& title, sf::Uint32 style);
         
         void Run();
 

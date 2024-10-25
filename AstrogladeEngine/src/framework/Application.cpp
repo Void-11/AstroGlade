@@ -2,11 +2,13 @@
 #include "framework/Application.h"
 #include "framework/Core.h"
 #include "framework/World.h"
+#include "framework/Actor.h"
 
 namespace ly
 {
-    Application::Application()
-        : mWindow{sf::VideoMode(1024, 1440), "Astro Glade"},
+    
+    Application::Application(unsigned int windowHeight, unsigned int windowWidth, const std::string& title,sf::Uint32 style)
+        : mWindow{sf::VideoMode(windowWidth, windowHeight), title, style},
         mTargetFrameRate(60.f),
         mTickClock{},
         currentWorld{nullptr}
@@ -66,10 +68,9 @@ namespace ly
 
     void Application::Render()
     {
-        sf::RectangleShape rect{ sf::Vector2f (200,200) };
-        rect.setFillColor(sf::Color::Magenta);
-        rect.setOrigin(100,100);
-        rect.setPosition(mWindow.getSize().x/2.f, mWindow.getSize().y/2.f);
-        mWindow.draw(rect);   
+         if(currentWorld)
+         {
+             currentWorld->Render(mWindow);
+         }
     }
 }

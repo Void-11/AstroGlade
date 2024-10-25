@@ -40,7 +40,7 @@ namespace ly
             }
             else
             {
-                iter->get()->Tick(deltaTime);
+                iter->get()->TickInternal(deltaTime);
                 ++iter; 
             }
         }
@@ -48,9 +48,17 @@ namespace ly
         Tick(deltaTime);
     }
 
+    void World::Render(sf::RenderWindow& window)
+    {
+        for(auto& actor : mActors)
+        {
+            actor->Render(window);
+        }
+    }
+
     World::~World()
     {
-        
+     
     } 
 
     void World::BeginPlay()
