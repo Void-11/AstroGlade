@@ -28,6 +28,8 @@ namespace ly
         virtual void Render();
 
         shared<World> currentWorld;
+        sf::Clock mCleanCycleClock;
+        float mCleanCycleInterval;
     };
 
     template <typename WorldType>
