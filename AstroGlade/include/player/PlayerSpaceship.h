@@ -4,6 +4,7 @@
 
 namespace ly
 {
+    class LaserShooter;
     class PlayerSpaceship : public Spaceship
     {
     public:
@@ -13,6 +14,7 @@ namespace ly
         virtual void Tick(float deltaTime) override;
         void SetSpeed(float newSpeed) { mSpeed = newSpeed; }
         float GetSpeed() const { return mSpeed; }
+        virtual void Shoot() override;
 
     private:
 
@@ -22,5 +24,7 @@ namespace ly
         void ClampInputOnEdge();
         sf::Vector2f mMoveInput;
         float mSpeed;
+
+        unique<LaserShooter> mShooter;
     };
 }
