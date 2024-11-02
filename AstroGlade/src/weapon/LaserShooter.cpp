@@ -1,5 +1,7 @@
 ﻿#include "weapon/LaserShooter.h"
 #include "framework/Core.h"
+#include "weapon/Laser.h"
+#include "framework/World.h"
 
 namespace ly
 {
@@ -24,6 +26,8 @@ namespace ly
     void LaserShooter::ShootExecution()
     {
         mCooldownClock.restart();
-        LOG("Shooting!")
+        weak<Laser> newLaser = GetOwner()->GetWorld()->SpawnActor<Laser>(GetOwner(), "PNG/Lasers/laserRed01.png");
+        newLaser.lock()->SetActorLocation(GetOwner()->GetActorLocation());
+        newLaser.lock()->SetActorRotation(GetOwner()->GetActorRotation());
     }
 }

@@ -33,6 +33,8 @@ namespace ly
         sf::Vector2f GetActorRightDirection() const;
 
         sf::Vector2u GetWindowSize() const;
+
+        World* GetWorld() const { return mOwningWorld; }
         
     private:
 
