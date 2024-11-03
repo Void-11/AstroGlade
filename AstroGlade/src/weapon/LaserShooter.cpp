@@ -5,7 +5,7 @@
 
 namespace ly
 {
-    LaserShooter::LaserShooter(Actor* owner, float cooldownTime)
+    LaserShooter::LaserShooter(Actor* owner, float cooldownTime) 
         :Shooter{owner},
         mCooldownClock{},
         mCooldownTime{cooldownTime}
@@ -26,8 +26,8 @@ namespace ly
     void LaserShooter::ShootExecution()
     {
         mCooldownClock.restart();
-        weak<Laser> newLaser = GetOwner()->GetWorld()->SpawnActor<Laser>(GetOwner(), "PNG/Lasers/laserRed01.png");
-        newLaser.lock()->SetActorLocation(GetOwner()->GetActorLocation());
+        weak<Laser> newLaser = GetOwner()->GetWorld()->SpawnActor<Laser>(GetOwner(), "PNG/Lasers/laserRed07.png");
         newLaser.lock()->SetActorRotation(GetOwner()->GetActorRotation());
+        newLaser.lock()->SetActorLocation(GetOwner()->GetActorLocation());
     }
 }

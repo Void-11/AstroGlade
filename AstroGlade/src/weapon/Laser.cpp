@@ -29,6 +29,6 @@ namespace ly
 
     void Laser::Move(float deltaTime)
     {
-        AddActorLocationOffset(GetActorForwardDirection() * mSpeed * deltaTime);
+        AddActorLocationOffset(GetActorRightDirection() * mSpeed * deltaTime);
     }
 }

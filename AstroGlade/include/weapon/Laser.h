@@ -7,7 +7,7 @@ namespace ly
     {
     public:
 
-        Laser(World* world, Actor* owner, const std::string& texturePath, float speed = 600.f, float damage = 10.f);
+        Laser(World* world, Actor* owner, const std::string& texturePath, float speed = -1000.f, float damage = 10.f);
 
         void SetSpeed(float newSpeed);
         void SetDamage(float newDamage);

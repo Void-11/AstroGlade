@@ -11,7 +11,7 @@ namespace ly
     }
 
     Shooter::Shooter(Actor* owner)
-        :mOwner{}
+        :mOwner{owner}
     {
         
     }
