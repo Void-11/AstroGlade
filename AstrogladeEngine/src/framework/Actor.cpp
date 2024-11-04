@@ -109,9 +109,43 @@ namespace ly
         return RotationToVector(GetActorRotation() + 90.f);
     }
 
+    sf::FloatRect Actor::GetActorGlobalBounds() const
+    {
+        return mSprite.getGlobalBounds();
+    }
+
     sf::Vector2u Actor::GetWindowSize() const
     {
         return mOwningWorld->GetWindowSize();
+    }
+
+    bool Actor::IsActorOutOfWindowBounds() const
+    {
+        float windowWidth = GetWorld()->GetWindowSize().x;
+        float windowHeight = GetWorld()->GetWindowSize().y;
+
+        float width = GetActorGlobalBounds().width;
+        float height = GetActorGlobalBounds().height;
+
+        sf::Vector2f actorPosition = GetActorLocation();
+
+        if(actorPosition.x < -width)
+        {
+            return true;
+        }
+        if(actorPosition.x > windowWidth + width)
+        {
+            return true;
+        }
+        if(actorPosition.y < -height)
+        {
+            return true;
+        }
+        if(actorPosition.y > windowHeight + height)
+        {
+            return true;
+        }
+        return false;
     }
 
     void Actor::CenterPivot()
