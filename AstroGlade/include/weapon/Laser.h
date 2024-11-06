@@ -14,6 +14,8 @@ namespace ly
 
         virtual void Tick(float deltaTime) override;
 
+        virtual void BeginPlay() override;
+
     private:
 
         Actor* mOwner;

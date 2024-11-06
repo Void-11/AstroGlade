@@ -1,8 +1,10 @@
 ﻿#include "framework/Actor.h"
+#include "box2d/b2_body.h"
 #include "framework/Core.h"
 #include "framework/AssetManager.h"
 #include "framework/MathUtility.h"
 #include "framework/World.h"
+#include "framework/PhysicsSystem.h"
 
 namespace ly
 {
@@ -10,7 +12,9 @@ namespace ly
         :mOwningWorld(owningWorld),
         mHasBeginPlay{false},
         mSprite{},
-        mTexture{}
+        mTexture{},
+        mPhysicsBody{nullptr},
+        mPhysicsEnable{false}
     {
         SetTexture(texturePath);
     }
@@ -148,9 +152,50 @@ namespace ly
         return false;
     }
 
+    void Actor::SetEnablePhysics(bool enable)
+    {
+        mPhysicsEnable = enable;
+        if (mPhysicsEnable)
+        {
+            InitializePhysics();
+        }
+        else
+        {
+            TerminatePhysics();
+        }
+    }
+
     void Actor::CenterPivot()
     {
         sf::FloatRect bound = mSprite.getGlobalBounds();
         mSprite.setOrigin(bound.width/2.f, bound.height/2.f);
+    }
+
+    void Actor::InitializePhysics()
+    {
+        if(!mPhysicsBody)
+        {
+            mPhysicsBody = PhysicsSystem::Get().AddListener(this);
+        }
+    }
+
+    void Actor::TerminatePhysics()
+    {
+        if(mPhysicsBody)
+        {
+            PhysicsSystem::Get().RemoveListener(mPhysicsBody);
+        }
+    }
+
+    void Actor::UpdatePhysicsBodyTransform()
+    {
+        if(mPhysicsBody)
+        {
+            float physicsScale = PhysicsSystem::Get().GetPhysicsScale();
+            b2Vec2 pos{GetActorLocation().x * physicsScale, GetActorLocation().y * physicsScale};
+            float rotation = DegreeToRadians(GetActorRotation());
+
+            mPhysicsBody->SetTransform(pos, rotation);
+        }
     }
 }

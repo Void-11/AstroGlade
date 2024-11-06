@@ -31,6 +31,12 @@ namespace ly
         }
     }
 
+    void Laser::BeginPlay()
+    {
+        Actor::BeginPlay();
+        SetEnablePhysics(true);
+    }
+
     void Laser::Move(float deltaTime)
     {
         AddActorLocationOffset(GetActorRightDirection() * mSpeed * deltaTime);

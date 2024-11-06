@@ -5,6 +5,8 @@
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Texture.hpp"
 
+class b2Body;
+
 namespace ly
 {
     class World;
@@ -37,14 +39,22 @@ namespace ly
 
         World* GetWorld() const { return mOwningWorld; }
         bool IsActorOutOfWindowBounds() const;
+
+        void SetEnablePhysics(bool enable);
         
     private:
-
-        void CenterPivot();
+        
         World* mOwningWorld;
         bool mHasBeginPlay;
 
         sf::Sprite mSprite;
         shared<sf::Texture> mTexture;
+        b2Body* mPhysicsBody;
+        bool mPhysicsEnable;
+
+        void CenterPivot();
+        void InitializePhysics();
+        void TerminatePhysics();
+        void UpdatePhysicsBodyTransform();
     };
 }
