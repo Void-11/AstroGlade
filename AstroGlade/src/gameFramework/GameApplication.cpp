@@ -24,10 +24,18 @@ namespace ly
         weak<Spaceship> testSpaceship = newWorld.lock()->SpawnActor<Spaceship>();
         testSpaceship.lock()->SetTexture("PNG/playerShip2_red.png");
         testSpaceship.lock()->SetActorLocation(sf::Vector2f{100.f, 50.f});
+        counter = 0.f;
     }
 
     void GameApplication::Tick(float deltaTime)
     {
-      
+        counter += deltaTime;
+        if(counter > 10.f)
+        {
+            if(!testPlayerSpaceship.expired())
+            {
+                testPlayerSpaceship.lock()->Destroy();
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace ly
 {
@@ -36,5 +37,8 @@ namespace ly
         std::cout << value << " ";
         log_helper(args...);
     }
+
+    template<typename T>
+    using set = std::unordered_set<T>;
 
 }

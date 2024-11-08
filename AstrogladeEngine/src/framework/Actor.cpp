@@ -177,6 +177,12 @@ namespace ly
         LOG("Overlapped Finished")
     }
 
+    void Actor::Destroy()
+    {
+        TerminatePhysics();
+        Object::Destroy();
+    }
+
     void Actor::CenterPivot()
     {
         sf::FloatRect bound = mSprite.getGlobalBounds();
@@ -196,6 +202,7 @@ namespace ly
         if(mPhysicsBody)
         {
             PhysicsSystem::Get().RemoveListener(mPhysicsBody);
+            mPhysicsBody = nullptr;   
         }
     }
 
