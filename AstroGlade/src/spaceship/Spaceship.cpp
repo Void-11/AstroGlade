@@ -5,7 +5,8 @@ namespace  ly
 {
     Spaceship::Spaceship(World* owningWorld, const std::string& texturePath)
         :Actor{owningWorld, texturePath},
-        mVelocity{}
+        mVelocity{},
+        mHealthComp{100.f, 100.f}
     {
         
     }
