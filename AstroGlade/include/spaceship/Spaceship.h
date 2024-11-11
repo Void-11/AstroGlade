@@ -19,5 +19,6 @@ namespace ly
 
         sf::Vector2f mVelocity;
         HealthComponent mHealthComp;
+        void OnHealthModified(float amt, float health, float maxHealth);
     };
 }

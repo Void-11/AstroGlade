@@ -31,5 +31,11 @@ namespace  ly
     {
         Actor::BeginPlay();
         SetEnablePhysics(true);
+        mHealthComp.onHealthModified.BindAction(GetWeakRef(), &Spaceship::OnHealthModified);
+    }
+
+    void Spaceship::OnHealthModified(float amt, float health, float maxHealth)
+    {
+        
     }
 }
