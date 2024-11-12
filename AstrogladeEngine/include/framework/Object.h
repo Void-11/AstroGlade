@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include "Core.h"
+#include "framework/Delegate.h"
 
 namespace ly
 {
@@ -16,6 +17,7 @@ namespace ly
 
         weak<Object> GetWeakRef();
         weak<const Object> GetWeakRef() const;
+        Delegate<Object*> onDestroy;
         
     private:
 

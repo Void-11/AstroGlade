@@ -16,6 +16,7 @@ namespace ly
 
     void Object::Destroy()
     {
+        onDestroy.Broadcast(this);
         mIsPendingDestroy = true ;
     }
 
