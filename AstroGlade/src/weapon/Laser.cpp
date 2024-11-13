@@ -8,7 +8,7 @@ namespace ly
         mSpeed{speed},
         mDamage{damage}
     {
-        
+        SetTeamID(owner->GetTeamID());
     }
 
     void Laser::SetSpeed(float newSpeed)
@@ -40,5 +40,14 @@ namespace ly
     void Laser::Move(float deltaTime)
     {
         AddActorLocationOffset(GetActorRightDirection() * mSpeed * deltaTime);
+    }
+
+    void Laser::OnActorBeginOverlap(Actor* other)
+    {
+        if (IsOtherHostile(other))
+        {
+            other->ApplyDamage(GetDamage());
+            Destroy();
+        }
     }
 }

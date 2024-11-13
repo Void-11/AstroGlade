@@ -24,6 +24,11 @@ namespace ly
 
     template<typename keyType, typename valType, typename hasher = std::hash<keyType>>
     using dictionary = std::unordered_map<keyType,valType,hasher>;
+
+    template<typename T>
+    using set = std::unordered_set<T>;
+
+    using uint8 = unsigned char;
     
     // Macro
     #define LOG(M, ...) std::cout << M; log_helper(__VA_ARGS__);
@@ -37,8 +42,4 @@ namespace ly
         std::cout << value << " ";
         log_helper(args...);
     }
-
-    template<typename T>
-    using set = std::unordered_set<T>;
-
 }

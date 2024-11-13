@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Core.h"
+#include "box2d/b2_types.h"
 #include "framework/Object.h"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "SFML/Graphics/Sprite.hpp"
@@ -46,6 +47,13 @@ namespace ly
 
         virtual void Destroy() override;
         
+        static uint8 GetNeturalTeamID() { return neturalTeamID; }
+        void SetTeamID(uint8 teamID) { mTeamID = teamID; }
+        uint8 GetTeamID() const { return mTeamID; }
+        bool IsOtherHostile(Actor* other) const;
+
+        virtual void ApplyDamage(float amount);
+        
     private:
         
         World* mOwningWorld;
@@ -55,6 +63,9 @@ namespace ly
         shared<sf::Texture> mTexture;
         b2Body* mPhysicsBody;
         bool mPhysicsEnable;
+
+        uint8 mTeamID;
+        const static uint8 neturalTeamID = 255;
 
         void CenterPivot();
         void InitializePhysics();

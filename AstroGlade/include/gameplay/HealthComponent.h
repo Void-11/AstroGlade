@@ -13,6 +13,8 @@ namespace ly
         float GetMaxHealth() const { return mMaxHealth; }
 
         Delegate<float,float,float> onHealthModified;
+        Delegate<float, float, float> onTakenDamage;
+        Delegate<> onHealthEmpty;
 
     private:
 

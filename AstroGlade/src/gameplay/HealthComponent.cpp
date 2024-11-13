@@ -33,26 +33,18 @@ namespace ly
             {
                 HealthEmpty();
             }
-
-            else
-            {
-                HealthRegenerate(amount);
-            }
+            
         }
+        onHealthModified.Broadcast(amount, mHealth, mMaxHealth);
     }
 
     void HealthComponent::TakenDamage(float amount)
     {
-        LOG("Take Damage", amount, mHealth, mMaxHealth)
+        onTakenDamage.Broadcast(amount, mHealth, mMaxHealth);
     }
 
     void HealthComponent::HealthEmpty()
     {
-        LOG("Dead")
-    }
-
-    void HealthComponent::HealthRegenerate(float amount)
-    {
-        LOG("Health Regenerate", amount, mHealth, mMaxHealth)
+        onHealthEmpty.Broadcast();
     }
 }

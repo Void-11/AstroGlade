@@ -14,11 +14,14 @@ namespace ly
         sf::Vector2f GetVelocity() const {return mVelocity;}
         virtual void Shoot();
         virtual void BeginPlay() override;
+        virtual void ApplyDamage(float amount) override;
 
     private:
 
         sf::Vector2f mVelocity;
         HealthComponent mHealthComp;
-        void OnHealthModified(float amt, float health, float maxHealth);
+        virtual void OnHealthModified(float amt, float health, float maxHealth);
+        virtual void OnTakenDamage(float amt, float health, float maxHealth);
+        virtual void Blow();
     };
 }
