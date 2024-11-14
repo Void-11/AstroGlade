@@ -20,8 +20,15 @@ namespace ly
 
         sf::Vector2f mVelocity;
         HealthComponent mHealthComp;
+        float mBlinkTime;
+        float mBlinkDuration;
+        sf::Color mBlinkColorOffset;
+        
         virtual void OnHealthModified(float amt, float health, float maxHealth);
         virtual void OnTakenDamage(float amt, float health, float maxHealth);
         virtual void Blow();
+
+        void Blink();
+        void UpdateBlink(float deltaTime);
     };
 }
