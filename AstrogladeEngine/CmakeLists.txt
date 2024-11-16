@@ -19,6 +19,8 @@ add_library(${ASTRO_GLADE_ENGINE_TARGET_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Delegate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/VFX/Particle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/VFX/Particle.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/VFX/Explosion.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/VFX/Explosion.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/EntryPoint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/EntryPoint.cpp   
 )
