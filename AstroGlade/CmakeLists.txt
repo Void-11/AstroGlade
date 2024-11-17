@@ -13,6 +13,10 @@ add_executable(${ASTRO_GLADE_GAME_TARGET_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/Laser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/gameplay/HealthComponent.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gameplay/HealthComponent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/EnemySpaceship.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/EnemySpaceship.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/Vanguard.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/Vanguard.cpp
 )
 
 target_include_directories(${ASTRO_GLADE_GAME_TARGET_NAME} PUBLIC
