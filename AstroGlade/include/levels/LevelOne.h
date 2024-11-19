@@ -7,8 +7,12 @@ namespace ly
     class GameLevelOne : public World
     {
     public:
+        
         GameLevelOne(Application* owningApp);
     private:
+        
+        virtual void BeginPlay() override;
         weak<PlayerSpaceship> testPlayerSpaceship;
+        void TimerCallBack_Test();
     };
 }

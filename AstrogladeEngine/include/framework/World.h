@@ -1,12 +1,13 @@
 ﻿#pragma once
 #include "framework/Core.h"
 #include "SFML/Graphics/RenderWindow.hpp"
+#include "framework/Object.h"
 
 namespace ly
 {
     class Application;
     class Actor;
-    class World
+    class World : public Object
     {
     public:
         
@@ -28,8 +29,8 @@ namespace ly
 
         Application* mOwningApp;
         bool mBeginPlay;
-        void BeginPlay();
-        void Tick(float deltaTime);
+        virtual void BeginPlay();
+        virtual void Tick(float deltaTime);
 
         list<shared<Actor>> mActors;
         list<shared<Actor>> mPendingActors;
