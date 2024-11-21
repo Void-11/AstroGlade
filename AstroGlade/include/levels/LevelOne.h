@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "framework/World.h"
+#include "framework/TimerManager.h"
 
 namespace ly
 {
@@ -14,6 +15,6 @@ namespace ly
         virtual void BeginPlay() override;
         weak<PlayerSpaceship> testPlayerSpaceship;
         void TimerCallBack_Test();
-        unsigned int timerIndex_Test;
+        TimerHandle timerHandle_Test;
     };
 }
