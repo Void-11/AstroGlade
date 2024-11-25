@@ -8,13 +8,15 @@ namespace ly
     {
     public:
 
-        LaserShooter(Actor* owner, float cooldownTime = 1.f);
+        LaserShooter(Actor* owner, float cooldownTime = 1.f, const sf::Vector2f& localPositionOffset = {0.f, 0.f}, float localRotationOffset = 0.f);
         virtual bool IsOnCoolDown() const override;
 
     private:
 
         sf::Clock mCooldownClock;
         float mCooldownTime;
+        sf::Vector2f mLocalPositionOffset;
+        float mLocalRotationOffset;
         
         virtual void ShootExecution() override;
     };

@@ -5,10 +5,12 @@
 
 namespace ly
 {
-    LaserShooter::LaserShooter(Actor* owner, float cooldownTime) 
+    LaserShooter::LaserShooter(Actor* owner, float cooldownTime, const sf::Vector2f& localPositionOffset, float localRotationOffset) 
         :Shooter{owner},
         mCooldownClock{},
-        mCooldownTime{cooldownTime}
+        mCooldownTime{cooldownTime},
+        mLocalPositionOffset{localPositionOffset},
+        mLocalRotationOffset{localRotationOffset}
     {
         
     }
@@ -25,9 +27,11 @@ namespace ly
 
     void LaserShooter::ShootExecution()
     {
+        sf::Vector2f ownerForwardDir = GetOwner()->GetActorForwardDirection();
+        sf::Vector2f ownerRightDir = GetOwner()->GetActorRightDirection();
         mCooldownClock.restart();
         weak<Laser> newLaser = GetOwner()->GetWorld()->SpawnActor<Laser>(GetOwner(), "PNG/Lasers/laserRed07.png");
-        newLaser.lock()->SetActorRotation(GetOwner()->GetActorRotation());
-        newLaser.lock()->SetActorLocation(GetOwner()->GetActorLocation());
+        newLaser.lock()->SetActorLocation(GetOwner()->GetActorLocation() + ownerForwardDir * mLocalPositionOffset.x + ownerRightDir * mLocalPositionOffset.y);
+        newLaser.lock()->SetActorRotation(GetOwner()->GetActorRotation() + mLocalRotationOffset);
     }
 }
