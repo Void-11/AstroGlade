@@ -1,6 +1,7 @@
-﻿#include "Enemy/Vanguard.h"
+#include "Enemy/Vanguard.h"
 #include "Enemy/VanguardStage.h"
 #include "framework/World.h"
+#include "weapon/LaserShooter.h"
 
 namespace ly
 {

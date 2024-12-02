@@ -9,7 +9,7 @@ std::string GetResourceDir()
 
 #else
     
-    return "E:/C++ Projects/AstroGlade/AstroGlade/assets/";
+    return "/Users/viv/Developer/AstroGlade/AstroGlade/assets/";
 
 #endif  
 }
