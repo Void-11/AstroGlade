@@ -10,7 +10,7 @@ namespace ly
         :Spaceship{owningWorld, path},
         mMoveInput{},
         mSpeed{200.f},
-        mShooter{ new LaserShooter{this, 0.3f}}
+        mShooter{ new LaserShooter{this, 0.1f, {50.f, 0.f}} }
     {
         SetTeamID(1);
     }
