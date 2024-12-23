@@ -19,6 +19,6 @@ namespace ly
         :Application{980,600,"Astro Glade", sf::Style::Titlebar | sf::Style::Close}
     {
         AssetManager::Get().SetAssetRootDirectory(GetResourceDir());
-        weak<GameLevelOne> newWorld = LoadWorld<GameLevelOne>();
+        weak<LevelOne> newWorld = LoadWorld<LevelOne>();
     }
 }

@@ -9,10 +9,11 @@
 #include "Enemy/VanguardStage.h"
 #include "Enemy/TwinBladeStage.h"
 #include "gameplay/WaitStage.h"
+#include "Enemy/Hexagon.h"
 
 namespace ly
 {
-    GameLevelOne::GameLevelOne(Application* owningApp)
+    LevelOne::LevelOne(Application* owningApp)
         : World{owningApp}
     {
         testPlayerSpaceship = SpawnActor<PlayerSpaceship>();
@@ -23,12 +24,12 @@ namespace ly
         testSpaceship.lock()->SetActorLocation(sf::Vector2f{ 100.f, 50.f });
     }
 
-    void GameLevelOne::BeginPlay()
+    void LevelOne::BeginPlay()
     {
         
     }
 
-    void GameLevelOne::InitGameStages()
+    void LevelOne::InitGameStages()
     {
         AddStage(shared<WaitStage>{new WaitStage{this, 5.f}});
         AddStage(shared<VanguardStage>{new VanguardStage{this}});

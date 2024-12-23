@@ -5,11 +5,12 @@
 namespace ly
 {
     class PlayerSpaceship;
-    class GameLevelOne : public World
+    class LevelOne : public World
     {
     public:
         
-        GameLevelOne(Application* owningApp);
+       LevelOne(Application* owningApp);
+        
     private:
         
         virtual void BeginPlay() override;
