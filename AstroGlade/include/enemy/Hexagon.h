@@ -8,7 +8,7 @@ namespace ly
     class Hexagon : public EnemySpaceship
     {
     public:
-        Hexagon(World* owingWorld, const std::string& texturePath = "SpaceShooterRedux/PNG/Enemies/enemyGreen4.png", const sf::Vector2f& velocity = sf::Vector2f{0.f, 100.f});
+        Hexagon(World* owingWorld, const std::string& texturePath = "PNG/Enemies/enemyGreen4.png", const sf::Vector2f& velocity = sf::Vector2f{0.f, 100.f});
 
         virtual void Tick(float deltaTime) override;
     private:
