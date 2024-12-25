@@ -1,5 +1,6 @@
 ﻿#include "Enemy/Hexagon.h"
 #include "weapon/LaserShooter.h"
+
 namespace ly
 {
     Hexagon::Hexagon(World* owingWorld, const std::string& texturePath, const sf::Vector2f& velocity)

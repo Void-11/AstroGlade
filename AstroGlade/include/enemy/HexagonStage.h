@@ -10,7 +10,9 @@ namespace ly
         HexagonStage(World* world);
 
         virtual void StartStage() override;
+        
     private:
+        
         virtual void StageFinished() override;
         void SpawnHexagon();
 
