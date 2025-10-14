@@ -26,7 +26,11 @@ namespace ly
         
         virtual void OnHealthModified(float amt, float health, float maxHealth);
         virtual void OnTakenDamage(float amt, float health, float maxHealth);
+    protected:
         virtual void Blow();
+    public:
+        HealthComponent& GetHealthComp() { return mHealthComp; }
+        const HealthComponent& GetHealthComp() const { return mHealthComp; }
 
         void Blink();
         void UpdateBlink(float deltaTime);

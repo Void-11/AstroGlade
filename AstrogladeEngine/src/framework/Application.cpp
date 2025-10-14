@@ -34,6 +34,10 @@ namespace ly
                 {
                     mWindow.close();
                 }
+                else if (currentWorld)
+                {
+                    currentWorld->HandleEvent(windowEvent);
+                }
             }
             AccumulatedTime += mTickClock.restart().asSeconds();
 
@@ -58,7 +62,7 @@ namespace ly
         
         if (currentWorld)
         {
-            //currentWorld->BeginPlayInternal();
+            currentWorld->BeginPlayInternal();
             currentWorld->TickInternal(deltaTime);
         }
         

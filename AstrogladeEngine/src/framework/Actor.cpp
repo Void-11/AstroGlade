@@ -74,6 +74,17 @@ namespace ly
         window.draw(mSprite);
     }
 
+    void Actor::RenderOverlay(sf::RenderWindow& window)
+    {
+        (void)window; // default no-op
+    }
+
+    bool Actor::HandleEvent(const sf::Event& event)
+    {
+        (void)event;
+        return false;
+    }
+
     void Actor::SetActorLocation(const sf::Vector2f& newLocation)
     {
         mSprite.setPosition(newLocation);

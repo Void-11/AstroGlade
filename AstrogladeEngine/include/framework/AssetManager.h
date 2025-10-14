@@ -10,6 +10,7 @@ namespace ly
 
         static AssetManager& Get();
         shared<sf::Texture> LoadTexture(const std::string& path);
+        shared<sf::Font> LoadFont(const std::string& path);
         void CleanCycle();
         void SetAssetRootDirectory(const std::string& directory);
         
@@ -21,6 +22,7 @@ namespace ly
 
         static unique<AssetManager> assetManager;
         dictionary<std::string, shared<sf::Texture>> mLoadedTextureMap;
+        dictionary<std::string, shared<sf::Font>> mLoadedFontMap;
         std::string mRootDirectory;
     };
 }

@@ -23,9 +23,12 @@ namespace ly
         template<typename ActorType, typename... Args>
         weak<ActorType> SpawnActor(Args... args);
 
+        Application* GetApplication() const { return mOwningApp; }
+
         sf::Vector2u GetWindowSize() const;
         void CleanCycle();
         void AddStage(const shared<GameStage>& newStage);
+        virtual bool HandleEvent(const sf::Event& event);
 
     private:
 

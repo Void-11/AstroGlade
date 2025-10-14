@@ -5,6 +5,7 @@
 namespace ly
 {
     class PlayerSpaceship;
+    class GameplayHUD;
     class LevelOne : public World
     {
     public:
@@ -14,9 +15,19 @@ namespace ly
     private:
         
         virtual void BeginPlay() override;
-        weak<PlayerSpaceship> testPlayerSpaceship;
-        
-        TimerHandle timerHandle_Test;
+        virtual void Tick(float deltaTime) override;
         virtual void InitGameStages() override;
+
+        void SpawnCosmetics();
+        void SetupPlayer();
+        void CheckRespawn();
+        void GameOver();
+        void QuitGame();
+        void Restart();
+
+        weak<PlayerSpaceship> mPlayerSpaceship;
+        weak<GameplayHUD> mGameplayHUD;
+
+        TimerHandle timerHandle_Test;
     };
 }

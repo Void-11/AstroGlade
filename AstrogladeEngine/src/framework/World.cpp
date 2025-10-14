@@ -53,6 +53,20 @@ namespace ly
 		{
 			actor->Render(window);
 		}
+		for (auto& actor : mActors)
+		{
+			actor->RenderOverlay(window);
+		}
+	}
+
+	bool World::HandleEvent(const sf::Event& event)
+	{
+		bool handled = false;
+		for (auto& actor : mActors)
+		{
+			handled = actor->HandleEvent(event) || handled;
+		}
+		return handled;
 	}
 	World::~World()
 	{

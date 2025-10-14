@@ -17,6 +17,7 @@ namespace ly
         weak<WorldType> LoadWorld();
 
         sf::Vector2u GetWindowSize() const;
+        void QuitApplication() { mWindow.close(); }
         
     private:
 
