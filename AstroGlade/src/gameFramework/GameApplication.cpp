@@ -5,6 +5,7 @@
 #include "config.h"
 #include "enemy/Vanguard.h"
 #include "levels/LevelOne.h"
+#include "levels/MainMenu.h"
 
 ly::Application *GetApplication()
 {
@@ -19,6 +20,6 @@ namespace ly
         :Application{980,600,"Astro Glade", sf::Style::Titlebar | sf::Style::Close}
     {
         AssetManager::Get().SetAssetRootDirectory(GetResourceDir());
-        weak<LevelOne> newWorld = LoadWorld<LevelOne>();
+        auto newWorld = LoadWorld<MainMenu>();
     }
 }

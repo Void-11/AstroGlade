@@ -5,9 +5,9 @@ namespace ly
 {
     UFO::UFO(World* owningWorld, const sf::Vector2f& velocity, const std::string& texturePath, float rotationSpeed)
         : EnemySpaceship{ owningWorld, texturePath},
-        mShooter1{ new LaserShooter{this, .5f, sf::Vector2f{0.f,0.f}, -60} },
-        mShooter2{ new LaserShooter{this, .5f, sf::Vector2f{0.f,0.f}, 60} },
-        mShooter3{ new LaserShooter{this, .5f, sf::Vector2f{0.f,0.f}, 180.f} },
+        mShooter1{ new LaserShooter{this, .5f, sf::Vector2f{0.f,0.f}, -60, "PNG/Lasers/laserGreen07.png"} },
+        mShooter2{ new LaserShooter{this, .5f, sf::Vector2f{0.f,0.f}, 60, "PNG/Lasers/laserGreen07.png"} },
+        mShooter3{ new LaserShooter{this, .5f, sf::Vector2f{0.f,0.f}, 180.f, "PNG/Lasers/laserGreen07.png"} },
         mRotationSpeed{rotationSpeed}
     {
         SetVelocity(velocity);

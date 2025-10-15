@@ -10,9 +10,11 @@ namespace ly
         :Spaceship{owningWorld, path},
         mMoveInput{},
         mSpeed{200.f},
-        mShooter{ new LaserShooter{this, 0.1f, {50.f, 0.f}} }
+        mShooter{ new LaserShooter{this, 0.1f, {50.f, 0.f}, 0.f, "PNG/Lasers/laserBlue07.png"} }
     {
         SetTeamID(1);
+        // Face upwards so forward points toward the top of the screen
+        SetActorRotation(-90.f);
     }
 
     void PlayerSpaceship::Tick(float deltaTime)
@@ -28,6 +30,25 @@ namespace ly
         {
             mShooter->Shoot();
         }
+        for (auto& s : mExtraShooters) s->Shoot();
+    }
+
+    void PlayerSpaceship::EnableThreeWayShooter()
+    {
+        mExtraShooters.clear();
+        mExtraShooters.emplace_back(new LaserShooter{this, 0.1f, {10.f, -10.f}, -30.f, "PNG/Lasers/laserBlue09.png"});
+        mExtraShooters.emplace_back(new LaserShooter{this, 0.1f, {0.f, 0.f}, 0.f, "PNG/Lasers/laserBlue07.png"});
+        mExtraShooters.emplace_back(new LaserShooter{this, 0.1f, {10.f, 10.f}, 30.f, "PNG/Lasers/laserBlue09.png"});
+    }
+
+    void PlayerSpaceship::EnableFrontalWiper()
+    {
+        mExtraShooters.clear();
+        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {-20.f, -12.f}, -25.f, "PNG/Lasers/laserBlue06.png"});
+        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {-10.f, -6.f}, -12.f, "PNG/Lasers/laserBlue06.png"});
+        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {0.f, 0.f}, 0.f, "PNG/Lasers/laserBlue07.png"});
+        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {-10.f, 6.f}, 12.f, "PNG/Lasers/laserBlue06.png"});
+        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {-20.f, 12.f}, 25.f, "PNG/Lasers/laserBlue06.png"});
     }
 
     void PlayerSpaceship::ManageInput()

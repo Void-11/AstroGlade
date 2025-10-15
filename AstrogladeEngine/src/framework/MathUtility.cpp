@@ -65,4 +65,9 @@ namespace ly
         Normalize(randVec);
         return randVec;
     }
+
+    float VectorToRotation(const sf::Vector2f& v)
+    {
+        return RadiansToDegrees(std::atan2(v.y, v.x));
+    }
 }

@@ -10,6 +10,7 @@
 #include "widgets/GameplayHUD.h"
 #include "widgets/Button.h"
 #include "background/MovingSpriteActor.h"
+#include "background/BackgroundLayer.h"
 #include "gameplay/GameStage.h"
 #include "Enemy/VanguardStage.h"
 #include "Enemy/TwinBladeStage.h"
@@ -18,6 +19,8 @@
 #include "Enemy/HexagonStage.h"
 #include "Enemy/UFO.h"
 #include "Enemy/UFOStage.h"
+#include "Enemy/ChaosStage.h"
+#include "Enemy/BossStage.h"
 
 namespace ly
 {
@@ -52,14 +55,20 @@ namespace ly
         AddStage(shared<WaitStage>{new WaitStage{this, 5.f}});
         AddStage(shared<VanguardStage>{new VanguardStage{this}});
         
-        AddStage(shared<WaitStage>{new WaitStage{this, 15.f}});
+        AddStage(shared<WaitStage>{new WaitStage{this, 10.f}});
         AddStage(shared<TwinBladeStage>{new TwinBladeStage{this}});
 
-        AddStage(shared<WaitStage>{new WaitStage{this, 10.f}});
+        AddStage(shared<WaitStage>{new WaitStage{this, 8.f}});
         AddStage(shared<HexagonStage>{new HexagonStage{ this }});
 
-        AddStage(shared<WaitStage>{new WaitStage{this, 10.f}});
+        AddStage(shared<WaitStage>{new WaitStage{this, 8.f}});
         AddStage(shared<UFOStage>{new UFOStage{ this }});
+
+        AddStage(shared<WaitStage>{new WaitStage{this, 8.f}});
+        AddStage(shared<ChaosStage>{new ChaosStage{ this }});
+
+        AddStage(shared<WaitStage>{new WaitStage{this, 8.f}});
+        AddStage(shared<BossStage>{new BossStage{ this }});
     }
 
     void LevelOne::SpawnCosmetics()
@@ -72,62 +81,38 @@ namespace ly
             backdrop.lock()->SetActorLocation(sf::Vector2f(win.x / 2.f, win.y / 2.f));
         }
 
-        // Planets (slow)
+        // Planets layer
         {
-            const char* planets[] = {
-                "PNG/Planets/Planet1.png",
-                "PNG/Planets/Planet2.png",
-                "PNG/Planets/Planet3.png",
-                "PNG/Planets/Planet4.png",
-                "PNG/Planets/Planet5.png",
-                "PNG/Planets/Planet6.png",
-                "PNG/Planets/Planet7.png"
+            std::vector<std::string> planets = {
+                "PNG/Planets/Planet1.png","PNG/Planets/Planet2.png","PNG/Planets/Planet3.png",
+                "PNG/Planets/Planet4.png","PNG/Planets/Planet5.png","PNG/Planets/Planet6.png","PNG/Planets/Planet7.png"
             };
-            int idx = 0;
-            // one big slow planet
-            weak<MovingSpriteActor> pl = SpawnActor<MovingSpriteActor>(planets[idx % 7], sf::Vector2f{0.f, 30.f}, 1.f, 1.5f);
-            if (!pl.expired())
+            auto layer = SpawnActor<BackgroundLayer>();
+            if (!layer.expired())
             {
-                pl.lock()->SetActorLocation(sf::Vector2f(win.x * 0.7f, 0.f));
+                layer.lock()->SetAssets(planets);
+                layer.lock()->SetSpriteCount(1);
+                layer.lock()->SetSizes(1.f, 1.5f);
+                layer.lock()->SetVelocities({0.f, 20.f}, {0.f, 40.f});
             }
         }
-
-        // Meteors (fast and many)
+        // Meteors layer
         {
-            const char* meteors[] = {
-                "PNG/Meteors/meteorGrey_tiny1.png",
-                "PNG/Meteors/meteorGrey_tiny2.png",
-                "PNG/Meteors/meteorBrown_big1.png",
-                "PNG/Meteors/meteorBrown_big2.png",
-                "PNG/Meteors/meteorBrown_big3.png",
-                "PNG/Meteors/meteorBrown_big4.png",
-                "PNG/Meteors/meteorBrown_med1.png",
-                "PNG/Meteors/meteorBrown_med3.png",
-                "PNG/Meteors/meteorBrown_small1.png",
-                "PNG/Meteors/meteorBrown_small2.png",
-                "PNG/Meteors/meteorBrown_tiny1.png",
-                "PNG/Meteors/meteorBrown_tiny2.png",
-                "PNG/Meteors/meteorGrey_big1.png",
-                "PNG/Meteors/meteorGrey_big2.png",
-                "PNG/Meteors/meteorGrey_big3.png",
-                "PNG/Meteors/meteorGrey_big4.png",
-                "PNG/Meteors/meteorGrey_med1.png",
-                "PNG/Meteors/meteorGrey_med2.png",
-                "PNG/Meteors/meteorGrey_small1.png",
-                "PNG/Meteors/meteorGrey_small2.png"
+            std::vector<std::string> meteors = {
+                "PNG/Meteors/meteorGrey_tiny1.png","PNG/Meteors/meteorGrey_tiny2.png",
+                "PNG/Meteors/meteorBrown_big1.png","PNG/Meteors/meteorBrown_big2.png","PNG/Meteors/meteorBrown_big3.png","PNG/Meteors/meteorBrown_big4.png",
+                "PNG/Meteors/meteorBrown_med1.png","PNG/Meteors/meteorBrown_med3.png","PNG/Meteors/meteorBrown_small1.png","PNG/Meteors/meteorBrown_small2.png",
+                "PNG/Meteors/meteorBrown_tiny1.png","PNG/Meteors/meteorBrown_tiny2.png","PNG/Meteors/meteorGrey_big1.png","PNG/Meteors/meteorGrey_big2.png",
+                "PNG/Meteors/meteorGrey_big3.png","PNG/Meteors/meteorGrey_big4.png","PNG/Meteors/meteorGrey_med1.png","PNG/Meteors/meteorGrey_med2.png",
+                "PNG/Meteors/meteorGrey_small1.png","PNG/Meteors/meteorGrey_small2.png"
             };
-
-            for (int i = 0; i < 20; ++i)
+            auto layer = SpawnActor<BackgroundLayer>();
+            if (!layer.expired())
             {
-                const char* path = meteors[i % (sizeof(meteors)/sizeof(meteors[0]))];
-                float speed = RandomRange(50.f, 120.f);
-                float scale = RandomRange(0.2f, 0.5f);
-                float startX = RandomRange(0.f, (float)win.x);
-                weak<MovingSpriteActor> m = SpawnActor<MovingSpriteActor>(path, sf::Vector2f{0.f, speed}, scale, scale);
-                if (!m.expired())
-                {
-                    m.lock()->SetActorLocation(sf::Vector2f(startX, RandomRange(-200.f, -20.f)));
-                }
+                layer.lock()->SetAssets(meteors);
+                layer.lock()->SetSpriteCount(20);
+                layer.lock()->SetSizes(0.2f, 0.5f);
+                layer.lock()->SetVelocities({0.f, 50.f}, {0.f, 120.f});
             }
         }
     }
@@ -178,6 +163,14 @@ namespace ly
         }
     }
 
+    void LevelOne::AllGameStageFinished()
+    {
+        if (!mGameplayHUD.expired())
+        {
+            mGameplayHUD.lock()->SetGameOver(true);
+        }
+    }
+
     void LevelOne::QuitGame()
     {
         GetApplication()->QuitApplication();
@@ -186,6 +179,6 @@ namespace ly
     void LevelOne::Restart()
     {
         PlayerManager::Get().Reset();
-        GetApplication()->LoadWorld<LevelOne>();
+        GetApplication()->QueueWorld<LevelOne>();
     }
 }

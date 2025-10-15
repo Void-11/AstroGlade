@@ -58,6 +58,14 @@ namespace ly
 
     void Application::TickInternal(float deltaTime)
     {
+        // Apply any requested world switch safely outside event dispatch
+        if (mWorldSwitchPending && mPendingWorldCreator)
+        {
+            currentWorld = mPendingWorldCreator();
+            mWorldSwitchPending = false;
+            mPendingWorldCreator = nullptr;
+        }
+
         Tick(deltaTime);
         
         if (currentWorld)

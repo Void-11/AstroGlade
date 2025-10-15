@@ -55,6 +55,7 @@ namespace ly
 
     void Actor::SetTexture(const std::string& texturePath)
     {
+        if (texturePath.empty()) return;
         mTexture = AssetManager::Get().LoadTexture(texturePath);
         if(!mTexture) return;
         
@@ -155,7 +156,8 @@ namespace ly
         {
             return true;
         }
-        if(actorPosition.y < -height + allowance)
+        // Off the top of the screen beyond allowance
+        if(actorPosition.y < -height - allowance)
         {
             return true;
         }

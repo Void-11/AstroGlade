@@ -12,5 +12,7 @@ namespace ly
     private:
         float mCollisionDamage;
         virtual void OnActorBeginOverlap(Actor* other) override;
+    protected:
+        virtual void Blow() override;
     };
 }

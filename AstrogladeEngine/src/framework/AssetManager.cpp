@@ -16,6 +16,9 @@ namespace ly
 
     shared<sf::Texture> AssetManager::LoadTexture(const std::string& path)
     {
+        // Guard invalid or directory-only paths
+        if (path.empty() || path == "/" || path == "\\" || path == "." || (!path.empty() && (path.back() == '/' || path.back() == '\\')))
+            return shared<sf::Texture>{nullptr};
         auto found = mLoadedTextureMap.find(path);
         if(found != mLoadedTextureMap.end())
         {
@@ -34,6 +37,9 @@ namespace ly
 
     shared<sf::Font> AssetManager::LoadFont(const std::string& path)
     {
+        // Guard invalid or directory-only paths
+        if (path.empty() || path == "/" || path == "\\" || path == "." || (!path.empty() && (path.back() == '/' || path.back() == '\\')))
+            return shared<sf::Font>{nullptr};
         auto found = mLoadedFontMap.find(path);
         if(found != mLoadedFontMap.end())
         {

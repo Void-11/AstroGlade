@@ -17,6 +17,7 @@ namespace ly
         virtual void BeginPlay() override;
         virtual void Tick(float deltaTime) override;
         virtual void InitGameStages() override;
+        virtual void AllGameStageFinished() override;
 
         void SpawnCosmetics();
         void SetupPlayer();

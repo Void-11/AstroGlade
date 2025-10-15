@@ -7,6 +7,8 @@ add_executable(${ASTRO_GLADE_GAME_TARGET_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/player/PlayerSpaceship.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/player/Player.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/player/Player.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/player/Reward.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/player/Reward.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/player/PlayerManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/player/PlayerManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/GameplayHUD.h
@@ -14,6 +16,8 @@ add_executable(${ASTRO_GLADE_GAME_TARGET_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/Button.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/Button.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/background/MovingSpriteActor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/background/BackgroundLayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/background/BackgroundLayer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/Shooter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/Shooter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/LaserShooter.h
@@ -28,6 +32,8 @@ add_executable(${ASTRO_GLADE_GAME_TARGET_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/Vanguard.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/levels/LevelOne.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/levels/LevelOne.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/levels/MainMenu.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/levels/MainMenu.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/VanguardStage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/VanguardStage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/TwinBlade.h
@@ -42,6 +48,12 @@ add_executable(${ASTRO_GLADE_GAME_TARGET_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/UFO.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/UFOStage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/UFOStage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/Boss.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/Boss.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/BossStage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/BossStage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/ChaosStage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/ChaosStage.cpp
 )
 
 target_include_directories(${ASTRO_GLADE_GAME_TARGET_NAME} PUBLIC

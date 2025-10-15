@@ -1,4 +1,5 @@
-﻿#include "weapon/Laser.h"
+#include "weapon/Laser.h"
+#include "framework/MathUtility.h"
 
 namespace ly
 {
@@ -39,7 +40,9 @@ namespace ly
 
     void Laser::Move(float deltaTime)
     {
-        AddActorLocationOffset(GetActorRightDirection() * mSpeed * deltaTime);
+        // Move along decoupled direction, independent from visual sprite rotation
+        sf::Vector2f dir = RotationToVector(mMoveRotation);
+        AddActorLocationOffset(dir * mSpeed * deltaTime);
     }
 
     void Laser::OnActorBeginOverlap(Actor* other)

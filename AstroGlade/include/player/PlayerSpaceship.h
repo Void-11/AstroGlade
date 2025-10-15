@@ -26,5 +26,9 @@ namespace ly
         float mSpeed;
 
         unique<LaserShooter> mShooter;
+        std::vector<unique<LaserShooter>> mExtraShooters;
+    public:
+        void EnableThreeWayShooter();
+        void EnableFrontalWiper();
     };
 }

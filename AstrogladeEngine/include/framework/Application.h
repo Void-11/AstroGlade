@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "framework/Core.h"
+#include <functional>
 
 namespace ly
 {
@@ -15,6 +16,10 @@ namespace ly
 
         template<typename WorldType>
         weak<WorldType> LoadWorld();
+        
+        // Safe world switch: queues a world change to occur at the start of the next TickInternal
+        template<typename WorldType>
+        void QueueWorld();
 
         sf::Vector2u GetWindowSize() const;
         void QuitApplication() { mWindow.close(); }
@@ -31,6 +36,10 @@ namespace ly
         virtual void Render();
 
         shared<World> currentWorld;
+        // Pending world switch
+        bool mWorldSwitchPending{false};
+        std::function<shared<World>()> mPendingWorldCreator;
+
         sf::Clock mCleanCycleClock;
         float mCleanCycleInterval;
     };
@@ -41,6 +50,16 @@ namespace ly
         shared<WorldType> newWorld{new WorldType(this) };
         currentWorld = newWorld;
         return newWorld;
+    }
+
+    template <typename WorldType>
+    void Application::QueueWorld()
+    {
+        mWorldSwitchPending = true;
+        mPendingWorldCreator = [this]() -> shared<World>
+        {
+            return shared<World>{ new WorldType(this) };
+        };
     }
 
 }

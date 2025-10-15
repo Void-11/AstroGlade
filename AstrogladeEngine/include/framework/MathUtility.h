@@ -40,4 +40,5 @@ namespace ly
 
     float RandomRange(float min, float max);
     sf::Vector2f RandomUnitVector();
+    float VectorToRotation(const sf::Vector2f& v);
 }

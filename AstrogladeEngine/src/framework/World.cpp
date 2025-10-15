@@ -113,6 +113,11 @@ namespace ly
 
 	void World::NextGameStage()
 	{
+		if (mGameStages.empty() || mCurrentStage == mGameStages.end())
+		{
+			AllGameStageFinished();
+			return;
+		}
 		mCurrentStage = mGameStages.erase(mCurrentStage);
 		if (mCurrentStage != mGameStages.end())
 		{
@@ -127,6 +132,12 @@ namespace ly
 
 	void World::StartStages()
 	{
+		// Reset iterator to a valid state relative to the current container
+		mCurrentStage = mGameStages.end();
+		if (mGameStages.empty())
+		{
+			return;
+		}
 		mCurrentStage = mGameStages.begin();
 		mCurrentStage->get()->StartStage();
 		mCurrentStage->get()->onStageFinished.BindAction(GetWeakRef(), &World::NextGameStage);
