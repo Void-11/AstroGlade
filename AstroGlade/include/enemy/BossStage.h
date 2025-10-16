@@ -3,14 +3,13 @@
 
 namespace ly
 {
-    class BossStage : public GameStage
-    {
-    public:
-        BossStage(World* world);
-        virtual void StartStage() override;
-        virtual void TickStage(float deltaTime) override;
-        virtual void StageFinished() override;
-    private:
-        weak<class Boss> mBoss;
-    };
+	class Actor;
+	class BossStage : public GameStage
+	{
+	public:
+		BossStage(World* world);
+		virtual void StartStage() override;
+	private:
+		void BossDestroyed(Actor* bossActor);
+	};
 }

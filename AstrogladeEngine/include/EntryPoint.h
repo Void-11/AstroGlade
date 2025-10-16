@@ -1,8 +1,9 @@
-﻿#pragma once
+#pragma once
+
 
 namespace ly
 {
-    class Application;
+	class Application;
 }
 
-extern ly::Application *GetApplication();
+extern ly::Application* GetApplication();

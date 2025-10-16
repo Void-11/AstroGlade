@@ -1,26 +1,28 @@
-﻿#pragma once
+#pragma once
 #include <memory>
-#include "Core.h"
+#include "framework/Core.h"
 #include "framework/Delegate.h"
 
 namespace ly
 {
-    class Object : public std::enable_shared_from_this<Object>
-    {
-    public:
+	class Object : public std::enable_shared_from_this<Object>
+	{
+	public:
+		Object();
+		virtual ~Object();
 
-        Object();
-        virtual ~Object();
+		virtual void Destory();
+		bool IsPendingDestory() const { return mIsPendingDestory; }
 
-        virtual void Destroy();
-        bool IsPendingDestroy() const { return mIsPendingDestroy; }
+		weak<Object> GetWeakRef();
+		weak<const Object> GetWeakRef() const;
+		Delegate<Object*> onDestory;
+		unsigned int GetUniqueID() const { return mUniqueID; }
+	private:
+		bool mIsPendingDestory;
+		unsigned int mUniqueID;
 
-        weak<Object> GetWeakRef();
-        weak<const Object> GetWeakRef() const;
-        Delegate<Object*> onDestroy;
-        
-    private:
-
-        bool mIsPendingDestroy;
-    };
+		static unsigned int uniqueIDCounter;
+		static unsigned int GetNextAvaliableID();
+	};
 }

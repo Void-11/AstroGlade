@@ -1,76 +1,108 @@
 add_executable(${ASTRO_GLADE_GAME_TARGET_NAME}
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/gameFramework/GameApplication.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gameFramework/GameApplication.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/spaceship/Spaceship.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/spaceship/Spaceship.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/player/PlayerSpaceship.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/player/PlayerSpaceship.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/player/Player.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/player/Player.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/player/Reward.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/player/Reward.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/player/PlayerManager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/player/PlayerManager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/GameplayHUD.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/GameplayHUD.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/Button.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/Button.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/background/MovingSpriteActor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/background/BackgroundLayer.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/background/BackgroundLayer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/Shooter.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/Shooter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/LaserShooter.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/LaserShooter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/Laser.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/Laser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/gameplay/HealthComponent.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gameplay/HealthComponent.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/EnemySpaceship.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/EnemySpaceship.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/Vanguard.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/Vanguard.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/levels/LevelOne.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/levels/LevelOne.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/levels/MainMenu.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/levels/MainMenu.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/VanguardStage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/VanguardStage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/TwinBlade.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/TwinBlade.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/TwinBladeStage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/TwinBladeStage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/Hexagon.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/Hexagon.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/HexagonStage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/HexagonStage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/UFO.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/UFO.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/UFOStage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/UFOStage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/Boss.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/Boss.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/BossStage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/BossStage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/ChaosStage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/ChaosStage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/gameFramework/GameApplication.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/gameFramework/GameApplication.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/spaceship/Spaceship.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/spaceship/Spaceship.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/player/PlayerSpaceship.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/player/PlayerSpaceship.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/Shooter.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/Shooter.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/LaserShooter.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/LaserShooter.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/ThreeWayShooter.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/ThreeWayShooter.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/FrontalWiper.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/FrontalWiper.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/weapon/Laser.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/weapon/Laser.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/gameplay/HealthComponent.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/gameplay/HealthComponent.cpp
+	
+	${CMAKE_CURRENT_SOURCE_DIR}/include/VFX/Explosion.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/VFX/Explosion.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/EnemySpaceship.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/EnemySpaceship.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/Vanguard.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/Vanguard.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/VanguardStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/VanguardStage.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/TwinBlade.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/TwinBlade.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/UFO.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/UFO.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/UFOStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/UFOStage.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/Hexagon.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/Hexagon.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/HexagonStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/HexagonStage.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/TwinBladeStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/TwinBladeStage.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/ChaosStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/ChaosStage.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/Boss.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/Boss.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/BossStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/BossStage.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Level/GameLevelOne.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Level/GameLevelOne.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Level/MainMenuLevel.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Level/MainMenuLevel.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/player/Reward.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/player/Reward.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/player/Player.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/player/Player.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/GameplayHUD.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/GameplayHUD.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/MainMenuHUD.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/MainMenuHUD.cpp
+
+
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/player/PlayerManager.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/player/PlayerManager.cpp
 )
 
-target_include_directories(${ASTRO_GLADE_GAME_TARGET_NAME} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+target_include_directories(${ASTRO_GLADE_GAME_TARGET_NAME} PUBLIC 
+	${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_link_libraries(${ASTRO_GLADE_GAME_TARGET_NAME} PUBLIC ${ASTRO_GLADE_ENGINE_TARGET_NAME})
 
 function(CopyLibDirToTarget LIB_NAME TARGET_NAME)
-add_custom_command(
-    TARGET ${TARGET_NAME}
-    POST_BUILD
-    COMMAND
-    ${CMAKE_COMMAND} -E copy_directory
-    $<TARGET_FILE_DIR:${LIB_NAME}>
-    $<TARGET_FILE_DIR:${ASTRO_GLADE_GAME_TARGET_NAME}>
-)
+	add_custom_command(TARGET ${TARGET_NAME}
+	POST_BUILD
+	COMMAND
+	${CMAKE_COMMAND} -E copy_directory
+	$<TARGET_FILE_DIR:${LIB_NAME}>
+	$<TARGET_FILE_DIR:${TARGET_NAME}>
+	)
 endfunction()
 
 CopyLibDirToTarget(${ASTRO_GLADE_ENGINE_TARGET_NAME} ${ASTRO_GLADE_GAME_TARGET_NAME})
@@ -79,15 +111,15 @@ set(RESOURCE_FOLDER_NAME "assets")
 set(RESOURCE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCE_FOLDER_NAME}")
 
 add_custom_command(
-    TARGET ${ASTRO_GLADE_GAME_TARGET_NAME}
-    POST_BUILD
-    COMMAND
-    ${CMAKE_COMMAND} -E copy_directory
-    ${RESOURCE_SRC_DIR}
-    $<TARGET_FILE_DIR:${ASTRO_GLADE_GAME_TARGET_NAME}>/${RESOURCE_FOLDER_NAME}
+	TARGET ${ASTRO_GLADE_GAME_TARGET_NAME}
+	POST_BUILD
+	COMMAND
+	${CMAKE_COMMAND} -E copy_directory
+	${RESOURCE_SRC_DIR}
+	$<TARGET_FILE_DIR:${ASTRO_GLADE_GAME_TARGET_NAME}>/${RESOURCE_FOLDER_NAME}
 )
 
 configure_file(
-    "config.h.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/config.h" ESCAPE_QUOTES 
+	"config.h.in"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/config.h" ESCAPE_QUOTES
 )

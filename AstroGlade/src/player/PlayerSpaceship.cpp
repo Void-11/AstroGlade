@@ -1,113 +1,145 @@
 #include "player/PlayerSpaceship.h"
 #include "SFML/System.hpp"
-#include "SFML/Window/Keyboard.hpp"
 #include "framework/MathUtility.h"
 #include "weapon/LaserShooter.h"
+#include "weapon/ThreeWayShooter.h"
+#include "weapon/FrontalWiper.h"
 
 namespace ly
 {
-    PlayerSpaceship::PlayerSpaceship(World* owningWorld, const std::string& path)
-        :Spaceship{owningWorld, path},
-        mMoveInput{},
-        mSpeed{200.f},
-        mShooter{ new LaserShooter{this, 0.1f, {50.f, 0.f}, 0.f, "PNG/Lasers/laserBlue07.png"} }
-    {
-        SetTeamID(1);
-        // Face upwards so forward points toward the top of the screen
-        SetActorRotation(-90.f);
-    }
+	PlayerSpaceship::PlayerSpaceship(World* owningWorld, const std::string& path)
+		: Spaceship{owningWorld, path},
+		mMoveInput{},
+		mSpeed{200.f},
+		mShooter{ new LaserShooter{this, .5f, {50.f, 0.f}} },
+		mInvulnerableTime{2.f},
+		mInvulnerable{true},
+		mInvulnerableFlashInterval{0.5f},
+		mInvulnerableFlashTimer{0.f},
+		mInvulerableFlashDir{1}
+	{
+		SetTeamID(1);
+		mShooter->SetCurrentLevel(4);
+	}
 
-    void PlayerSpaceship::Tick(float deltaTime)
-    {
-        Spaceship::Tick(deltaTime);
-        ManageInput();
-        ApplyInput(deltaTime);
-    }
+	void PlayerSpaceship::Tick(float deltaTime)
+	{
+		Spaceship::Tick(deltaTime);
+		HandleInput();
+		ConsumeInput(deltaTime);
+		UpdateInvulnerable(deltaTime);
+	}
 
-    void PlayerSpaceship::Shoot()
-    {
-        if(mShooter)
-        {
-            mShooter->Shoot();
-        }
-        for (auto& s : mExtraShooters) s->Shoot();
-    }
+	void PlayerSpaceship::Shoot()
+	{
+		if (mShooter)
+		{
+			mShooter->Shoot();
+		}
+	}
 
-    void PlayerSpaceship::EnableThreeWayShooter()
-    {
-        mExtraShooters.clear();
-        mExtraShooters.emplace_back(new LaserShooter{this, 0.1f, {10.f, -10.f}, -30.f, "PNG/Lasers/laserBlue09.png"});
-        mExtraShooters.emplace_back(new LaserShooter{this, 0.1f, {0.f, 0.f}, 0.f, "PNG/Lasers/laserBlue07.png"});
-        mExtraShooters.emplace_back(new LaserShooter{this, 0.1f, {10.f, 10.f}, 30.f, "PNG/Lasers/laserBlue09.png"});
-    }
+	void PlayerSpaceship::SetShooter(unique<Shooter>&& newsShooter)
+	{
+		if (mShooter && typeid(*mShooter.get()) == typeid(*newsShooter.get()))
+		{
+			mShooter->IncrementLevel();
+			return;
+		}
 
-    void PlayerSpaceship::EnableFrontalWiper()
-    {
-        mExtraShooters.clear();
-        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {-20.f, -12.f}, -25.f, "PNG/Lasers/laserBlue06.png"});
-        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {-10.f, -6.f}, -12.f, "PNG/Lasers/laserBlue06.png"});
-        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {0.f, 0.f}, 0.f, "PNG/Lasers/laserBlue07.png"});
-        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {-10.f, 6.f}, 12.f, "PNG/Lasers/laserBlue06.png"});
-        mExtraShooters.emplace_back(new LaserShooter{this, 0.08f, {-20.f, 12.f}, 25.f, "PNG/Lasers/laserBlue06.png"});
-    }
+		mShooter = std::move(newsShooter);
+	}
 
-    void PlayerSpaceship::ManageInput()
-    {
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        {
-            mMoveInput.y = -1.f;
-        }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        {
-            mMoveInput.y = 1.f;
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        {
-            mMoveInput.x = -1.f;
-        }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        {
-            mMoveInput.x = 1.f;
-        }
+	void PlayerSpaceship::ApplyDamage(float amt)
+	{
+		if (!mInvulnerable)
+		{
+			Spaceship::ApplyDamage(amt);
+		}
+	}
 
-        ClampInputOnEdge();
-        NormalizeInput();
+	void PlayerSpaceship::BeginPlay()
+	{
+		Spaceship::BeginPlay();
+		TimerManager::Get().SetTimer(GetWeakRef(), &PlayerSpaceship::StopInvulnerable, mInvulnerableTime);
+	}
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        {
-           Shoot(); 
-        }
-    }
+	void PlayerSpaceship::HandleInput()
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		{
+			mMoveInput.y = -1.f;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+			mMoveInput.y = 1.f;
+		}
+		 
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			mMoveInput.x = -1.f;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		{
+			mMoveInput.x = 1.f;
+		}
 
-    void PlayerSpaceship::NormalizeInput()
-    {
-        Normalize(mMoveInput);
-    }
+		ClampInputOnEdge();
+		NormalizeInput();
 
-    void PlayerSpaceship::ApplyInput(float deltaTime)
-    {
-        SetVelocity(mMoveInput * mSpeed);
-        mMoveInput.x = mMoveInput.y = 0.f;
-    }
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			Shoot();
+		}
+	}
+	void PlayerSpaceship::NormalizeInput()
+	{
+		Normalize(mMoveInput);
+	}
+	void PlayerSpaceship::ClampInputOnEdge()
+	{
+		sf::Vector2f actorLocation = GetActorLocation();
+		if (actorLocation.x < 0 && mMoveInput.x == -1)
+		{
+			mMoveInput.x = 0.f;
+		}
 
-    void PlayerSpaceship::ClampInputOnEdge()
-    {
-        sf::Vector2f actorLocation = GetActorLocation();
-        if(actorLocation.x < 0 && mMoveInput.x == -1)
-        {
-            mMoveInput.x = 0.f;
-        }
-        if(actorLocation.x > GetWindowSize().x && mMoveInput.x == 1.f)
-        {
-            mMoveInput.x = 0.f;
-        }
-        if(actorLocation.y < 0 && mMoveInput.y == -1)
-        {
-            mMoveInput.y = 0.f;
-        }
-        if(actorLocation.y > GetWindowSize().y && mMoveInput.y == 1.f)
-        {
-            mMoveInput.y = 0.f;
-        }
-    }
+		if (actorLocation.x > GetWindowSize().x && mMoveInput.x == 1.f)
+		{
+			mMoveInput.x = 0.f;
+		}
+
+		if (actorLocation.y < 0 && mMoveInput.y == -1)
+		{
+			mMoveInput.y = 0.f;
+		}
+
+		if (actorLocation.y > GetWindowSize().y && mMoveInput.y == 1.f)
+		{
+			mMoveInput.y = 0.f;
+		}
+	}
+	void PlayerSpaceship::ConsumeInput(float deltaTime)
+	{
+		SetVelocity(mMoveInput * mSpeed);
+		mMoveInput.x = mMoveInput.y = 0.f;
+	}
+
+	void PlayerSpaceship::StopInvulnerable()
+	{
+		GetSprite().setColor({255,255,255,255});
+		mInvulnerable = false;
+	}
+
+	void PlayerSpaceship::UpdateInvulnerable(float deltaTime)
+	{
+		if (!mInvulnerable) return;
+		
+		mInvulnerableFlashTimer += deltaTime * mInvulerableFlashDir;
+		if (mInvulnerableFlashTimer < 0 || mInvulnerableFlashTimer > mInvulnerableFlashInterval)
+		{
+			mInvulerableFlashDir *= -1;
+		}
+
+		GetSprite().setColor(LerpColor({255,255, 255, 64} ,{255, 255, 255, 128}, mInvulnerableFlashTimer/mInvulnerableFlashInterval));
+	}
 }

@@ -1,9 +1,9 @@
-﻿#include "EntryPoint.h"
+#include "EntryPoint.h"
 #include "framework/Application.h"
 
 int main()
 {
-    ly::Application* app = GetApplication();
-    app-> Run();
-    delete app;
+	ly::Application* app = GetApplication();
+	app->Run();
+	delete app;
 }

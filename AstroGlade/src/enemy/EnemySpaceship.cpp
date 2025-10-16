@@ -1,55 +1,69 @@
-﻿#include "Enemy/EnemySpaceship.h"
+#include "Enemy/EnemySpaceship.h"
+#include "framework/MathUtility.h"
 #include "player/PlayerManager.h"
-#include "framework/MathUtility.h"
-#include "player/Reward.h"
-#include "framework/World.h"
-#include "framework/MathUtility.h"
 
 namespace ly
 {
-    EnemySpaceship::EnemySpaceship(World* owningWorld, const std::string& texturePath, float collisionDamage)
-        : Spaceship{owningWorld, texturePath}, mCollisionDamage{collisionDamage}
-    {
-        SetTeamID(2);
-    }
+	EnemySpaceship::EnemySpaceship(World* owningWorld, const std::string& texturePath, float collisionDamage, float rewardSpawnWeight, const List<RewardFactoryFunc> rewards)
+		: Spaceship{ owningWorld, texturePath }, mCollisionDamage{ collisionDamage }, mRewardFactories{rewards}, scoreAwardAmt{10}, mRewardSpawnWeight{ rewardSpawnWeight }
+	{
+		SetTeamID(2);
+	}
 
-    void EnemySpaceship::Tick(float deltaTime)
-    {
-        Spaceship::Tick(deltaTime);
+	void EnemySpaceship::Tick(float deltaTime)
+	{
+		Spaceship::Tick(deltaTime);
+		if(IsActorOutOfWindowBounds(GetActorGlobalBounds().width * 2.f))
+		{
+			Destory();
+		}
+	}
 
-        // Enemies keep their stage-defined facing (like LightYears). No auto-aim rotation here.
+	void EnemySpaceship::SetScoreAwardAmt(unsigned int amt)
+	{
+		scoreAwardAmt = amt;
+	}
 
-        if(IsActorOutOfWindowBounds(GetActorGlobalBounds().width))
-        {
-            Destroy();
-        }
-    }
+	void EnemySpaceship::SetRewardSpawnWeight(float weight)
+	{
+		if (weight < 0 || weight > 1)
+		{
+			return;
+		}
 
-    void EnemySpaceship::OnActorBeginOverlap(Actor* other)
-    {
-        Spaceship::OnActorBeginOverlap(other);
-        if (IsOtherHostile(other))
-        {
-            other->ApplyDamage(mCollisionDamage);
-        }
-    }
+		mRewardSpawnWeight = weight;
+	}
 
-    // Add score and drop reward on death
-    void EnemySpaceship::Blow()
-    {
-        // Add score
-        if (auto player = PlayerManager::Get().GetPlayer())
-        {
-            player->AddScore(10);
-        }
-        // Drop a reward sometimes (30% chance)
-        float r = RandomRange(0.f, 1.f);
-        if (r < 0.3f)
-        {
-            // spawn a simple reward
-            auto reward = GetWorld()->SpawnActor<Reward>(GetActorLocation());
-            (void)reward;
-        }
-        Spaceship::Blow();
-    }
+	void EnemySpaceship::SpawnReward()
+	{
+		if (mRewardFactories.size() == 0) return;
+
+		if (mRewardSpawnWeight < RandomRange(0, 1))
+			return;
+		
+		int pick = (int)RandomRange(0, mRewardFactories.size());
+		if (pick >= 0 && pick < mRewardFactories.size())
+		{
+			weak<Reward> newReward =  mRewardFactories[pick](GetWorld());
+			newReward.lock()->SetActorLocation(GetActorLocation());
+		}
+	}
+
+	void EnemySpaceship::OnActorBeginOverlap(Actor* other)
+	{
+		Spaceship::OnActorBeginOverlap(other);
+		if (IsOtherHostile(other))
+		{
+			other->ApplyDamage(mCollisionDamage);
+		}
+	}
+	void EnemySpaceship::Blew()
+	{
+		SpawnReward();
+		Player* player = PlayerManager::Get().GetPlayer();
+		if (player)
+		{
+			player->AddScore(scoreAwardAmt);
+		}
+	}
 }

@@ -1,31 +1,32 @@
 #pragma once
+
 #include "framework/Object.h"
 #include "framework/Delegate.h"
-#include "player/PlayerSpaceship.h"
 
 namespace ly
 {
-    class Player : public Object
-    {
-    public:
-        Player();
+	class PlayerSpaceship;
+	class World;
+	class Player : public Object
+	{
+	public:
+		Player();
+		weak<PlayerSpaceship> SpawnSpaceship(World* world);
+		const weak<PlayerSpaceship> GetCurrentSpaceship() const { return mCurrentPlayerSpaceship; };
 
-        void Reset();
-        void AddScore(int amt);
-        int GetScore() const { return mScore; }
+		void AddLifeCount(unsigned int count);
+		int GetLifeCount() const { return mLifeCount; }
+		
+		void AddScore(unsigned int amt);
+		int GetScore() const { return mScore; }
 
-        void SetLifeCount(int life) { mLifeCount = life; }
-        int GetLifeCount() const { return mLifeCount; }
+		Delegate<int> onLifeChange;
+		Delegate<int> onScoreChange;
+		Delegate<> onLifeExhausted;
 
-        weak<PlayerSpaceship> GetCurrentSpaceship() const { return mCurrentSpaceship; }
-        void SetCurrentSpaceship(weak<PlayerSpaceship> sp) { mCurrentSpaceship = sp; }
-
-        Delegate<int> onLifeChange;
-        Delegate<int> onScoreChange;
-
-    private:
-        int mLifeCount;
-        int mScore;
-        weak<PlayerSpaceship> mCurrentSpaceship;
-    };
+	private:
+		unsigned int mLifeCount;
+		unsigned int mScore;
+		weak<PlayerSpaceship> mCurrentPlayerSpaceship;
+	};
 }

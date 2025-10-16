@@ -1,32 +1,39 @@
-﻿#include "framework/Object.h"
+#include "framework/Object.h"
 #include "framework/Core.h"
 
 namespace ly
 {
-    Object::Object()
-        : mIsPendingDestroy{false}
-    {
-        
-    }
+	unsigned int Object::uniqueIDCounter = 0;
+	Object::Object()
+		: mIsPendingDestory{false},
+		mUniqueID{GetNextAvaliableID()}
 
-    Object::~Object()
-    {
-       LOG("Object Destroyed")
-    }
+	{
+	}
 
-    void Object::Destroy()
-    {
-        onDestroy.Broadcast(this);
-        mIsPendingDestroy = true ;
-    }
+	Object::~Object()
+	{
+		LOG("Object Destoryed");
+	}
 
-    weak<Object> Object::GetWeakRef()
-    {
-        return weak_from_this();
-    }
+	void Object::Destory()
+	{
+		onDestory.Broadcast(this);
+		mIsPendingDestory = true;
+	}
+	
+	weak<Object> Object::GetWeakRef()
+	{
+		return shared_from_this();
+	}
 
-    weak<const Object> Object::GetWeakRef() const
-    {
-        return  weak_from_this();
-    }
+	weak<const Object> Object::GetWeakRef() const
+	{
+		return shared_from_this();
+	}
+
+	unsigned int Object::GetNextAvaliableID()
+	{
+		return uniqueIDCounter++;
+	}
 }

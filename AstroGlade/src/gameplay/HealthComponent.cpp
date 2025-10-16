@@ -1,50 +1,58 @@
-﻿#include "gameplay/HealthComponent.h"
+#include "gameplay/HealthComponent.h"
 #include "framework/Core.h"
 
 namespace ly
 {
-    HealthComponent::HealthComponent(float health, float maxHealth)
-        :mHealth{health},
-        mMaxHealth{maxHealth}
-    {
-        
-    }
+	HealthComponent::HealthComponent(float health, float maxHealth)
+		: mHealth{health},
+		mMaxHealth{maxHealth}
+	{
 
-    void HealthComponent::ModifyHealth(float amount)
-    {
-        if(amount == 0) return;
-        if(mHealth == 0) return;
+	}
 
-        mHealth += amount;
-        if(mHealth < 0)
-        {
-            mHealth = 0;
-        }
+	void HealthComponent::ChangeHealth(float amt)
+	{
+		if (amt == 0) return;
+		if (mHealth == 0) return;
 
-        if(mHealth > mMaxHealth)
-        {
-            mHealth = mMaxHealth;
-        }
+		mHealth += amt;
+		if (mHealth < 0)
+		{
+			mHealth = 0;
+		}
 
-        if(amount < 0)
-        {
-            TakenDamage(-amount);
-            if(mHealth <= 0)
-            {
-                HealthEmpty();
-            }
-            
-        }
-        onHealthModified.Broadcast(amount, mHealth, mMaxHealth);
-    }
+		if (mHealth > mMaxHealth)
+		{
+			mHealth = mMaxHealth;
+		}
 
-    void HealthComponent::TakenDamage(float amount)
-    {
-        onTakenDamage.Broadcast(amount, mHealth, mMaxHealth);
-    }
+		onHealthChanged.Broadcast(amt, mHealth, mMaxHealth);
 
-    void HealthComponent::HealthEmpty()
-    {
-        onHealthEmpty.Broadcast();
-    }
+		if (amt < 0)
+		{
+			TakenDamage(-amt);
+			if (mHealth <= 0)
+			{
+				HealthEmpty();
+			}
+		}
+
+	}
+
+	void HealthComponent::SetInitialHealth(float health, float maxHealth)
+	{
+		mHealth = health;
+		mMaxHealth = maxHealth;
+	}
+
+	void HealthComponent::TakenDamage(float amt)
+	{
+		onTakenDamage.Broadcast(amt, mHealth, mMaxHealth);
+	}
+
+	void HealthComponent::HealthEmpty()
+	{
+		onHealthEmpty.Broadcast();
+	}
+
 }

@@ -1,28 +1,24 @@
-﻿#pragma once
+#pragma once
 #include "framework/Delegate.h"
 
 namespace ly
 {
-    class HealthComponent
-    {
-    public:
+	class HealthComponent
+	{
+	public:
+		HealthComponent(float health, float maxHealth);
+		void ChangeHealth(float amt);
+		float GetHealth() const { return mHealth; }
+		float GetMaxHealth() const { return mMaxHealth; }
+		void SetInitialHealth(float health, float maxHealth);
+		Delegate<float,float,float> onHealthChanged;
+		Delegate<float, float, float> onTakenDamage;
+		Delegate<> onHealthEmpty;
 
-        HealthComponent(float health, float maxHealth);
-        void ModifyHealth(float amount);
-        float GetHealth() const { return mHealth; }
-        float GetMaxHealth() const { return mMaxHealth; }
-
-        Delegate<float,float,float> onHealthModified;
-        Delegate<float, float, float> onTakenDamage;
-        Delegate<> onHealthEmpty;
-
-    private:
-
-        float mHealth;
-        float mMaxHealth;
-
-        void TakenDamage(float amount);
-        void HealthEmpty();
-        void HealthRegenerate(float amount);
-    };
+	private:
+		void TakenDamage(float amt);
+		void HealthEmpty();
+		float mHealth;
+		float mMaxHealth;
+	};
 }

@@ -1,48 +1,54 @@
 #pragma once
-#include "framework/Actor.h"
-#include "framework/Delegate.h"
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
+#include "widgets/HUD.h"
+#include "widgets/TextWidget.h"
+#include "widgets/ValueGuage.h"
+#include "widgets/ImageWidget.h"
+#include "widgets/Button.h"
 
 namespace ly
 {
-    class GameplayHUD : public Actor
-    {
-    public:
-        GameplayHUD(World* owningWorld);
-        virtual void BeginPlay() override;
-        virtual void Tick(float deltaTime) override;
-        virtual void RenderOverlay(sf::RenderWindow& window) override;
+	class Actor;
+	class GameplayHUD : public HUD
+	{
+	public:
+		GameplayHUD();
 
-        void SetGameOver(bool won);
-        void SetScore(int score);
-        void SetLives(int lives);
+		virtual void Draw(sf::RenderWindow& windowRef) override;
+		virtual void Tick(float deltaTime) override;
+		virtual bool HandleEvent(const sf::Event& event) override;
 
-        Delegate<> onRestartBtnClicked;
-        Delegate<> onQuitBtnClicked;
+		void GameFinished(bool playerWon);
+		Delegate<> onRestartBtnClicked;
+		Delegate<> onQuitBtnClicked;
+	private:
+		virtual void Init(const sf::RenderWindow& windowRef) override;
+		void RefreshHealthBar();
+		void ConnectPlayerStatus();
+		void PlayerHealthUpdated(float amt, float currentHealth, float maxHealth);
+		void PlayerLifeCountUpdated(int amt);
+		void PlayerScoreUpdated(int newScore);
+		void PlayerSpaceshipDestoryed(Actor* actor);
+		void RestartButtonClicked();
+		void QuitButtonClicked();
+		TextWidget mFramerateText;
+		ValueGuage mPlayerHealthBar;
+		ImageWidget mPlayerLifeIcon;
+		TextWidget mPlayerLifeText;
 
-    private:
-        shared<sf::Font> mFont;
-        std::string mFpsText;
-        int mScore;
-        int mLives;
-        bool mGameOver;
-        bool mWin;
+		ImageWidget mPlayerScoreIcon;
+		TextWidget mPlayerScoreText;
 
-        // Preloaded icons (optional, can be expanded)
-        shared<sf::Texture> mLifeIconTex;
-        sf::Sprite mLifeIcon;
+		sf::Color mHealthyHealthBarColor;
+		sf::Color mCriticalHealthBarColor;
+		float mCriticalThreshold;
 
-        // Health bar rectangles
-        sf::RectangleShape mHealthBarBack;
-        sf::RectangleShape mHealthBarFront;
+		float mWidgetSpaceing;
+	
+		TextWidget mWinLoseText;
+		TextWidget mFinalScoreText;
+		Button mRestartButton;
+		Button mQuitButton;
 
-        // Buttons
-        weak<class Button> mRestartBtn;
-        weak<class Button> mQuitBtn;
-
-        void DrawHealthBar(sf::RenderWindow& window);
-        void RestartClicked();
-        void QuitClicked();
-    };
+		sf::Vector2u mWindowSize;
+	};
 }

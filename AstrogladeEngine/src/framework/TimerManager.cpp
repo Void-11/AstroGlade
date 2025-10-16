@@ -1,101 +1,99 @@
-﻿#include "framework/TimerManager.h"
+#include "framework/TimerManager.h"
 
 namespace ly
 {
-    unique<TimerManager> TimerManager::timerManager{ nullptr };
-    unsigned int TimerHandle::timerKeyCounter = 0;
+	unsigned int TimerHandle::timerKeyCounter = 0;
 
-    TimerHandle::TimerHandle()
-        : mTimerKey{GetNextTimerKey()}
-    {
+	TimerHandle::TimerHandle()
+		: mTimerKey{GetNextTimerKey()}
+	{
 
-    }
-    
-    Timer::Timer(weak<Object> weakRef, std::function<void()> callback, float duration, bool repeat)
-        : mListener{ weakRef, callback },
-        mDuration{ duration },
-        mRepeat{ repeat },
-        mTimeCounter{ 0.f },
-        mIsExpired{ false }
-    {
-        
-    }
+	}
+	Timer::Timer(weak<Object> weakRef, std::function<void()> callback, float duration, bool repeat)
+		: mListener{ weakRef, callback },
+		mDuration{ duration },
+		mRepeat{ repeat },
+		mTimeCounter{ 0.f },
+		mIsExpired{ false }
+	{
 
-    TimerManager::TimerManager() : mTimers{}
-    {
-        
-    }
-    
-    void Timer::TickTime(float deltaTime)
-    {
-        if (Expired())
-        {
-            return;
-        }
+	}
 
-        mTimeCounter += deltaTime;
-        if (mTimeCounter >= mDuration)
-        {
-            mListener.second();
+	void Timer::TickTime(float deltaTime)
+	{
+		if (Expired())
+		{
+			return;
+		}
 
-            if (mRepeat)
-            {
-                mTimeCounter = 0.f;
-            }
-            else
-            {
-                SetExpired();
-            }
-        }   
-    }
+		mTimeCounter += deltaTime;
+		if (mTimeCounter >= mDuration)
+		{
+			mListener.second();
 
-    bool Timer::Expired() const
-    {
-        return mIsExpired || mListener.first.expired() || mListener.first.lock()->IsPendingDestroy();
-    }
+			if (mRepeat)
+			{
+				mTimeCounter = 0.f;
+			}
+			else
+			{
+				SetExpired();
+			}
+		}
+	}
 
-    void Timer::SetExpired()
-    {
-        mIsExpired = true;
-    }
+	bool Timer::Expired() const
+	{
+		return mIsExpired || mListener.first.expired() || mListener.first.lock()->IsPendingDestory();
+	}
 
-    TimerManager& TimerManager::Get()
-    {
-        if (!timerManager)
-        {
-            timerManager = std::move(unique<TimerManager>(new TimerManager{}));
-        }
+	void Timer::SetExpired()
+	{
+		mIsExpired = true;
+	}
 
-        return *timerManager;
-    }
+	unique<TimerManager> TimerManager::timerManager{ nullptr };
+	
+	TimerManager::TimerManager() : mTimers{}
+	{
+	}
+	TimerManager& TimerManager::Get()
+	{
+		if (!timerManager)
+		{
+			timerManager = std::move(unique<TimerManager>(new TimerManager{}));
+		}
 
-    void TimerManager::UpdateTimer(float deltaTime)
-    {
-        for (auto iter = mTimers.begin(); iter != mTimers.end();)
-        {
-            if (iter->second.Expired())
-            {
-                iter = mTimers.erase(iter);
-            }
-            else
-            {
-                iter->second.TickTime(deltaTime);
-                ++iter;
-            }
-        }
-    }
+		return *timerManager;
+	}
 
-    bool operator==(const TimerHandle& lhs, const TimerHandle& rhs)
-    {
-        return lhs.GetTimerKey() == rhs.GetTimerKey();
-    }
-    
-    void TimerManager::ClearTimer(TimerHandle timerHandle)
-    {
-        auto iter = mTimers.find(timerHandle);
-        if (iter != mTimers.end())
-        {
-            iter->second.SetExpired();
-        }
-    }
+	void TimerManager::UpdateTimer(float deltaTime)
+	{
+		for (auto iter = mTimers.begin(); iter != mTimers.end();)
+		{
+			if (iter->second.Expired())
+			{
+				iter = mTimers.erase(iter);
+			}
+			else
+			{
+				iter->second.TickTime(deltaTime);
+				++iter;
+			}
+		}
+	}
+
+	bool operator==(const TimerHandle& lhs, const TimerHandle& rhs)
+	{
+		return lhs.GetTimerKey() == rhs.GetTimerKey();
+	}
+
+	void TimerManager::ClearTimer(TimerHandle timerHandle)
+	{
+		auto iter = mTimers.find(timerHandle);
+		if (iter != mTimers.end())
+		{
+			iter->second.SetExpired();
+		}
+	}
 }

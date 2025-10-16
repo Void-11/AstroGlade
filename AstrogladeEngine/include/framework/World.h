@@ -1,57 +1,77 @@
-﻿#pragma once
+#pragma once
+#include <SFML/Graphics.hpp>
+
 #include "framework/Core.h"
-#include "SFML/Graphics/RenderWindow.hpp"
 #include "framework/Object.h"
 
 namespace ly
 {
-    class Application;
-    class Actor;
-    class GameStage;
-    class World : public Object
-    {
-    public:
-        
-        World(Application* owningApp);
+	class Actor;
+	class HUD;
+	class Application;
+	class GameStage;
 
-        void BeginPlayInternal();
-        void TickInternal(float deltaTime);
-        void Render(sf::RenderWindow& window);
-        
-        virtual ~World();
+	class World : public Object
+	{
+	public:
+		World(Application* owningApp);
+		
+		void BeginPlayInternal();
+		void TickInternal(float deltaTime);
+		void Render(sf::RenderWindow& window);
 
-        template<typename ActorType, typename... Args>
-        weak<ActorType> SpawnActor(Args... args);
+		virtual ~World();
 
-        Application* GetApplication() const { return mOwningApp; }
+		template<typename ActorType, typename... Args>
+		weak<ActorType> SpawnActor(Args... args);
 
-        sf::Vector2u GetWindowSize() const;
-        void CleanCycle();
-        void AddStage(const shared<GameStage>& newStage);
-        virtual bool HandleEvent(const sf::Event& event);
+		template<typename HUDType, typename... Args>
+		weak<HUDType> SpawnHUD(Args... args);
 
-    private:
+		sf::Vector2u GetWindowSize() const;
+		void CleanCycle();
+		void AddStage(const shared<GameStage>& newStage);
+		bool DispathEvent(const sf::Event& event);
+		Application* GetApplication() { return mOwningApp; }
+		const Application* GetApplication() const { return mOwningApp; }
+	private:
+		virtual void BeginPlay();
+		virtual void Tick(float deltaTime);
+		void RenderHUD(sf::RenderWindow& window);
+		Application* mOwningApp;
+		bool mBeganPlay;
 
-        Application* mOwningApp;
-        bool mBeginPlay;
-        virtual void BeginPlay();
-        virtual void Tick(float deltaTime);
+		List<shared<Actor>> mActors;
 
-        list<shared<Actor>> mActors;
-        list<shared<Actor>> mPendingActors;
-        list<shared<GameStage>> mGameStages;
-        list<shared<GameStage>>::iterator mCurrentStage;
-        virtual void InitGameStages();
-        virtual void AllGameStageFinished();
-        void NextGameStage();
-        void StartStages();
-    };
+		List<shared<Actor>> mPendingActors;
 
-    template<typename ActorType, typename... Args>
-    weak<ActorType> World::SpawnActor(Args... args)
-    {
-        shared<ActorType> newActor{ new ActorType(this, args...) };
-        mPendingActors.push_back(newActor);
-        return newActor;
-    }
+		List<shared<GameStage>> mGameStages;
+		
+		List<shared<GameStage>>::iterator mCurrentStage;
+
+		shared<HUD> mHUD;
+
+		virtual void InitGameStages();
+		virtual void AllGameStageFinished();
+		void NextGameStage();
+		void StartStages();
+	};
+
+
+	template<typename ActorType, typename... Args>
+	weak<ActorType> World::SpawnActor(Args... args)
+	{
+		shared<ActorType> newActor{ new ActorType(this, args...) };
+		mPendingActors.push_back(newActor);
+		return newActor;
+	}
+
+	template<typename HUDType, typename ...Args>
+	inline weak<HUDType> World::SpawnHUD(Args ...args)
+	{
+		shared<HUDType> newHUD{ new HUDType(args...)};
+		mHUD = newHUD;
+		return newHUD;
+	}
+
 }

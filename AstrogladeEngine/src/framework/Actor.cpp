@@ -1,5 +1,6 @@
-﻿#include "framework/Actor.h"
-#include "box2d/b2_body.h"
+#include <box2d/b2_body.h>
+
+#include "framework/Actor.h"
 #include "framework/Core.h"
 #include "framework/AssetManager.h"
 #include "framework/MathUtility.h"
@@ -8,244 +9,238 @@
 
 namespace ly
 {
-    Actor::Actor(World* owningWorld, const std::string& texturePath)
-        :mOwningWorld(owningWorld),
-        mHasBeginPlay{false},
-        mSprite{},
-        mTexture{},
-        mPhysicsBody{nullptr},
-        mPhysicsEnable{false},
-        mTeamID{GetNeturalTeamID()}
-    {
-        SetTexture(texturePath);
-    }
-    
+	Actor::Actor(World* owningWorld, const std::string& texturePath)
+		: mOwningWorld{owningWorld},
+		mHasBeganPlay{false},
+		mSprite{},
+		mTexture{},
+		mPhysicBody{nullptr},
+		mPhysicsEnabled{false},
+		mTeamID{GetNeturalTeamID()}
+	{
+		SetTexture(texturePath);
+	}
 
-    Actor::~Actor()
-    {
-        LOG("Actor Destroyed")
-    }
+	Actor::~Actor()
+	{
+		LOG("Actor destoryed");
+	}
+	void Actor::BeginPlayInternal()
+	{
+		if (!mHasBeganPlay)
+		{
+			mHasBeganPlay = true;
+			BeginPlay();
+		}
+	}
 
-    void Actor::BeginPlayIternal()
-    {
-        if(!mHasBeginPlay)
-        {
-            mHasBeginPlay = true;
-            BeginPlay();
-        }
-    }
+	void Actor::TickInternal(float deltaTime)
+	{
+		if (!IsPendingDestory())
+		{
+			Tick(deltaTime);
+		}
+	}
 
-    void Actor::TickInternal(float deltaTime)
-    {
-        if(!IsPendingDestroy())
-        {
-            Tick(deltaTime);
-        }
-    }
+	void Actor::BeginPlay()
+	{
+	}
 
-    void Actor::BeginPlay()
-    {
-       
-    }
+	void Actor::Tick(float deltaTime)
+	{
+	}
 
-    void Actor::Tick(float deltaTime)
-    {
-      
-    }
+	void Actor::SetTexture(const std::string& texturePath)
+	{
+		mTexture = AssetManager::Get().LoadTexture(texturePath);
+		if (!mTexture) return;
 
-    void Actor::SetTexture(const std::string& texturePath)
-    {
-        if (texturePath.empty()) return;
-        mTexture = AssetManager::Get().LoadTexture(texturePath);
-        if(!mTexture) return;
-        
-        mSprite.setTexture(*mTexture);
+		mSprite.setTexture(*mTexture);
 
-        int textureWidth = mTexture->getSize().x;
-        int textureHeight = mTexture->getSize().y;
-        mSprite.setTextureRect(sf::IntRect{sf::Vector2i{},sf::Vector2i{textureWidth,textureHeight}});
-        CenterPivot();
-    }
+		int textureWidth = mTexture->getSize().x;
+		int textureHeight = mTexture->getSize().y;
+		mSprite.setTextureRect(sf::IntRect{ sf::Vector2i{}, sf::Vector2i{textureWidth, textureHeight} });
+		CenterPivot(); 
+	}
 
-    void Actor::Render(sf::RenderWindow& window)
-    {
-        if(IsPendingDestroy())
-            return;
-        
-        window.draw(mSprite);
-    }
+	void Actor::Render(sf::RenderWindow& window)
+	{
+		if (IsPendingDestory())
+			return;
 
-    void Actor::RenderOverlay(sf::RenderWindow& window)
-    {
-        (void)window; // default no-op
-    }
+		window.draw(mSprite);
+	}
 
-    bool Actor::HandleEvent(const sf::Event& event)
-    {
-        (void)event;
-        return false;
-    }
+	void Actor::SetActorLocation(const sf::Vector2f& newLoc)
+	{
+		mSprite.setPosition(newLoc);
+		UpdatePhysicsBodyTransform();
+	}
 
-    void Actor::SetActorLocation(const sf::Vector2f& newLocation)
-    {
-        mSprite.setPosition(newLocation);
-        UpdatePhysicsBodyTransform();
-    }
+	void Actor::SetActorRotation(float newRot)
+	{
+		mSprite.setRotation(newRot);
+		UpdatePhysicsBodyTransform();
+	}
+	
+	void Actor::AddActorLocationOffset(const sf::Vector2f& offsetAmt)
+	{
+		SetActorLocation(GetActorLocation() + offsetAmt);
+	}
+	
+	void Actor::AddActorRotationOffset(float offsetAmt)
+	{
+		SetActorRotation(GetActorRotation() + offsetAmt);
+	}
 
-    void Actor::SetActorRotation(float newRotation)
-    {
-        mSprite.setRotation(newRotation);
-        UpdatePhysicsBodyTransform();
-    }
+	sf::Vector2f Actor::GetActorLocation() const
+	{
+		return mSprite.getPosition();
+	}
+	
+	float Actor::GetActorRotation() const
+	{
+		return mSprite.getRotation();
+	}
 
-    void Actor::AddActorLocationOffset(const sf::Vector2f& offSetAmt)
-    {
-        SetActorLocation(GetActorLocation() + offSetAmt);
-    }
+	sf::Vector2f Actor::GetActorForwardDirection() const
+	{
+		return RotationToVector(GetActorRotation());
+	}
 
-    void Actor::AddActorRotationOffset(float offSetAmt)
-    {
-        SetActorRotation(GetActorRotation() + offSetAmt);
-    }
+	sf::Vector2f Actor::GetActorRightDirection() const
+	{
+		return RotationToVector(GetActorRotation() + 90.f);
+	}
 
-    sf::Vector2f Actor::GetActorLocation() const
-    {
-       return mSprite.getPosition();
-    }
+	sf::Vector2u Actor::GetWindowSize() const
+	{
+		return mOwningWorld->GetWindowSize();
+	}
 
-    float Actor::GetActorRotation() const
-    {
-        return mSprite.getRotation();
-    }
+	void Actor::SetTextureRepeated(bool repeated)
+	{
+		mTexture->setRepeated(repeated);
+	}
 
-    sf::Vector2f Actor::GetActorForwardDirection() const
-    {
-        return RotationToVector(GetActorRotation()); 
-    }
+	void Actor::InitiallizePhyics()
+	{
+		if (!mPhysicBody)
+		{
+			mPhysicBody = PhysicsSystem::Get().AddListener(this);
+		}
+	}
 
-    sf::Vector2f Actor::GetActorRightDirection() const
-    {
-        return RotationToVector(GetActorRotation() + 90.f);
-    }
+	void Actor::UnInitializePhysics()
+	{
+		if(mPhysicBody)
+		{
+			PhysicsSystem::Get().RemoveListener(mPhysicBody);
+			mPhysicBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(nullptr);
+			mPhysicBody = nullptr;
+		}
+	}
 
-    sf::FloatRect Actor::GetActorGlobalBounds() const
-    {
-        return mSprite.getGlobalBounds();
-    }
+	void Actor::UpdatePhysicsBodyTransform()
+	{
+		if (mPhysicBody)
+		{
+			float physicsScale = PhysicsSystem::Get().GetPhysicsScale();
+			b2Vec2 pos{GetActorLocation().x * physicsScale, GetActorLocation().y * physicsScale};
+			float rotation = DegreesToRadians(GetActorRotation());
 
-    sf::Vector2u Actor::GetWindowSize() const
-    {
-        return mOwningWorld->GetWindowSize();
-    }
+			mPhysicBody->SetTransform(pos, rotation);
+		}
+	}
 
-    bool Actor::IsActorOutOfWindowBounds(float allowance) const
-    {
-        float windowWidth = GetWorld()->GetWindowSize().x;
-        float windowHeight = GetWorld()->GetWindowSize().y;
+	void Actor::CenterPivot()
+	{
+		sf::FloatRect bound = mSprite.getGlobalBounds();
+		mSprite.setOrigin(bound.width/2.f, bound.height/2.f);
+	}
 
-        float width = GetActorGlobalBounds().width;
-        float height = GetActorGlobalBounds().height;
+	bool Actor::IsActorOutOfWindowBounds(float allowance) const
+	{
+		float windowWidth = GetWorld()->GetWindowSize().x;
+		float windowHeight = GetWorld()->GetWindowSize().y;
 
-        sf::Vector2f actorPosition = GetActorLocation();
+		float width = GetActorGlobalBounds().width;
+		float height = GetActorGlobalBounds().height;
 
-        if (actorPosition.x < -width - allowance)
-        {
-            return true;
-        }
-        if(actorPosition.x > windowWidth + width + allowance)
-        {
-            return true;
-        }
-        // Off the top of the screen beyond allowance
-        if(actorPosition.y < -height - allowance)
-        {
-            return true;
-        }
-        if(actorPosition.y > windowHeight + height + allowance)
-        {
-            return true;
-        }
-        return false;
-    }
+		sf::Vector2f actorPos = GetActorLocation();
 
-    void Actor::SetEnablePhysics(bool enable)
-    {
-        mPhysicsEnable = enable;
-        if (mPhysicsEnable)
-        {
-            InitializePhysics();
-        }
-        else
-        {
-            TerminatePhysics();
-        }
-    }
+		if (actorPos.x < -width - allowance)
+		{
+			return true;
+		}
 
-    void Actor::OnActorBeginOverlap(Actor* other)
-    {
-       
-    }
+		if (actorPos.x > windowWidth + width + allowance)
+		{
+			return true;
+		}
 
-    void Actor::OnActorEndOverlap(Actor* other)
-    {
-        
-    }
+		if (actorPos.y < -height - allowance)
+		{
+			return true;
+		}
 
-    void Actor::Destroy()
-    {
-        TerminatePhysics();
-        Object::Destroy();
-    }
+		if (actorPos.y > windowHeight + height + allowance)
+		{
+			return true;
+		}
 
-    bool Actor::IsOtherHostile(Actor* other) const
-    {
-        if (other == nullptr) return false;
-        
-        if (GetTeamID() == GetNeturalTeamID() || other->GetTeamID() == GetNeturalTeamID())
-        {
-            return false;
-        }
+		return false;
+	}
 
-        return GetTeamID() != other->GetTeamID();
-    }
+	void Actor::SetEnablePhysics(bool enable)
+	{
+		mPhysicsEnabled = enable;
+		if (mPhysicsEnabled)
+		{
+			InitiallizePhyics();
+		}
+		else
+		{
+			UnInitializePhysics();
+		}
+	}
 
-    void Actor::ApplyDamage(float amount)
-    {
-        
-    }
+	void Actor::OnActorBeginOverlap(Actor* other)
+	{
+		
+	}
 
-    void Actor::CenterPivot()
-    {
-        sf::FloatRect bound = mSprite.getGlobalBounds();
-        mSprite.setOrigin(bound.width/2.f, bound.height/2.f);
-    }
+	void Actor::OnActorEndOverlap(Actor* other)
+	{
 
-    void Actor::InitializePhysics()
-    {
-        if(!mPhysicsBody)
-        {
-            mPhysicsBody = PhysicsSystem::Get().AddListener(this);
-        }
-    }
+	}
 
-    void Actor::TerminatePhysics()
-    {
-        if(mPhysicsBody)
-        {
-            PhysicsSystem::Get().RemoveListener(mPhysicsBody);
-            mPhysicsBody = nullptr;   
-        }
-    }
+	void Actor::Destory()
+	{
+		UnInitializePhysics();
+		onActoryDestoryed.Broadcast(this);
+		Object::Destory();
+	}
 
-    void Actor::UpdatePhysicsBodyTransform()
-    {
-        if(mPhysicsBody)
-        {
-            float physicsScale = PhysicsSystem::Get().GetPhysicsScale();
-            b2Vec2 pos{GetActorLocation().x * physicsScale, GetActorLocation().y * physicsScale};
-            float rotation = DegreeToRadians(GetActorRotation());
+	bool Actor::IsOtherHostile(Actor* other) const
+	{
+		if (other == nullptr) return false;
 
-            mPhysicsBody->SetTransform(pos, rotation);
-        }
-    }
+		if (GetTeamID() == GetNeturalTeamID() || other->GetTeamID() == GetNeturalTeamID())
+		{
+			return false;
+		}
+
+		return GetTeamID() != other->GetTeamID();
+	}
+
+	sf::FloatRect Actor::GetActorGlobalBounds() const
+	{
+		return mSprite.getGlobalBounds();
+	}
+
+	void Actor::ApplyDamage(float amt)
+	{
+
+	}
 }

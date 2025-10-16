@@ -7,104 +7,117 @@
 
 namespace ly
 {
-    
-    Application::Application(unsigned int windowHeight, unsigned int windowWidth, const std::string& title,sf::Uint32 style)
-        : mWindow{sf::VideoMode(windowWidth, windowHeight), title, style},
-        mTargetFrameRate(60.f),
-        mTickClock{},
-        currentWorld{nullptr},
-        mCleanCycleClock{},
-        mCleanCycleInterval{2.f}
-    {
-        
-    }
 
-    void Application::Run()
-    {
-        mTickClock.restart();
-        float AccumulatedTime = 0.0f;
-        float TargetDeltaTime = 1.0f / mTargetFrameRate;
-        
-        while (mWindow.isOpen())
-        {
-            sf::Event windowEvent;
-            while (mWindow.pollEvent(windowEvent))
-            {
-                if(windowEvent.type == sf::Event::EventType::Closed)
-                {
-                    mWindow.close();
-                }
-                else if (currentWorld)
-                {
-                    currentWorld->HandleEvent(windowEvent);
-                }
-            }
-            AccumulatedTime += mTickClock.restart().asSeconds();
+	Application::Application(unsigned int windowWidth, unsigned int windowHeight, const std::string& title, sf::Uint32 style)
+		: mWindow{ sf::VideoMode(windowWidth, windowHeight),  title, style},
+		mTargetFrameRate{ 60.f },
+		mTickClock{},
+		mCurrentWorld{ nullptr },
+		mCleanCycleClock{},
+		mCleanCycleIterval{2.f}
+	{
 
-            while (AccumulatedTime > TargetDeltaTime)
-            {
-                AccumulatedTime -= TargetDeltaTime;
-                TickInternal(TargetDeltaTime);
-                RenderInternal();
-            }
-            
-        }
-    }
+	}
 
-    sf::Vector2u Application::GetWindowSize() const
-    {
-        return mWindow.getSize();
-    }
+	void Application::Run()
+	{
+		mTickClock.restart();
+		float accumulatedTime = 0.f;
+		float targetDeltaTime = 1.f / mTargetFrameRate;
+		while (mWindow.isOpen())
+		{
+			sf::Event windowEvent;
+			while (mWindow.pollEvent(windowEvent))
+			{
+				if (windowEvent.type == sf::Event::EventType::Closed)
+				{
+					QuitApplication();
+				}
+				else
+				{
+					DispathEvent(windowEvent);
+				}
+			}
+			float frameDeltaTime = mTickClock.restart().asSeconds();
+			accumulatedTime += frameDeltaTime;
+			while (accumulatedTime > targetDeltaTime)
+			{
+				accumulatedTime -= targetDeltaTime;
+				TickInternal(targetDeltaTime);
+				RenderInternal();
+			}
+		}
+	}
+	sf::Vector2u Application::GetWindowSize() const
+	{
+		return mWindow.getSize();
+	}
 
-    void Application::TickInternal(float deltaTime)
-    {
-        // Apply any requested world switch safely outside event dispatch
-        if (mWorldSwitchPending && mPendingWorldCreator)
-        {
-            currentWorld = mPendingWorldCreator();
-            mWorldSwitchPending = false;
-            mPendingWorldCreator = nullptr;
-        }
+	bool Application::DispathEvent(const sf::Event& event)
+	{
+		if (mCurrentWorld)
+		{
+			return mCurrentWorld->DispathEvent(event);
+		}
+		return false;
+	}
+	
+	void Application::TickInternal(float deltaTime)
+	{
+		Tick(deltaTime);
+	
+		if (mCurrentWorld)
+		{
+			mCurrentWorld->TickInternal(deltaTime);
+		}
 
-        Tick(deltaTime);
-        
-        if (currentWorld)
-        {
-            currentWorld->BeginPlayInternal();
-            currentWorld->TickInternal(deltaTime);
-        }
-        
-        TimerManager::Get().UpdateTimer(deltaTime);
-        PhysicsSystem::Get().Step(deltaTime);
+		TimerManager::Get().UpdateTimer(deltaTime);
 
-        if(mCleanCycleClock.getElapsedTime().asSeconds() >= mCleanCycleInterval)
-        {
-            mCleanCycleClock.restart();
-            AssetManager::Get().CleanCycle();
-            if(currentWorld)
-            {
-                currentWorld->CleanCycle();
-            }
-        }
-    }
+		PhysicsSystem::Get().Step(deltaTime);
 
-    void Application::RenderInternal()
-    {
-        mWindow.clear();
-        Render();
-        mWindow.display();
-    }
+		if (mCleanCycleClock.getElapsedTime().asSeconds() >= mCleanCycleIterval)
+		{
+			mCleanCycleClock.restart();
+			AssetManager::Get().CleanCycle();
+			if (mCurrentWorld)
+			{
+				mCurrentWorld->CleanCycle();
+			}
+		}
 
-    void Application::Tick(float deltaTime)
-    {
-        
-    }
+		if (mPendingWorld && mPendingWorld != mCurrentWorld)
+		{
+			mCurrentWorld = mPendingWorld;
 
-    void Application::Render()
-    {
-         if(currentWorld)
-         {
-             currentWorld->Render(mWindow);
-         }
-    }
+			PhysicsSystem::Get().Cleanup();
+			mCurrentWorld->BeginPlayInternal();
+		}
+	}
+
+	void Application::RenderInternal()
+	{
+		mWindow.clear();
+
+		Render();
+
+		mWindow.display();
+	}
+
+	void Application::Render()
+	{
+		if (mCurrentWorld)
+		{
+			mCurrentWorld->Render(mWindow);
+		}
+	}
+
+	void Application::Tick(float deltaTime)
+	{
+		
+	}
+
+	void Application::QuitApplication()
+	{
+		mWindow.close();
+	}
 }

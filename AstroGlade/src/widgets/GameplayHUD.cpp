@@ -1,166 +1,185 @@
+#include "framework/Actor.h"
 #include "widgets/GameplayHUD.h"
-#include "framework/AssetManager.h"
-#include "framework/World.h"
+#include "player/Player.h"
 #include "player/PlayerManager.h"
-#include <SFML/Graphics/Text.hpp>
-#include "widgets/Button.h"
 #include "player/PlayerSpaceship.h"
-
 namespace ly
 {
-    GameplayHUD::GameplayHUD(World* owningWorld)
-        : Actor{owningWorld, ""},
-          mFont{},
-          mFpsText{},
-          mScore{0},
-          mLives{3},
-          mGameOver{false},
-          mWin{false},
-          mLifeIconTex{},
-          mLifeIcon{},
-          mHealthBarBack{},
-          mHealthBarFront{},
-          mRestartBtn{},
-          mQuitBtn{}
-    {
-    }
+	GameplayHUD::GameplayHUD()
+		:mFramerateText{"Frame Rate:"},
+		mPlayerHealthBar{},
+		mPlayerLifeIcon{ "SpaceShooterRedux/PNG/pickups/playerLife1_blue.png" },
+		mPlayerLifeText{ "" },
+		mPlayerScoreIcon{ "SpaceShooterRedux/PNG/Power-ups/star_gold.png" },
+		mPlayerScoreText{ "" },
+		mHealthyHealthBarColor{128,255,128,255},
+		mCriticalHealthBarColor{255,0,0,255},
+		mCriticalThreshold{0.3},
+		mWidgetSpaceing{10.f},
+		mWinLoseText{""},
+		mFinalScoreText{""},
+		mRestartButton{"Restart"},
+		mQuitButton{"Quit"},
+		mWindowSize{}
+	{
+		mFramerateText.SetTextSize(30);
+		mPlayerLifeText.SetTextSize(20);
+		mPlayerScoreText.SetTextSize(20);
 
-    void GameplayHUD::BeginPlay()
-    {
-        Actor::BeginPlay();
-        mFont = AssetManager::Get().LoadFont("Bonus/kenvector_future.ttf");
-        mLifeIconTex = AssetManager::Get().LoadTexture("PNG/pickups/playerLife1_blue.png");
-        if (mLifeIconTex)
-        {
-            mLifeIcon.setTexture(*mLifeIconTex);
-            mLifeIcon.setScale(0.75f, 0.75f);
-            mLifeIcon.setPosition(10.f, 10.f);
-        }
+		mWinLoseText.SetVisiblity(false);
+		mFinalScoreText.SetVisiblity(false);
+		mRestartButton.SetVisiblity(false);
+		mQuitButton.SetVisiblity(false);
+	}
+	void GameplayHUD::Draw(sf::RenderWindow& windowRef)
+	{
+		mWindowSize = windowRef.getSize();
+		mFramerateText.NativeDraw(windowRef);
+		mPlayerHealthBar.NativeDraw(windowRef);
+		mPlayerLifeIcon.NativeDraw(windowRef);
+		mPlayerLifeText.NativeDraw(windowRef);
+		mPlayerScoreIcon.NativeDraw(windowRef);
+		mPlayerScoreText.NativeDraw(windowRef);
 
-        // Subscribe to player events
-        // Buttons
-        mRestartBtn = GetWorld()->SpawnActor<Button>("Restart");
-        if (!mRestartBtn.expired())
-        {
-            mRestartBtn.lock()->SetWidgetLocation({ 400.f, 300.f });
-            mRestartBtn.lock()->onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::RestartClicked);
-        }
-        mQuitBtn = GetWorld()->SpawnActor<Button>("Quit");
-        if (!mQuitBtn.expired())
-        {
-            mQuitBtn.lock()->SetWidgetLocation({ 400.f, 350.f });
-            mQuitBtn.lock()->onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::QuitClicked);
-        }
-        if (PlayerManager::Get().GetPlayer())
-        {
-            PlayerManager::Get().GetPlayer()->onLifeChange.BindAction(GetWeakRef(), &GameplayHUD::SetLives);
-            PlayerManager::Get().GetPlayer()->onScoreChange.BindAction(GetWeakRef(), &GameplayHUD::SetScore);
-        }
-    }
+		mWinLoseText.NativeDraw(windowRef);
+		mFinalScoreText.NativeDraw(windowRef);
+		mRestartButton.NativeDraw(windowRef);
+		mQuitButton.NativeDraw(windowRef);
+	}
 
-    void GameplayHUD::Tick(float deltaTime)
-    {
-        Actor::Tick(deltaTime);
-        int fps = int(1.f / (deltaTime > 0.f ? deltaTime : 0.0001f));
-        mFpsText = "FPS: " + std::to_string(fps);
-    }
+	void GameplayHUD::Tick(float deltaTime)
+	{
+		int frameRate = int(1 / deltaTime);
+		std::string frameRateStr = "Frame Rate: " + std::to_string(frameRate);
+		mFramerateText.SetString(frameRateStr);
+	}
 
-    void GameplayHUD::RenderOverlay(sf::RenderWindow& window)
-    {
-        DrawHealthBar(window);
-        // Draw life icon
-        if (mLifeIconTex)
-        {
-            window.draw(mLifeIcon);
-        }
+	bool GameplayHUD::HandleEvent(const sf::Event& event)
+	{
+		if (mRestartButton.HandleEvent(event)) return true;
+		if (mQuitButton.HandleEvent(event)) return true;
 
-        if (mFont)
-        {
-            sf::Text text;
-            text.setFont(*mFont);
-            text.setCharacterSize(20);
+		return HUD::HandleEvent(event);
+	}
+	void GameplayHUD::Init(const sf::RenderWindow& windowRef)
+	{
+		auto windowSize = windowRef.getSize();
+		mWindowSize = windowSize;
+		mPlayerHealthBar.SetWidgetLocation(sf::Vector2f{ 20.f, windowSize.y - 50.f });
 
-            // FPS
-            text.setString(mFpsText);
-            text.setPosition(60.f, 8.f);
-            window.draw(text);
+		sf::Vector2f nextWidgetPos = mPlayerHealthBar.GetWidgetLocation();
 
-            // Lives
-            text.setString("Lives: " + std::to_string(mLives));
-            text.setPosition(10.f, 40.f);
-            window.draw(text);
+		nextWidgetPos += sf::Vector2f{ mPlayerHealthBar.GetBound().width + mWidgetSpaceing, 0.f };
+		mPlayerLifeIcon.SetWidgetLocation(nextWidgetPos);
 
-            // Score
-            text.setString("Score: " + std::to_string(mScore));
-            text.setPosition(10.f, 64.f);
-            window.draw(text);
+		nextWidgetPos += sf::Vector2f{ mPlayerLifeIcon.GetBound().width + mWidgetSpaceing, 0.f };
+		mPlayerLifeText.SetWidgetLocation(nextWidgetPos);
 
-            if (mGameOver)
-            {
-                std::string result = mWin ? "You Win!" : "You Lose!";
-                sf::Text big;
-                big.setFont(*mFont);
-                big.setCharacterSize(40);
-                big.setString(result);
-                auto winSize = window.getSize();
-                big.setPosition(winSize.x / 2.f - big.getLocalBounds().width / 2.f, 100.f);
-                window.draw(big);
+		nextWidgetPos += sf::Vector2f{ mPlayerLifeText.GetBound().width + mWidgetSpaceing * 4, -2.f };
+		mPlayerScoreIcon.SetWidgetLocation(nextWidgetPos);
 
-                sf::Text finalScore;
-                finalScore.setFont(*mFont);
-                finalScore.setCharacterSize(30);
-                finalScore.setString("Score: " + std::to_string(mScore));
-                finalScore.setPosition(winSize.x / 2.f - finalScore.getLocalBounds().width / 2.f, 150.f);
-                window.draw(finalScore);
-            }
-        }
-    }
+		nextWidgetPos += sf::Vector2f{ mPlayerScoreIcon.GetBound().width + mWidgetSpaceing, 0.f };
+		mPlayerScoreText.SetWidgetLocation(nextWidgetPos);
 
-    void GameplayHUD::DrawHealthBar(sf::RenderWindow& window)
-    {
-        // Very simple health bar (requires a current spaceship)
-        auto player = PlayerManager::Get().GetPlayer();
-        if (!player || player->GetCurrentSpaceship().expired()) return;
-        auto sp = player->GetCurrentSpaceship();
-        float health = sp.lock()->GetHealthComp().GetHealth();
-        float maxH = sp.lock()->GetHealthComp().GetMaxHealth();
-        float pct = (maxH > 0) ? (health / maxH) : 0.f;
+		RefreshHealthBar();
+		ConnectPlayerStatus();
+		mWinLoseText.SetTextSize(40);
+		//mWinLoseText.SetString("You Win!");
+		mWinLoseText.SetWidgetLocation({ windowSize.x / 2.f - mWinLoseText.GetBound().width / 2.f, 100.f });
+		
+		//mFinalScoreText.SetString("score: " + std::to_string(100));
+		mFinalScoreText.SetTextSize(40);
+		mFinalScoreText.SetWidgetLocation({ windowSize.x / 2.f - mFinalScoreText.GetBound().width / 2.f, 200.f });
 
-        mHealthBarBack.setSize({ 200.f, 16.f });
-        mHealthBarBack.setFillColor(sf::Color(80, 80, 80, 200));
-        mHealthBarBack.setPosition(10.f, window.getSize().y - 30.f);
+		mRestartButton.SetWidgetLocation({ windowSize.x / 2.f - mRestartButton.GetBound().width / 2.f, windowSize.y / 2.f });
+		mQuitButton.SetWidgetLocation(mRestartButton.GetWidgetLocation() + sf::Vector2f{ 0.f, 50.f });
+		mRestartButton.onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::RestartButtonClicked);
+		mQuitButton.onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::QuitButtonClicked);
+	}
+	void GameplayHUD::PlayerHealthUpdated(float amt, float currentHealth, float maxHealth)
+	{
+		mPlayerHealthBar.UpdateValue(currentHealth, maxHealth);
+		if (currentHealth / maxHealth < mCriticalThreshold)
+		{
+			mPlayerHealthBar.SetForgroundColor(mCriticalHealthBarColor);
+		}
+		else
+		{
+			mPlayerHealthBar.SetForgroundColor(mHealthyHealthBarColor);
+		}
+	}
 
-        mHealthBarFront.setSize({ 200.f * pct, 16.f });
-        mHealthBarFront.setFillColor(pct < 0.3f ? sf::Color(220, 50, 50, 220) : sf::Color(60, 200, 60, 220));
-        mHealthBarFront.setPosition(10.f, window.getSize().y - 30.f);
+	void GameplayHUD::PlayerLifeCountUpdated(int amt)
+	{
+		mPlayerLifeText.SetString(std::to_string(amt));
+	}
 
-        window.draw(mHealthBarBack);
-        window.draw(mHealthBarFront);
-    }
+	void GameplayHUD::PlayerScoreUpdated(int newScore)
+	{
+		mPlayerScoreText.SetString(std::to_string(newScore));
+	}
 
-    void GameplayHUD::SetGameOver(bool won)
-    {
-        mGameOver = true;
-        mWin = won;
-    }
+	void GameplayHUD::RefreshHealthBar()
+	{
+		Player* player = PlayerManager::Get().GetPlayer();
+		if (player && !player->GetCurrentSpaceship().expired())
+		{
+			weak<PlayerSpaceship> playerSpaceship = player->GetCurrentSpaceship();
+			playerSpaceship.lock()->onActoryDestoryed.BindAction(GetWeakRef(), &GameplayHUD::PlayerSpaceshipDestoryed);
+			HealthComponent& healthComp = player->GetCurrentSpaceship().lock()->GetHealthComp();
+			healthComp.onHealthChanged.BindAction(GetWeakRef(), &GameplayHUD::PlayerHealthUpdated);
+			PlayerHealthUpdated(0, healthComp.GetHealth(), healthComp.GetMaxHealth());
+		}
+	}
 
-    void GameplayHUD::SetScore(int score)
-    {
-        mScore = score;
-    }
+	void GameplayHUD::ConnectPlayerStatus()
+	{
+		Player* player = PlayerManager::Get().GetPlayer();
+		if (player)
+		{
+			int lifeCount = player->GetLifeCount();
+			mPlayerLifeText.SetString(std::to_string(lifeCount));
+			player->onLifeChange.BindAction(GetWeakRef(), &GameplayHUD::PlayerLifeCountUpdated);
 
-    void GameplayHUD::RestartClicked()
-    {
-        onRestartBtnClicked.Broadcast();
-    }
+			int playerScore = player->GetScore();
+			mPlayerScoreText.SetString(std::to_string(playerScore));
+			player->onScoreChange.BindAction(GetWeakRef(), &GameplayHUD::PlayerScoreUpdated);
+		}
+	}
+	void GameplayHUD::PlayerSpaceshipDestoryed(Actor* actor)
+	{
+		RefreshHealthBar();
+	}
 
-    void GameplayHUD::QuitClicked()
-    {
-        onQuitBtnClicked.Broadcast();
-    }
+	void GameplayHUD::RestartButtonClicked()
+	{
+		onRestartBtnClicked.Broadcast();
+	}
 
-    void GameplayHUD::SetLives(int lives)
-    {
-        mLives = lives;
-    }
+	void GameplayHUD::QuitButtonClicked()
+	{
+		onQuitBtnClicked.Broadcast();
+	}
+
+	void GameplayHUD::GameFinished(bool playerWon)
+	{
+		mWinLoseText.SetVisiblity(true);
+		mFinalScoreText.SetVisiblity(true);
+		mRestartButton.SetVisiblity(true);
+		mQuitButton.SetVisiblity(true);
+		
+		int score = PlayerManager::Get().GetPlayer()->GetScore();
+		mFinalScoreText.SetString("score: " + std::to_string(score));
+		if (playerWon)
+		{
+			mWinLoseText.SetString("You Win!");
+
+		}
+		else
+		{
+			mWinLoseText.SetString("You Lose!");
+		}
+		mWinLoseText.SetWidgetLocation({ mWindowSize.x / 2.f - mWinLoseText.GetBound().width / 2.f, 100.f });
+		mFinalScoreText.SetWidgetLocation({ mWindowSize.x / 2.f - mFinalScoreText.GetBound().width / 2.f, 200.f });
+	}
 }

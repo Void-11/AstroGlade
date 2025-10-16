@@ -1,15 +1,40 @@
 #pragma once
-#include "enemy/EnemySpaceship.h"
+
+#include "Enemy/EnemySpaceship.h"
+#include "weapon/LaserShooter.h"
+#include "weapon/ThreeWayShooter.h"
+#include "weapon/FrontalWiper.h"
 
 namespace ly
 {
-    class Boss : public EnemySpaceship
-    {
-    public:
-        Boss(World* world, const std::string& texturePath = "PNG/Enemies/boss.png");
-        virtual void Tick(float deltaTime) override;
-    private:
-        float mTime;
-        virtual void Shoot() override;
-    };
+	class Boss : public EnemySpaceship
+	{
+	public:
+		Boss(World* world);
+		virtual void Tick(float deltaTime) override;
+		virtual void BeginPlay() override;
+	private:
+		float mSpeed;
+		float mBaseSpeed;
+		float mSwitchDistanceToEdge;
+		void CheckMove();
+
+	LaserShooter mBaseShooterLeft;
+	LaserShooter mBaseShooterRight;
+
+	ThreeWayShooter mThreeWayShooter;
+	FrontalWiper mFrontalWiperLeft;
+	FrontalWiper mFrontalWiperRight;
+
+	LaserShooter mFinalStageShooterLeft;
+	LaserShooter mFinalStageShooterRight;
+
+		void ShootBaseShooters();
+		void ShootThreeWayShooter();
+		void ShootFrotnalWipers();
+		void HealthChanged(float amt, float currentHealth, float maxHealth);
+
+		void SetStage(int newStage);
+		int mStage;
+	};
 }

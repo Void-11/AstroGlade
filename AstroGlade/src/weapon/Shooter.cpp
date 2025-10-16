@@ -1,18 +1,31 @@
-﻿#include "weapon/Shooter.h"
+#include "weapon/Shooter.h"
 
 namespace ly
 {
-    void Shooter::Shoot()
-    {
-        if(CanShot() && !IsOnCoolDown())
-        {
-            ShootExecution();
-        }
-    }
+	void Shooter::Shoot()
+	{
+		if (CanShoot() && !IsOnCooldown())
+		{
+			ShootImpl();
+		}
+	}
+	
+	void Shooter::IncrementLevel(int amt)
+	{
+		if (mCurrentLevel == mMaxLevel) return;
+		++mCurrentLevel;
+	}
 
-    Shooter::Shooter(Actor* owner)
-        :mOwner{owner}
-    {
-        
-    }
+	void Shooter::SetCurrentLevel(int level)
+	{
+		mCurrentLevel = level;
+	}
+
+	Shooter::Shooter(Actor* owner)
+		: mOwner{owner},
+		mCurrentLevel{1},
+		mMaxLevel{4}
+	{
+
+	}
 }

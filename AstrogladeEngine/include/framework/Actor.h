@@ -1,81 +1,78 @@
-﻿#pragma once
-#include "Core.h"
-#include "box2d/b2_types.h"
-#include "framework/Object.h"
-#include "SFML/Graphics/RenderWindow.hpp"
-#include "SFML/Graphics/Sprite.hpp"
-#include "SFML/Graphics/Texture.hpp"
+#pragma once
+#include <SFML/Graphics.hpp>
 
+#include "framework/Core.h"
+#include "framework/Delegate.h"
+#include "framework/Object.h"
 class b2Body;
 
 namespace ly
 {
-    class World;
-    class Actor : public Object
-    {
-    public:
+	class World;
+	class Actor : public Object
+	{
+	public:
+		Actor(World* owningWorld, const std::string& texturePath = "");
+		virtual ~Actor();
+		void BeginPlayInternal();
+		void TickInternal(float deltaTime);
+		virtual void BeginPlay();
+		virtual void Tick(float deltaTime);
+		void SetTexture(const std::string& texturePath);
+		virtual void Render(sf::RenderWindow& window);
 
-        Actor(World* owningWorld, const std::string& texturePath = "");
-        
-        virtual ~Actor();
-        
-        void BeginPlayIternal();
-        void TickInternal(float deltaTime);
-        virtual void BeginPlay();
-        virtual void Tick(float deltaTime);
-        void SetTexture(const std::string& texturePath);
-        void Render(sf::RenderWindow& window);
-        virtual void RenderOverlay(sf::RenderWindow& window);
-        virtual bool HandleEvent(const sf::Event& event);
+		void SetActorLocation(const sf::Vector2f& newLoc);
+		void SetActorRotation(float newRot);
+		void AddActorLocationOffset(const sf::Vector2f& offsetAmt);
+		void AddActorRotationOffset(float offsetAmt);
 
-        void SetActorLocation(const sf::Vector2f& newLocation);
-        void SetActorRotation(float newRotation);
-        void AddActorLocationOffset(const sf::Vector2f& offSetAmt);
-        void AddActorRotationOffset(float offSetAmt);
-        sf::Vector2f GetActorLocation() const;
-        float GetActorRotation() const;
-        sf::Vector2f GetActorForwardDirection() const;
-        sf::Vector2f GetActorRightDirection() const;
-        sf::FloatRect GetActorGlobalBounds() const;
+		sf::Vector2f GetActorLocation() const;
+		float GetActorRotation() const;
+		sf::Vector2f GetActorForwardDirection() const;
+		sf::Vector2f GetActorRightDirection() const;
+		sf::FloatRect GetActorGlobalBounds() const;
 
-        sf::Vector2u GetWindowSize() const;
+		sf::Vector2u GetWindowSize() const;
 
-        const World* GetWorld() const { return mOwningWorld; }
-        World* GetWorld() { return mOwningWorld; }
-        bool IsActorOutOfWindowBounds(float allowance = 10.f) const;
+		const World* GetWorld() const { return mOwningWorld; }
+		World* GetWorld() { return mOwningWorld; }
 
-        void SetEnablePhysics(bool enable);
-        virtual void OnActorBeginOverlap(Actor* other);
-        virtual void OnActorEndOverlap(Actor* other);
+		bool IsActorOutOfWindowBounds(float allowance = 10.f) const;
 
-        virtual void Destroy() override;
-        
-        static uint8 GetNeturalTeamID() { return neturalTeamID; }
-        void SetTeamID(uint8 teamID) { mTeamID = teamID; }
-        uint8 GetTeamID() const { return mTeamID; }
-        bool IsOtherHostile(Actor* other) const;
+		void SetEnablePhysics(bool enable);
+		virtual void OnActorBeginOverlap(Actor* other);
+		virtual void OnActorEndOverlap(Actor* other);
+		virtual void Destory() override;
+		static uint8 GetNeturalTeamID() { return neturalTeamID; }
 
-        virtual void ApplyDamage(float amount);
+		void SetTeamID(uint8 teamID) { mTeamID = teamID; }
 
-        sf::Sprite& GetSprite() { return mSprite; }
-        const sf::Sprite& GetSprite() const { return mSprite; }
-        
-    private:
-        
-        World* mOwningWorld;
-        bool mHasBeginPlay;
+		uint8 GetTeamID() const { return mTeamID; }
+		bool IsOtherHostile(Actor* other) const;
 
-        sf::Sprite mSprite;
-        shared<sf::Texture> mTexture;
-        b2Body* mPhysicsBody;
-        bool mPhysicsEnable;
+		virtual void ApplyDamage(float amt);
 
-        uint8 mTeamID;
-        const static uint8 neturalTeamID = 255;
+		sf::Sprite& GetSprite() { return mSprite; }
+		const sf::Sprite& GetSprite() const { return mSprite; }
+		Delegate<Actor*> onActoryDestoryed;
+		void SetTextureRepeated(bool repeated);
+	private:
+		void InitiallizePhyics();
+		void UnInitializePhysics();
+		void UpdatePhysicsBodyTransform();
+		void CenterPivot();
+		
+		World* mOwningWorld;
+		bool mHasBeganPlay;
 
-        void CenterPivot();
-        void InitializePhysics();
-        void TerminatePhysics();
-        void UpdatePhysicsBodyTransform();
-    };
+		sf::Sprite mSprite;
+		shared<sf::Texture> mTexture;
+		
+		b2Body* mPhysicBody;
+		bool mPhysicsEnabled;
+
+		uint8 mTeamID;
+
+		const static uint8 neturalTeamID = 255;
+	};
 }

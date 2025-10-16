@@ -1,48 +1,49 @@
-#include "weapon/LaserShooter.h"
 #include "framework/Core.h"
+#include "weapon/LaserShooter.h"
 #include "weapon/Laser.h"
 #include "framework/World.h"
-#include "framework/MathUtility.h"
 
 namespace ly
 {
-    LaserShooter::LaserShooter(Actor* owner, float cooldownTime, const sf::Vector2f& localPositionOffset, float localRotationOffset, const std::string& texturePath) 
-        :Shooter{owner},
-        mCooldownClock{},
-        mCooldownTime{cooldownTime},
-        mLocalPositionOffset{localPositionOffset},
-        mLocalRotationOffset{localRotationOffset},
-        mTexturePath{texturePath}
-    {
-        
-    }
 
-    bool LaserShooter::IsOnCoolDown() const
-    {
-        if(mCooldownClock.getElapsedTime().asSeconds() > mCooldownTime)
-        {
-            return false;
-        }
+	LaserShooter::LaserShooter(Actor* owner, float cooldownTime, const sf::Vector2f& localPositionOffset, float localRotationOffset, const std::string& laserTexturePath)
+		: Shooter{ owner },
+		mCooldownClock{},
+		mCooldownTime{ cooldownTime },
+		mLocalPositionOffset{ localPositionOffset },
+		mLocalRotationOffset{ localRotationOffset },
+		mLaserTexturePath{laserTexturePath}
+	{
+	}
 
-        return true;
-    }
+	bool LaserShooter::IsOnCooldown() const
+	{
+		if (mCooldownClock.getElapsedTime().asSeconds() > mCooldownTime / GetCurrentLevel())
+		{
+			return false;
+		}
 
-    void LaserShooter::ShootExecution()
-    {
-        auto* owner = GetOwner();
-        // Aim using the owner's current rotation (owner decides where to face)
-        float baseRot = owner->GetActorRotation();
-        sf::Vector2f fwd = RotationToVector(baseRot);
-        sf::Vector2f right = RotationToVector(baseRot + 90.f);
+		return true;
+	}
 
-        mCooldownClock.restart();
-        weak<Laser> newLaser = owner->GetWorld()->SpawnActor<Laser>(owner, mTexturePath);
-        if (auto l = newLaser.lock())
-        {
-            // Use owner's facing directly; sprite will be rotated to that angle
-            l->SetActorLocation(owner->GetActorLocation() + fwd * mLocalPositionOffset.x + right * mLocalPositionOffset.y);
-            l->SetActorRotation(baseRot + mLocalRotationOffset);
-            l->SetMoveRotation(baseRot + mLocalRotationOffset); // actual movement direction
-        }
-    }
+	void LaserShooter::IncrementLevel(int amt)
+	{
+		Shooter::IncrementLevel(amt);
+	}
+
+	void LaserShooter::SetLaserTexturePath(const std::string& laserTexturePath)
+	{
+		mLaserTexturePath = laserTexturePath;
+	}
+
+	void LaserShooter::ShootImpl()
+	{
+		sf::Vector2f ownerForwardDir = GetOwner()->GetActorForwardDirection();
+		sf::Vector2f ownerRightDir = GetOwner()->GetActorRightDirection();
+
+		mCooldownClock.restart();
+		weak<Laser> newLaser = GetOwner()->GetWorld()->SpawnActor<Laser>(GetOwner(), mLaserTexturePath);
+		newLaser.lock()->SetActorLocation(GetOwner()->GetActorLocation() + ownerForwardDir * mLocalPositionOffset.x + ownerRightDir * mLocalPositionOffset.y);
+		newLaser.lock()->SetActorRotation(GetOwner()->GetActorRotation() + mLocalRotationOffset);
+	}
 }

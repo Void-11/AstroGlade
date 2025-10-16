@@ -1,65 +1,46 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "framework/Core.h"
-#include <functional>
-
 namespace ly
 {
-    class World;
-    class Application
-    {
-    public:
+	class World;
+	class Application
+	{
+	public:
+		Application(unsigned int windowWidth, unsigned int windowHeight, const std::string& title, sf::Uint32 style);
+		void Run();
 
-        Application(unsigned int windowHeight,unsigned int windowWidth, const std::string& title, sf::Uint32 style);
-        
-        void Run();
+		template<typename WorldType>
+		weak<WorldType> LoadWorld();
 
-        template<typename WorldType>
-        weak<WorldType> LoadWorld();
-        
-        // Safe world switch: queues a world change to occur at the start of the next TickInternal
-        template<typename WorldType>
-        void QueueWorld();
+		sf::Vector2u GetWindowSize() const;
+		sf::RenderWindow& GetWindow() { return mWindow; }
+		const sf::RenderWindow& GetWindow() const { return mWindow; }
+		void QuitApplication();
+	private:
+		bool DispathEvent(const sf::Event& event);
+		void TickInternal(float deltaTime);
+		void RenderInternal();
 
-        sf::Vector2u GetWindowSize() const;
-        void QuitApplication() { mWindow.close(); }
-        
-    private:
+		virtual void Render();
+		virtual void Tick(float deltaTime);
 
-        sf::RenderWindow mWindow;
-        float mTargetFrameRate;
-        sf::Clock mTickClock;
+		sf::RenderWindow mWindow;
+		float mTargetFrameRate;
+		sf::Clock mTickClock;
+	
+		shared<World> mCurrentWorld;
+		shared<World> mPendingWorld;
 
-        void TickInternal(float deltaTime);
-        void RenderInternal();
-        virtual void Tick(float deltaTime);
-        virtual void Render();
+		sf::Clock mCleanCycleClock;
+		float mCleanCycleIterval;
+	};
 
-        shared<World> currentWorld;
-        // Pending world switch
-        bool mWorldSwitchPending{false};
-        std::function<shared<World>()> mPendingWorldCreator;
-
-        sf::Clock mCleanCycleClock;
-        float mCleanCycleInterval;
-    };
-
-    template <typename WorldType>
-    weak<WorldType> Application::LoadWorld()
-    {
-        shared<WorldType> newWorld{new WorldType(this) };
-        currentWorld = newWorld;
-        return newWorld;
-    }
-
-    template <typename WorldType>
-    void Application::QueueWorld()
-    {
-        mWorldSwitchPending = true;
-        mPendingWorldCreator = [this]() -> shared<World>
-        {
-            return shared<World>{ new WorldType(this) };
-        };
-    }
-
+	template<typename WorldType>
+	weak<WorldType> Application::LoadWorld()
+	{
+		shared<WorldType> newWorld{ new WorldType{this} };
+		mPendingWorld = newWorld;
+		return newWorld;
+	}
 }
