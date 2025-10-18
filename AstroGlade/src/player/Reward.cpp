@@ -26,20 +26,20 @@ namespace ly
 
 	void Reward::OnActorBeginOverlap(Actor* otherActor)
 	{
-		if (!otherActor || otherActor->IsPendingDestory())
+		if (!otherActor || otherActor->IsPendingDestroy())
 			return;
 
 		if (!PlayerManager::Get().GetPlayer())
 			return;
 
 		weak<PlayerSpaceship> playerSpaceship = PlayerManager::Get().GetPlayer()->GetCurrentSpaceship();
-		if (playerSpaceship.expired() || playerSpaceship.lock()->IsPendingDestory())
+		if (playerSpaceship.expired() || playerSpaceship.lock()->IsPendingDestroy())
 			return;
 
 		if (playerSpaceship.lock()->GetUniqueID() == otherActor->GetUniqueID())
 		{
 			mRewardFunc(playerSpaceship.lock().get());
-			Destory();
+			Destroy();
 		}
 	}
 
@@ -72,7 +72,7 @@ namespace ly
 	void RewardHealth(PlayerSpaceship* player)
 	{
 		static float rewardAmt = 10.f;
-		if (player && !player->IsPendingDestory())
+		if (player && !player->IsPendingDestroy())
 		{
 			player->GetHealthComp().ChangeHealth(rewardAmt);
 		}
@@ -80,14 +80,14 @@ namespace ly
 
 	void RewardThreewayShooter(PlayerSpaceship* player)
 	{
-		if (player && !player->IsPendingDestory())
+		if (player && !player->IsPendingDestroy())
 		{
 			player->SetShooter(unique<Shooter>{new ThreeWayShooter{player, 0.4f, {50.f, 0.f} }});
 		}
 	}
 	void RewardFrontalWiper(PlayerSpaceship* player)
 	{
-		if (player && !player->IsPendingDestory())
+		if (player && !player->IsPendingDestroy())
 		{
 			player->SetShooter(unique<Shooter>{new FrontalWiper{ player, 0.4f, {50.f, 0.f} }});
 		}

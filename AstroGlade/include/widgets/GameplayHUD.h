@@ -31,7 +31,7 @@ namespace ly
 		void RestartButtonClicked();
 		void QuitButtonClicked();
 		TextWidget mFramerateText;
-		ValueGuage mPlayerHealthBar;
+		ValueGauge mPlayerHealthBar;
 		ImageWidget mPlayerLifeIcon;
 		TextWidget mPlayerLifeText;
 

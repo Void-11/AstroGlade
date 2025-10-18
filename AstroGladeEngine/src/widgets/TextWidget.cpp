@@ -19,7 +19,7 @@ namespace ly
 		mText.setCharacterSize(newSize);
 	}
 
-	sf::FloatRect TextWidget::GetBound() const
+sf::FloatRect TextWidget::GetBounds() const
 	{
 		return mText.getGlobalBounds();
 	}

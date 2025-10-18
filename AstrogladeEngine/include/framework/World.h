@@ -31,7 +31,7 @@ namespace ly
 		sf::Vector2u GetWindowSize() const;
 		void CleanCycle();
 		void AddStage(const shared<GameStage>& newStage);
-		bool DispathEvent(const sf::Event& event);
+		bool DispatchEvent(const sf::Event& event);
 		Application* GetApplication() { return mOwningApp; }
 		const Application* GetApplication() const { return mOwningApp; }
 	private:

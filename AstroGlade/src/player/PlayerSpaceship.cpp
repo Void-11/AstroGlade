@@ -14,9 +14,9 @@ namespace ly
 		mShooter{ new LaserShooter{this, .5f, {50.f, 0.f}} },
 		mInvulnerableTime{2.f},
 		mInvulnerable{true},
-		mInvulnerableFlashInterval{0.5f},
+	mInvulnerableFlashInterval{0.5f},
 		mInvulnerableFlashTimer{0.f},
-		mInvulerableFlashDir{1}
+		mInvulnerableFlashDir{1}
 	{
 		SetTeamID(1);
 		mShooter->SetCurrentLevel(4);
@@ -134,10 +134,10 @@ namespace ly
 	{
 		if (!mInvulnerable) return;
 		
-		mInvulnerableFlashTimer += deltaTime * mInvulerableFlashDir;
+	mInvulnerableFlashTimer += deltaTime * mInvulnerableFlashDir;
 		if (mInvulnerableFlashTimer < 0 || mInvulnerableFlashTimer > mInvulnerableFlashInterval)
 		{
-			mInvulerableFlashDir *= -1;
+			mInvulnerableFlashDir *= -1;
 		}
 
 		GetSprite().setColor(LerpColor({255,255, 255, 64} ,{255, 255, 255, 128}, mInvulnerableFlashTimer/mInvulnerableFlashInterval));

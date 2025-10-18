@@ -11,18 +11,18 @@ namespace ly
 		Object();
 		virtual ~Object();
 
-		virtual void Destory();
-		bool IsPendingDestory() const { return mIsPendingDestory; }
+		virtual void Destroy();
+		bool IsPendingDestroy() const { return mIsPendingDestroy; }
 
 		weak<Object> GetWeakRef();
 		weak<const Object> GetWeakRef() const;
-		Delegate<Object*> onDestory;
+		Delegate<Object*> onDestroy;
 		unsigned int GetUniqueID() const { return mUniqueID; }
 	private:
-		bool mIsPendingDestory;
+		bool mIsPendingDestroy;
 		unsigned int mUniqueID;
 
 		static unsigned int uniqueIDCounter;
-		static unsigned int GetNextAvaliableID();
+		static unsigned int GetNextAvailableID();
 	};
 }

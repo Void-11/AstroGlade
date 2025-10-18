@@ -16,9 +16,9 @@ namespace ly
 		mSpeed = newSpeed;
 	}
 
-	void Laser::SetDamage(float newDaamge)
+	void Laser::SetDamage(float newDamage)
 	{
-		mDamage = newDaamge;
+		mDamage = newDamage;
 	}
 
 	void Laser::Tick(float deltaTime)
@@ -27,7 +27,7 @@ namespace ly
 		Move(deltaTime);
 		if (IsActorOutOfWindowBounds())
 		{
-			Destory();
+			Destroy();
 		}
 	}
 
@@ -42,7 +42,7 @@ namespace ly
 		if (IsOtherHostile(other))
 		{
 			other->ApplyDamage(GetDamage());
-			Destory();
+			Destroy();
 		}
 	}
 

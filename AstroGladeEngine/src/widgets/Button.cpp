@@ -33,7 +33,7 @@ namespace ly
 		mButtonText.setRotation(rotation);
 	}
 
-	sf::FloatRect Button::GetBound() const
+sf::FloatRect Button::GetBounds() const
 	{
 		return mButtonSprite.getGlobalBounds();
 	}
@@ -59,7 +59,7 @@ namespace ly
 
 	bool Button::HandleEvent(const sf::Event& windowEvent)
 	{
-		if (!GetVisiblity()) return false;
+		if (!GetVisibility()) return false;
 
 		bool handled = false;
 		if (windowEvent.type == sf::Event::MouseButtonReleased)

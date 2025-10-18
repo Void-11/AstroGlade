@@ -42,8 +42,8 @@ namespace ly
 		void SetEnablePhysics(bool enable);
 		virtual void OnActorBeginOverlap(Actor* other);
 		virtual void OnActorEndOverlap(Actor* other);
-		virtual void Destory() override;
-		static uint8 GetNeturalTeamID() { return neturalTeamID; }
+		virtual void Destroy() override;
+		static uint8 GetNeutralTeamID() { return neutralTeamID; }
 
 		void SetTeamID(uint8 teamID) { mTeamID = teamID; }
 
@@ -54,11 +54,11 @@ namespace ly
 
 		sf::Sprite& GetSprite() { return mSprite; }
 		const sf::Sprite& GetSprite() const { return mSprite; }
-		Delegate<Actor*> onActoryDestoryed;
+		Delegate<Actor*> onActorDestroyed;
 		void SetTextureRepeated(bool repeated);
 	private:
-		void InitiallizePhyics();
-		void UnInitializePhysics();
+		void InitializePhysics();
+		void UninitializePhysics();
 		void UpdatePhysicsBodyTransform();
 		void CenterPivot();
 		
@@ -73,6 +73,6 @@ namespace ly
 
 		uint8 mTeamID;
 
-		const static uint8 neturalTeamID = 255;
+		const static uint8 neutralTeamID = 255;
 	};
 }

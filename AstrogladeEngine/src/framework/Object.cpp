@@ -5,21 +5,21 @@ namespace ly
 {
 	unsigned int Object::uniqueIDCounter = 0;
 	Object::Object()
-		: mIsPendingDestory{false},
-		mUniqueID{GetNextAvaliableID()}
+	: mIsPendingDestroy{false},
+		mUniqueID{GetNextAvailableID()}
 
 	{
 	}
 
 	Object::~Object()
 	{
-		LOG("Object Destoryed");
+		LOG("Object Destroyed");
 	}
 
-	void Object::Destory()
+	void Object::Destroy()
 	{
-		onDestory.Broadcast(this);
-		mIsPendingDestory = true;
+		onDestroy.Broadcast(this);
+		mIsPendingDestroy = true;
 	}
 	
 	weak<Object> Object::GetWeakRef()
@@ -32,7 +32,7 @@ namespace ly
 		return shared_from_this();
 	}
 
-	unsigned int Object::GetNextAvaliableID()
+	unsigned int Object::GetNextAvailableID()
 	{
 		return uniqueIDCounter++;
 	}

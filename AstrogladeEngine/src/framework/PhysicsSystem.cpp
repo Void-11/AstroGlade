@@ -28,7 +28,7 @@ namespace ly
 
 	b2Body* PhysicsSystem::AddListener(Actor* listener)
 	{
-		if (listener->IsPendingDestory()) return nullptr;
+		if (listener->IsPendingDestroy()) return nullptr;
 
 		b2BodyDef bodyDef;
 		bodyDef.type = b2_dynamicBody;
@@ -92,12 +92,12 @@ namespace ly
 		Actor* ActorA = reinterpret_cast<Actor*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
 		Actor* ActorB = reinterpret_cast<Actor*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
 
-		if (ActorA && !ActorA->IsPendingDestory())
+		if (ActorA && !ActorA->IsPendingDestroy())
 		{
 			ActorA->OnActorBeginOverlap(ActorB);
 		}
 
-		if (ActorB && !ActorB->IsPendingDestory())
+		if (ActorB && !ActorB->IsPendingDestroy())
 		{
 			ActorB->OnActorBeginOverlap(ActorA);
 		}
@@ -118,12 +118,12 @@ namespace ly
 			ActorB = reinterpret_cast<Actor*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
 		}
 
-		if (ActorA && !ActorA->IsPendingDestory())
+		if (ActorA && !ActorA->IsPendingDestroy())
 		{
 			ActorA->OnActorEndOverlap(ActorB);
 		}
 
-		if (ActorB && !ActorB->IsPendingDestory())
+		if (ActorB && !ActorB->IsPendingDestroy())
 		{
 			ActorB->OnActorEndOverlap(ActorA);
 		}

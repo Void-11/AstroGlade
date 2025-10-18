@@ -16,14 +16,14 @@ namespace ly
 		mTexture{},
 		mPhysicBody{nullptr},
 		mPhysicsEnabled{false},
-		mTeamID{GetNeturalTeamID()}
+		mTeamID{GetNeutralTeamID()}
 	{
 		SetTexture(texturePath);
 	}
 
 	Actor::~Actor()
 	{
-		LOG("Actor destoryed");
+		LOG("Actor destroyed");
 	}
 	void Actor::BeginPlayInternal()
 	{
@@ -36,7 +36,7 @@ namespace ly
 
 	void Actor::TickInternal(float deltaTime)
 	{
-		if (!IsPendingDestory())
+		if (!IsPendingDestroy())
 		{
 			Tick(deltaTime);
 		}
@@ -65,7 +65,7 @@ namespace ly
 
 	void Actor::Render(sf::RenderWindow& window)
 	{
-		if (IsPendingDestory())
+		if (IsPendingDestroy())
 			return;
 
 		window.draw(mSprite);
@@ -120,10 +120,10 @@ namespace ly
 
 	void Actor::SetTextureRepeated(bool repeated)
 	{
-		mTexture->setRepeated(repeated);
+		if (mTexture) { mTexture->setRepeated(repeated); }
 	}
 
-	void Actor::InitiallizePhyics()
+	void Actor::InitializePhysics()
 	{
 		if (!mPhysicBody)
 		{
@@ -131,7 +131,7 @@ namespace ly
 		}
 	}
 
-	void Actor::UnInitializePhysics()
+	void Actor::UninitializePhysics()
 	{
 		if(mPhysicBody)
 		{
@@ -197,11 +197,11 @@ namespace ly
 		mPhysicsEnabled = enable;
 		if (mPhysicsEnabled)
 		{
-			InitiallizePhyics();
+			InitializePhysics();
 		}
 		else
 		{
-			UnInitializePhysics();
+			UninitializePhysics();
 		}
 	}
 
@@ -215,18 +215,18 @@ namespace ly
 
 	}
 
-	void Actor::Destory()
+	void Actor::Destroy()
 	{
-		UnInitializePhysics();
-		onActoryDestoryed.Broadcast(this);
-		Object::Destory();
+		UninitializePhysics();
+		onActorDestroyed.Broadcast(this);
+		Object::Destroy();
 	}
 
 	bool Actor::IsOtherHostile(Actor* other) const
 	{
 		if (other == nullptr) return false;
 
-		if (GetTeamID() == GetNeturalTeamID() || other->GetTeamID() == GetNeturalTeamID())
+		if (GetTeamID() == GetNeutralTeamID() || other->GetTeamID() == GetNeutralTeamID())
 		{
 			return false;
 		}

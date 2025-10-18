@@ -26,14 +26,14 @@ namespace ly
 		RotationUpdated(newRotation);
 	}
 
-	void Widget::SetVisiblity(bool newVisibility)
+	void Widget::SetVisibility(bool newVisibility)
 	{
 		mIsVisible = newVisibility;
 	}
 
 	sf::Vector2f Widget::GetCenterPosition() const
 	{
-		sf::FloatRect bound = GetBound();
+		sf::FloatRect bound = GetBounds();
 		return sf::Vector2f{bound.left + bound.width/2.f, bound.top + bound.height/2.f};
 	}
 

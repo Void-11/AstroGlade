@@ -29,11 +29,11 @@ namespace ly
 		unique<Shooter> mShooter;
 	
 		float mInvulnerableTime;
-		TimerHandle mInvulerableTimerHandle;
+		TimerHandle mInvulnerableTimerHandle;
 		bool mInvulnerable;
 
 		float mInvulnerableFlashInterval;
 		float mInvulnerableFlashTimer;
-		float mInvulerableFlashDir;
+		float mInvulnerableFlashDir;
 	};
 }

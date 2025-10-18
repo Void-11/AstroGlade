@@ -30,7 +30,7 @@ namespace ly
 		winowRef.draw(mSprite);
 	}
 
-	sf::FloatRect ImageWidget::GetBound() const
+sf::FloatRect ImageWidget::GetBounds() const
 	{
 		return mSprite.getGlobalBounds();
 	}

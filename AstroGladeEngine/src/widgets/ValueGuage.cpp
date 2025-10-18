@@ -3,7 +3,7 @@
 namespace ly
 {
 
-	ValueGuage::ValueGuage(const sf::Vector2f& size, float initialPercent, const sf::Color& foreGroundColor, const sf::Color& backgroundColor)
+	ValueGauge::ValueGauge(const sf::Vector2f& size, float initialPercent, const sf::Color& foreGroundColor, const sf::Color& backgroundColor)
 		: mTextFont{ AssetManager::Get().LoadFont("SpaceShooterRedux/Bonus/kenvector_future.ttf") },
 		mText{ "",*(mTextFont.get()) },
 		mBarFront{ size },
@@ -16,7 +16,7 @@ namespace ly
 		mBarBack.setFillColor(mBackgroundColor);
 		SetTextSize(20);
 	}
-	void ValueGuage::UpdateValue(float value, float maxValue)
+	void ValueGauge::UpdateValue(float value, float maxValue)
 	{
 		LOG("player health is now: %f", value);
 		if (maxValue == 0) return;
@@ -29,48 +29,48 @@ namespace ly
 		CenterText();
 	}
 
-	sf::FloatRect ValueGuage::GetBound() const
+sf::FloatRect ValueGauge::GetBounds() const
 	{
 		return mBarBack.getGlobalBounds();
 	}
 
-	void ValueGuage::SetTextSize(unsigned int characterSize)
+	void ValueGauge::SetTextSize(unsigned int characterSize)
 	{
 		mText.setCharacterSize(characterSize);
 	}
 
-	void ValueGuage::SetForgroundColor(const sf::Color& color)
+	void ValueGauge::SetForegroundColor(const sf::Color& color)
 	{
 		mBarFront.setFillColor(color);
 	}
 
-	void ValueGuage::SetBackgroundColor(const sf::Color& color)
+	void ValueGauge::SetBackgroundColor(const sf::Color& color)
 	{
 		mBarBack.setFillColor(color);
 	}
 
-	void ValueGuage::Draw(sf::RenderWindow& windowRef)
+	void ValueGauge::Draw(sf::RenderWindow& windowRef)
 	{
 		windowRef.draw(mBarBack);
 		windowRef.draw(mBarFront);
 		windowRef.draw(mText);
 	}
 
-	void ValueGuage::LocationUpdated(const sf::Vector2f& newLocation)
+	void ValueGauge::LocationUpdated(const sf::Vector2f& newLocation)
 	{
 		mBarFront.setPosition(newLocation);
 		mBarBack.setPosition(newLocation);
 		CenterText();
 	}
 	
-	void ValueGuage::RotationUpdated(float newRotation)
+	void ValueGauge::RotationUpdated(float newRotation)
 	{
 		mText.setRotation(newRotation);
 		mBarFront.setRotation(newRotation);
 		mBarBack.setRotation(newRotation);
 	}
 
-	void ValueGuage::CenterText()
+	void ValueGauge::CenterText()
 	{
 		sf::Vector2f widgetCenter = GetCenterPosition();
 		sf::FloatRect textBound = mText.getGlobalBounds();

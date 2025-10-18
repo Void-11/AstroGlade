@@ -14,7 +14,7 @@ namespace ly
 		weak<Boss> boss = GetWorld()->SpawnActor<Boss>();
 		auto windowSize = GetWorld()->GetWindowSize();
 		boss.lock()->SetActorLocation({ windowSize.x / 2.f, 200.f });
-		boss.lock()->onActoryDestoryed.BindAction(GetWeakRef(), &BossStage::BossDestroyed);
+	boss.lock()->onActorDestroyed.BindAction(GetWeakRef(), &BossStage::BossDestroyed);
 	}
 	void BossStage::BossDestroyed(Actor* bossActor)
 	{

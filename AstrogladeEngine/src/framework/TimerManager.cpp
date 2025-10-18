@@ -44,7 +44,7 @@ namespace ly
 
 	bool Timer::Expired() const
 	{
-		return mIsExpired || mListener.first.expired() || mListener.first.lock()->IsPendingDestory();
+		return mIsExpired || mListener.first.expired() || mListener.first.lock()->IsPendingDestroy();
 	}
 
 	void Timer::SetExpired()

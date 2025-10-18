@@ -41,18 +41,18 @@ namespace ly
 
 		Player& newPlayer = PlayerManager::Get().CreateNewPlayer();
 		mPlayerSpaceship = newPlayer.SpawnSpaceship(this);
-		mPlayerSpaceship.lock()->onActoryDestoryed.BindAction(GetWeakRef(), &GameLevelOne::PlayerSpaceshipDestroyed);
+	mPlayerSpaceship.lock()->onActorDestroyed.BindAction(GetWeakRef(), &GameLevelOne::PlayerSpaceshipDestroyed);
 		mGameplayHUD = SpawnHUD<GameplayHUD>();
 		mGameplayHUD.lock()->onQuitBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::QuitGame);
 		mGameplayHUD.lock()->onRestartBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::Restart);
 	}
 
-	void GameLevelOne::PlayerSpaceshipDestroyed(Actor* destoryedPlayerSpaceship)
+	void GameLevelOne::PlayerSpaceshipDestroyed(Actor* destroyedPlayerSpaceship)
 	{
 		mPlayerSpaceship = PlayerManager::Get().GetPlayer()->SpawnSpaceship(this);
 		if (!mPlayerSpaceship.expired())
 		{
-			mPlayerSpaceship.lock()->onActoryDestoryed.BindAction(GetWeakRef(), &GameLevelOne::PlayerSpaceshipDestroyed);
+	mPlayerSpaceship.lock()->onActorDestroyed.BindAction(GetWeakRef(), &GameLevelOne::PlayerSpaceshipDestroyed);
 		}
 		else
 		{

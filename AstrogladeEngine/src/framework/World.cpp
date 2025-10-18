@@ -83,7 +83,7 @@ namespace ly
 	{
 		for (auto iter = mActors.begin(); iter != mActors.end();)
 		{
-			if (iter->get()->IsPendingDestory())
+			if (iter->get()->IsPendingDestroy())
 			{
 				iter = mActors.erase(iter);
 			}
@@ -99,7 +99,7 @@ namespace ly
 		mGameStages.push_back(newStage);
 	}
 
-	bool World::DispathEvent(const sf::Event& event)
+	bool World::DispatchEvent(const sf::Event& event)
 	{
 		if (mHUD)
 		{

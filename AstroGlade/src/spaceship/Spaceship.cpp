@@ -77,11 +77,10 @@ namespace ly
 
 	void Spaceship::Blow()
 	{
-		Explosion* exp = new Explosion();
-		exp->SpawnExplosion(GetWorld(), GetActorLocation());
+		Explosion exp{};
+		exp.SpawnExplosion(GetWorld(), GetActorLocation());
 		Blew();
-		Destory();
-		delete exp;
+		Destroy();
 	}
 
 	void Spaceship::Blew()

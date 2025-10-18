@@ -35,17 +35,17 @@ namespace ly
 				}
 				else
 				{
-					DispathEvent(windowEvent);
+					DispatchEvent(windowEvent);
 				}
 			}
 			float frameDeltaTime = mTickClock.restart().asSeconds();
 			accumulatedTime += frameDeltaTime;
-			while (accumulatedTime > targetDeltaTime)
+			while (accumulatedTime >= targetDeltaTime)
 			{
 				accumulatedTime -= targetDeltaTime;
 				TickInternal(targetDeltaTime);
-				RenderInternal();
 			}
+			RenderInternal();
 		}
 	}
 	sf::Vector2u Application::GetWindowSize() const
@@ -53,11 +53,11 @@ namespace ly
 		return mWindow.getSize();
 	}
 
-	bool Application::DispathEvent(const sf::Event& event)
+	bool Application::DispatchEvent(const sf::Event& event)
 	{
 		if (mCurrentWorld)
 		{
-			return mCurrentWorld->DispathEvent(event);
+			return mCurrentWorld->DispatchEvent(event);
 		}
 		return false;
 	}

@@ -18,7 +18,7 @@ namespace ly
 
 		if (mTimer.getElapsedTime().asSeconds() >= mLifeTime)
 		{
-			Destory();
+			Destroy();
 		}
 	}
 

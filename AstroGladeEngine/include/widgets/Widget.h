@@ -15,9 +15,9 @@ namespace ly
 		sf::Vector2f GetWidgetLocation() const { return mWidgetTransform.getPosition(); }
 		float GetWidgetRotation() const { return mWidgetTransform.getRotation(); }
 
-		void SetVisiblity(bool newVisibility);
-		bool GetVisiblity() const { return mIsVisible; }
-		virtual sf::FloatRect GetBound() const = 0;
+		void SetVisibility(bool newVisibility);
+		bool GetVisibility() const { return mIsVisible; }
+		virtual sf::FloatRect GetBounds() const = 0;
 		sf::Vector2f GetCenterPosition() const;
 	protected:
 		Widget();
