@@ -3,5 +3,9 @@
 
 inline std::string GetResourceDir()
 {
+#ifdef NDEBUG // Release Build
 	return "@RESOURCE_FOLDER_NAME@/";
+#else // Debug Build
+	return "@RESOURCE_SRC_DIR@/";
+#endif
 }
