@@ -18,6 +18,7 @@ namespace ly
 		mWidgetSpaceing{10.f},
 		mWinLoseText{""},
 		mFinalScoreText{""},
+		mPauseText{"Paused"},
 		mRestartButton{"Restart"},
 		mQuitButton{"Quit"},
 		mWindowSize{}
@@ -26,10 +27,11 @@ namespace ly
 		mPlayerLifeText.SetTextSize(20);
 		mPlayerScoreText.SetTextSize(20);
 
-	mWinLoseText.SetVisibility(false);
-	mFinalScoreText.SetVisibility(false);
-	mRestartButton.SetVisibility(false);
-	mQuitButton.SetVisibility(false);
+		mWinLoseText.SetVisibility(false);
+		mFinalScoreText.SetVisibility(false);
+		mPauseText.SetVisibility(false);
+		mRestartButton.SetVisibility(false);
+		mQuitButton.SetVisibility(false);
 	}
 	void GameplayHUD::Draw(sf::RenderWindow& windowRef)
 	{
@@ -43,6 +45,7 @@ namespace ly
 
 		mWinLoseText.NativeDraw(windowRef);
 		mFinalScoreText.NativeDraw(windowRef);
+		mPauseText.NativeDraw(windowRef);
 		mRestartButton.NativeDraw(windowRef);
 		mQuitButton.NativeDraw(windowRef);
 	}
@@ -90,6 +93,9 @@ namespace ly
 		//mFinalScoreText.SetString("score: " + std::to_string(100));
 		mFinalScoreText.SetTextSize(40);
 	mFinalScoreText.SetWidgetLocation({ windowSize.x / 2.f - mFinalScoreText.GetBounds().width / 2.f, 200.f });
+
+	mPauseText.SetTextSize(40);
+	mPauseText.SetWidgetLocation({ windowSize.x / 2.f - mPauseText.GetBounds().width / 2.f, 200.f });
 
 	mRestartButton.SetWidgetLocation({ windowSize.x / 2.f - mRestartButton.GetBounds().width / 2.f, windowSize.y / 2.f });
 		mQuitButton.SetWidgetLocation(mRestartButton.GetWidgetLocation() + sf::Vector2f{ 0.f, 50.f });
@@ -159,6 +165,13 @@ namespace ly
 	void GameplayHUD::QuitButtonClicked()
 	{
 		onQuitBtnClicked.Broadcast();
+	}
+
+	void GameplayHUD::SetPause(bool paused)
+	{
+		mRestartButton.SetVisibility(paused);
+		mQuitButton.SetVisibility(paused);
+		mPauseText.SetVisibility(paused);
 	}
 
 	void GameplayHUD::GameFinished(bool playerWon)

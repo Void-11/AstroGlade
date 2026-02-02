@@ -8,15 +8,15 @@ namespace ly
 	class GameLevelOne : public World
 	{
 	public:
-		GameLevelOne(Application* owningApp);
-	private:
-		virtual void AllGameStageFinished() override;
-		virtual void BeginPlay() override;
-		weak<PlayerSpaceship> mPlayerSpaceship;
-		weak<GameplayHUD> mGameplayHUD;
+		        GameLevelOne(Application* owningApp);
+		        virtual void BeginPlay() override;
+		        virtual void InitGameStages() override;
+		        virtual void AllGameStageFinished() override;
+		        virtual bool DispatchEvent(const sf::Event& event) override;
+		    private:
+		        weak<PlayerSpaceship> mPlayerSpaceship;		weak<GameplayHUD> mGameplayHUD;
 		void PlayerSpaceshipDestroyed(Actor* destoryedPlayerSpaceship);
 		TimerHandle timerHandle_Test;
-		virtual void InitGameStages() override;
 		void QuitGame();
 		void Restart();
 		void GameOver();

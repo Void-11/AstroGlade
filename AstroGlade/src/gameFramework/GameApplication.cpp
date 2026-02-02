@@ -12,7 +12,7 @@ ly::Application* GetApplication()
 namespace ly
 {
 	GameApplication::GameApplication()
-		: Application{600, 980, "AstroGlade" , sf::Style::Titlebar | sf::Style::Close }
+		: Application{sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, "AstroGlade" , sf::Style::Fullscreen }
 	{
 		AssetManager::Get().SetAssetRootDirectory(GetResourceDir());
 		weak<MainMenuLevel> newWorld = LoadWorld<MainMenuLevel>();

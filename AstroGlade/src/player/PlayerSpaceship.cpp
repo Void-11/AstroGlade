@@ -4,13 +4,14 @@
 #include "weapon/LaserShooter.h"
 #include "weapon/ThreeWayShooter.h"
 #include "weapon/FrontalWiper.h"
+#include "framework/World.h"
 
 namespace ly
 {
 	PlayerSpaceship::PlayerSpaceship(World* owningWorld, const std::string& path)
 		: Spaceship{owningWorld, path},
 		mMoveInput{},
-		mSpeed{200.f},
+		mSpeed{200.f, 200.f},
 		mShooter{ new LaserShooter{this, .5f, {50.f, 0.f}} },
 		mInvulnerableTime{2.f},
 		mInvulnerable{true},
@@ -20,6 +21,12 @@ namespace ly
 	{
 		SetTeamID(1);
 		mShooter->SetCurrentLevel(4);
+
+		sf::Vector2u windowSize = owningWorld->GetWindowSize();
+		float scaleX = windowSize.x / 600.f;
+		float scaleY = windowSize.y / 980.f;
+		mSpeed.x *= scaleX;
+		mSpeed.y *= scaleY;
 	}
 
 	void PlayerSpaceship::Tick(float deltaTime)
@@ -120,7 +127,7 @@ namespace ly
 	}
 	void PlayerSpaceship::ConsumeInput(float deltaTime)
 	{
-		SetVelocity(mMoveInput * mSpeed);
+		SetVelocity({mMoveInput.x * mSpeed.x, mMoveInput.y * mSpeed.y});
 		mMoveInput.x = mMoveInput.y = 0.f;
 	}
 

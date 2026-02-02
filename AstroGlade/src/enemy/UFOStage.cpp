@@ -55,6 +55,11 @@ namespace ly
 		Normalize(spawnLocToCenter);
 
 		sf::Vector2f spawnVelocity = spawnLocToCenter * mUFOSpeed;
+		
+		float scaleX = windowSize.x / 600.f;
+		float scaleY = windowSize.y / 980.f;
+		spawnVelocity.x *= scaleX;
+		spawnVelocity.y *= scaleY;
 
 		weak<UFO> newUFO = GetWorld()->SpawnActor<UFO>(spawnVelocity);
 		newUFO.lock()->SetActorLocation(spawnLoc);

@@ -1,5 +1,6 @@
 #include "Enemy/Boss.h"
 #include "gameplay/HealthComponent.h"
+#include "framework/World.h"
 namespace ly
 {
 	Boss::Boss(World* world)
@@ -17,6 +18,12 @@ namespace ly
 		mStage{1}
 	{
 		SetActorRotation(90.f);
+
+		sf::Vector2u windowSize = world->GetWindowSize();
+		float scale = windowSize.x / 600.f;
+		mSpeed *= scale;
+		mBaseSpeed *= scale;
+
 		SetVelocity({mSpeed, 0.f});
 		SetRewardSpawnWeight(0.f);
 	}

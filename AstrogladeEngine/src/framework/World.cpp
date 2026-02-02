@@ -12,7 +12,8 @@ namespace ly
 		mActors{},
 		mPendingActors{},
 		mGameStages{},
-		mCurrentStage{mGameStages.end()}
+		mCurrentStage{mGameStages.end()},
+		mIsPaused{false}
 	{
 
 	}
@@ -37,18 +38,21 @@ namespace ly
 		}
 		mPendingActors.clear();
 
-		for (auto iter = mActors.begin(); iter != mActors.end();)
+		if (!mIsPaused)
 		{
-			iter->get()->TickInternal(deltaTime);
-			++iter;
-		}
+			for (auto iter = mActors.begin(); iter != mActors.end();)
+			{
+				iter->get()->TickInternal(deltaTime);
+				++iter;
+			}
 
-		if (mCurrentStage != mGameStages.end())
-		{
-			mCurrentStage->get()->TickStage(deltaTime);
-		}
+			if (mCurrentStage != mGameStages.end())
+			{
+				mCurrentStage->get()->TickStage(deltaTime);
+			}
 
-		Tick(deltaTime);
+			Tick(deltaTime);
+		}
 
 		if (mHUD)
 		{

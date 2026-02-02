@@ -81,6 +81,22 @@ namespace ly
 		AddStage(shared<BossStage>{new BossStage{ this }});
 	}
 
+	bool GameLevelOne::DispatchEvent(const sf::Event& event)
+	{
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+		{
+			bool isPaused = !IsPaused();
+			SetPaused(isPaused);
+			if (!mGameplayHUD.expired())
+			{
+				mGameplayHUD.lock()->SetPause(isPaused);
+			}
+			return true;
+		}
+		
+		return World::DispatchEvent(event);
+	}
+
 	void GameLevelOne::QuitGame()
 	{
 		GetApplication()->QuitApplication();
@@ -99,6 +115,10 @@ namespace ly
 
 	void GameLevelOne::SpawnCosmetics()
 	{
+		auto windowSize = GetWindowSize();
+		float scaleX = windowSize.x / 600.f;
+		float scaleY = windowSize.y / 980.f;
+
 		auto backdropActor = SpawnActor<BackdropActor>("SpaceShooterRedux/Backgrounds/StellarDrift.png");
 		weak<BackgroundLayer> planets = SpawnActor<BackgroundLayer>();
 		planets.lock()->SetAssets(
@@ -115,7 +135,7 @@ namespace ly
 
 		planets.lock()->SetSpriteCount(1);
 		planets.lock()->SetSizes(1, 1.5f);
-		planets.lock()->SetVelocities({0, 30.f} ,{0, 80.f});
+		planets.lock()->SetVelocities({0, 30.f * scaleY} ,{0, 80.f * scaleY});
 
 
 		weak<BackgroundLayer> meteors = SpawnActor<BackgroundLayer>();
@@ -146,5 +166,6 @@ namespace ly
 
 		meteors.lock()->SetSpriteCount(20);
 		meteors.lock()->SetSizes(.2f, .5f);
+		meteors.lock()->SetVelocities({ 0, 50.f * scaleY }, { 0, 200.f * scaleY });
 	}
 }

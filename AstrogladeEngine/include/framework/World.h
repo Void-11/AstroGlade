@@ -31,15 +31,19 @@ namespace ly
 		sf::Vector2u GetWindowSize() const;
 		void CleanCycle();
 		void AddStage(const shared<GameStage>& newStage);
-		bool DispatchEvent(const sf::Event& event);
+		virtual bool DispatchEvent(const sf::Event& event);
 		Application* GetApplication() { return mOwningApp; }
 		const Application* GetApplication() const { return mOwningApp; }
+
+		void SetPaused(bool paused) { mIsPaused = paused; }
+		bool IsPaused() const { return mIsPaused; }
 	private:
 		virtual void BeginPlay();
 		virtual void Tick(float deltaTime);
 		void RenderHUD(sf::RenderWindow& window);
 		Application* mOwningApp;
 		bool mBeganPlay;
+		bool mIsPaused;
 
 		List<shared<Actor>> mActors;
 

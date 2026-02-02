@@ -10,8 +10,8 @@ namespace ly
 		PlayerSpaceship(World* owningWorld, const std::string& path = "SpaceShooterRedux/PNG/playerShip.png");
 	
 		virtual void Tick(float deltaTime) override;
-		void SetSpeed(float newSpeed) { mSpeed = newSpeed; }
-		float GetSpeed() const { return mSpeed; }
+		void SetSpeed(sf::Vector2f newSpeed) { mSpeed = newSpeed; }
+		sf::Vector2f GetSpeed() const { return mSpeed; }
 		virtual void Shoot() override;
 		void SetShooter(unique<Shooter>&& newsShooter);
 		virtual void ApplyDamage(float amt) override;
@@ -24,7 +24,7 @@ namespace ly
 		void StopInvulnerable();
 		void UpdateInvulnerable(float deltaTime);
 		sf::Vector2f mMoveInput;
-		float mSpeed;
+		sf::Vector2f mSpeed;
 
 		unique<Shooter> mShooter;
 	

@@ -18,6 +18,7 @@ namespace ly
 		virtual bool HandleEvent(const sf::Event& event) override;
 
 		void GameFinished(bool playerWon);
+		void SetPause(bool paused);
 		Delegate<> onRestartBtnClicked;
 		Delegate<> onQuitBtnClicked;
 	private:
@@ -46,6 +47,7 @@ namespace ly
 	
 		TextWidget mWinLoseText;
 		TextWidget mFinalScoreText;
+		TextWidget mPauseText;
 		Button mRestartButton;
 		Button mQuitButton;
 
