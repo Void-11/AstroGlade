@@ -15,6 +15,7 @@ namespace ly
 			mSprite.setTexture(*(mTexture.get()));
 		}
 	}
+
 	void ImageWidget::LocationUpdated(const sf::Vector2f& newLocation)
 	{
 		mSprite.setPosition(newLocation);

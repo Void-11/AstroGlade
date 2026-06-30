@@ -21,6 +21,7 @@ namespace ly
 		void SetPause(bool paused);
 		Delegate<> onRestartBtnClicked;
 		Delegate<> onQuitBtnClicked;
+		Delegate<> onResumeBtnClicked;
 	private:
 		virtual void Init(const sf::RenderWindow& windowRef) override;
 		void RefreshHealthBar();
@@ -29,8 +30,12 @@ namespace ly
 		void PlayerLifeCountUpdated(int amt);
 		void PlayerScoreUpdated(int newScore);
 		void PlayerSpaceshipDestoryed(Actor* actor);
+		void ResumeButtonClicked();
 		void RestartButtonClicked();
+		void ControlsButtonClicked();
+		void ReturnButtonClicked();
 		void QuitButtonClicked();
+		void SetControlsVisible(bool visible);
 		TextWidget mFramerateText;
 		ValueGauge mPlayerHealthBar;
 		ImageWidget mPlayerLifeIcon;
@@ -48,8 +53,17 @@ namespace ly
 		TextWidget mWinLoseText;
 		TextWidget mFinalScoreText;
 		TextWidget mPauseText;
+		TextWidget mControlsTitleText;
+		TextWidget mControlsKeysText;
+		TextWidget mControlsActionsText;
+		Button mResumeButton;
 		Button mRestartButton;
+		Button mControlsButton;
 		Button mQuitButton;
+		Button mReturnButton;
+		sf::RectangleShape mControlsPanel;
+		bool mShowingControls;
+		bool mIsPaused;
 
 		sf::Vector2u mWindowSize;
 	};

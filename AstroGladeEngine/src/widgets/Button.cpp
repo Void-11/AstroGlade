@@ -5,14 +5,18 @@ namespace ly
 	Button::Button(const std::string& textString, const std::string& buttonTexturePath)
 		: mButtonTexture{ AssetManager::Get().LoadTexture(buttonTexturePath) },
 		mButtonSprite{ *(mButtonTexture.get()) },
-		mButtonFont{ AssetManager::Get().LoadFont("SpaceShooterRedux/Bonus/kenvector_future.ttf") },
+		mButtonFont{ AssetManager::Get().LoadFont("SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf") },
 		mButtonText(textString, *(mButtonFont.get())),
 		mButtonDefaultColor{128,128,128,255},
 		mButtonDownColor{64,64,64, 255},
 		mButtonHoverColor{190, 190,190, 255},
+		mTextDefaultColor{255, 255, 255, 255},
+		mTextDownColor{200, 200, 200, 255},
+		mTextHoverColor{255, 255, 255, 255},
 		mIsButtonDown{false}
 	{
 		mButtonSprite.setColor(mButtonDefaultColor);
+		mButtonText.setFillColor(mTextDefaultColor);
 		CenterText();
 	}
 	void Button::Draw(sf::RenderWindow& windowRef)
@@ -55,6 +59,22 @@ sf::FloatRect Button::GetBounds() const
 	{
 		mButtonText.setCharacterSize(characterSize);
 		CenterText();
+	}
+
+	void Button::SetButtonColors(const sf::Color& defaultColor, const sf::Color& hoverColor, const sf::Color& downColor)
+	{
+		mButtonDefaultColor = defaultColor;
+		mButtonHoverColor = hoverColor;
+		mButtonDownColor = downColor;
+		ButtonUp();
+	}
+
+	void Button::SetTextColors(const sf::Color& defaultColor, const sf::Color& hoverColor, const sf::Color& downColor)
+	{
+		mTextDefaultColor = defaultColor;
+		mTextHoverColor = hoverColor;
+		mTextDownColor = downColor;
+		ButtonUp();
 	}
 
 	bool Button::HandleEvent(const sf::Event& windowEvent)
@@ -104,14 +124,17 @@ sf::FloatRect Button::GetBounds() const
 	{
 		mIsButtonDown = false;
 		mButtonSprite.setColor(mButtonDefaultColor);
+		mButtonText.setFillColor(mTextDefaultColor);
 	}
 	void Button::ButtonDown()
 	{
 		mIsButtonDown = true;
 		mButtonSprite.setColor(mButtonDownColor);
+		mButtonText.setFillColor(mTextDownColor);
 	}
 	void Button::MouseHovered()
 	{
 		mButtonSprite.setColor(mButtonHoverColor);
+		mButtonText.setFillColor(mTextHoverColor);
 	}
 }

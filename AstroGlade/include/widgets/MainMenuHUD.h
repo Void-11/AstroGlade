@@ -18,11 +18,22 @@ namespace ly
 
 		virtual void Init(const sf::RenderWindow& windowRef) override;
 
-		TextWidget mTitleText;
+		TextWidget mTitleAstroText;
+		TextWidget mTitleGladeText;
+		TextWidget mControlsTitleText;
+		TextWidget mControlsKeysText;
+		TextWidget mControlsActionsText;
 		Button mStartButton;
+		Button mControlsButton;
 		Button mQuitButton;
+		Button mBackButton;
+		sf::RectangleShape mControlsPanel;
+		bool mShowingControls;
 
 		void StartButtonClicked();
+		void ControlsButtonClicked();
+		void BackButtonClicked();
 		void QuitButtonClicked();
+		void SetControlsVisible(bool visible);
 	};
 }

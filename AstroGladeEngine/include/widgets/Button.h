@@ -12,6 +12,8 @@ namespace ly
 		virtual sf::FloatRect GetBounds() const;
 		void SetTextString(const std::string& newStr);
 		void SetTextSize(unsigned int characterSize);
+		void SetButtonColors(const sf::Color& defaultColor, const sf::Color& hoverColor, const sf::Color& downColor);
+		void SetTextColors(const sf::Color& defaultColor, const sf::Color& hoverColor, const sf::Color& downColor);
 		virtual bool HandleEvent(const sf::Event& windowEvent) override;
 		Delegate<> onButtonClicked;
 	private:
@@ -28,6 +30,9 @@ namespace ly
 		sf::Color mButtonDefaultColor;
 		sf::Color mButtonDownColor;
 		sf::Color mButtonHoverColor;
+		sf::Color mTextDefaultColor;
+		sf::Color mTextDownColor;
+		sf::Color mTextHoverColor;
 
 		bool mIsButtonDown;
 

@@ -45,6 +45,7 @@ namespace ly
 		mGameplayHUD = SpawnHUD<GameplayHUD>();
 		mGameplayHUD.lock()->onQuitBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::QuitGame);
 		mGameplayHUD.lock()->onRestartBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::Restart);
+		mGameplayHUD.lock()->onResumeBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::ResumeGame);
 	}
 
 	void GameLevelOne::PlayerSpaceshipDestroyed(Actor* destroyedPlayerSpaceship)
@@ -83,6 +84,11 @@ namespace ly
 
 	bool GameLevelOne::DispatchEvent(const sf::Event& event)
 	{
+		if (IsPaused() && World::DispatchEvent(event))
+		{
+			return true;
+		}
+
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 		{
 			bool isPaused = !IsPaused();
@@ -95,6 +101,15 @@ namespace ly
 		}
 		
 		return World::DispatchEvent(event);
+	}
+
+	void GameLevelOne::ResumeGame()
+	{
+		SetPaused(false);
+		if (!mGameplayHUD.expired())
+		{
+			mGameplayHUD.lock()->SetPause(false);
+		}
 	}
 
 	void GameLevelOne::QuitGame()

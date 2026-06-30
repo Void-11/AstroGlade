@@ -10,12 +10,13 @@ namespace ly
 	{
 	public:
 		TextWidget(const std::string& textStr, const std::string& fontPath
-			= "SpaceShooterRedux/Bonus/kenvector_future.ttf",
+			= "SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf",
 			unsigned int characterSize = 10
 		);
 
 		void SetString(const std::string& newStr);
 		void SetTextSize(unsigned int newSize);
+		void SetTextColor(const sf::Color& color);
 		virtual sf::FloatRect GetBounds() const override;
 	private:
 		virtual void LocationUpdated(const sf::Vector2f& newLocation) override;

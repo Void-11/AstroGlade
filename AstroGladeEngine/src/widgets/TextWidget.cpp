@@ -19,6 +19,11 @@ namespace ly
 		mText.setCharacterSize(newSize);
 	}
 
+	void TextWidget::SetTextColor(const sf::Color& color)
+	{
+		mText.setFillColor(color);
+	}
+
 sf::FloatRect TextWidget::GetBounds() const
 	{
 		return mText.getGlobalBounds();

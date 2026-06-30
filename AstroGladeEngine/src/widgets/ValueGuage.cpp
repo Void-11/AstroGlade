@@ -4,7 +4,7 @@ namespace ly
 {
 
 	ValueGauge::ValueGauge(const sf::Vector2f& size, float initialPercent, const sf::Color& foreGroundColor, const sf::Color& backgroundColor)
-		: mTextFont{ AssetManager::Get().LoadFont("SpaceShooterRedux/Bonus/kenvector_future.ttf") },
+		: mTextFont{ AssetManager::Get().LoadFont("SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf") },
 		mText{ "",*(mTextFont.get()) },
 		mBarFront{ size },
 		mBarBack{ size },
@@ -37,6 +37,11 @@ sf::FloatRect ValueGauge::GetBounds() const
 	void ValueGauge::SetTextSize(unsigned int characterSize)
 	{
 		mText.setCharacterSize(characterSize);
+	}
+
+	void ValueGauge::SetTextColor(const sf::Color& color)
+	{
+		mText.setFillColor(color);
 	}
 
 	void ValueGauge::SetForegroundColor(const sf::Color& color)
@@ -73,7 +78,7 @@ sf::FloatRect ValueGauge::GetBounds() const
 	void ValueGauge::CenterText()
 	{
 		sf::Vector2f widgetCenter = GetCenterPosition();
-		sf::FloatRect textBound = mText.getGlobalBounds();
-		mText.setPosition(widgetCenter - sf::Vector2f{textBound.width/2.f, textBound.height});
+		sf::FloatRect textBound = mText.getLocalBounds();
+		mText.setPosition(widgetCenter - sf::Vector2f{textBound.left + textBound.width / 2.f, textBound.top + textBound.height / 2.f});
 	}
 }

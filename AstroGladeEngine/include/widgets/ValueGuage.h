@@ -15,6 +15,7 @@ namespace ly
 		virtual sf::FloatRect GetBounds() const;
 
 		void SetTextSize(unsigned int characterSize);
+		void SetTextColor(const sf::Color& color);
 
 		void SetForegroundColor(const sf::Color& color);
 		void SetBackgroundColor(const sf::Color& color);

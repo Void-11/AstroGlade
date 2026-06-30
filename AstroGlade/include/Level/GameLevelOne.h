@@ -17,6 +17,7 @@ namespace ly
 		        weak<PlayerSpaceship> mPlayerSpaceship;		weak<GameplayHUD> mGameplayHUD;
 		void PlayerSpaceshipDestroyed(Actor* destoryedPlayerSpaceship);
 		TimerHandle timerHandle_Test;
+		void ResumeGame();
 		void QuitGame();
 		void Restart();
 		void GameOver();
