@@ -10,6 +10,7 @@ namespace ly
 	public:
 		VanguardStage(World* world);
 		virtual void StartStage() override;
+		virtual void TickStage(float deltaTime) override;
 	private:
 		float mSpawnInterval;
 		float mSwitchInterval;
@@ -27,6 +28,7 @@ namespace ly
 
 		int mVarguardsPerRow;
 		int mCurrentRowVanguardCount;
+		bool mFinishedSpawning;
 
 		virtual void StageFinished() override;
 		void SpawnVanguard();

@@ -4,21 +4,31 @@ namespace ly
 {
 
 	ValueGauge::ValueGauge(const sf::Vector2f& size, float initialPercent, const sf::Color& foreGroundColor, const sf::Color& backgroundColor)
-		: mTextFont{ AssetManager::Get().LoadFont("SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf") },
-		mText{ "",*(mTextFont.get()) },
+		: mTextFont{},
+		mText{},
 		mBarFront{ size },
 		mBarBack{ size },
 		mPercent{ initialPercent },
 		mForegroundColor{foreGroundColor},
 		mBackgroundColor{backgroundColor}
 	{
+		const std::string textFontPath = "SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf";
+		mTextFont = AssetManager::Get().LoadFont(textFontPath);
+		if (!mTextFont)
+		{
+			LOG("Failed to load value gauge font: %s", textFontPath.c_str());
+		}
+		else
+		{
+			mText.setFont(*mTextFont);
+		}
+
 		mBarFront.setFillColor(mForegroundColor);
 		mBarBack.setFillColor(mBackgroundColor);
 		SetTextSize(20);
 	}
 	void ValueGauge::UpdateValue(float value, float maxValue)
 	{
-		LOG("player health is now: %f", value);
 		if (maxValue == 0) return;
 		mPercent = value / maxValue;
 		std::string displayStr = std::to_string((int)value) + "/" + std::to_string((int)maxValue);

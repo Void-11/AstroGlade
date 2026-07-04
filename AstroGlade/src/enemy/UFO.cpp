@@ -1,4 +1,5 @@
 #include "Enemy/UFO.h"
+#include "gameplay/GameAudio.h"
 #include "weapon/LaserShooter.h"
 
 namespace ly
@@ -10,6 +11,7 @@ namespace ly
 		mShooter3{ new LaserShooter{this, .5f, sf::Vector2f{0.f,0.f}, 180.f, "SpaceShooterRedux/PNG/Lasers/laserRed01.png"} },
 		mRotationSpeed{rotationSpeed}
 	{
+		GetHealthComp().SetInitialHealth(85.f, 85.f);
 		SetVelocity(velocity);
 		SetActorRotation(90.f);
 	}
@@ -21,8 +23,13 @@ namespace ly
 	}
 	void UFO::Shoot()
 	{
-		mShooter1->Shoot();
-		mShooter2->Shoot();
-		mShooter3->Shoot();
+		bool fired = false;
+		fired = mShooter1->Shoot() || fired;
+		fired = mShooter2->Shoot() || fired;
+		fired = mShooter3->Shoot() || fired;
+		if (fired)
+		{
+			GameAudio::PlayEnemyShoot();
+		}
 	}
 }

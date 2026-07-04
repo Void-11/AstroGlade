@@ -13,19 +13,36 @@ namespace ly
 		mRightSpawnLoc{world->GetWindowSize().x/2.f + mSpawnDistanceToCenter, -100.f},
 		mSpawnLoc{mLeftSpawnLoc},
 		mSpawnAmt{10},
-		mCurrentSpawnCount{0}
+		mCurrentSpawnCount{0},
+		mFinishedSpawning{false}
 	{
 	}
 
 	void TwinBladeStage::StartStage()
 	{
+		mFinishedSpawning = false;
 		mSpawnTimerHandle = TimerManager::Get().SetTimer(GetWeakRef(), &TwinBladeStage::SpawnTwinBlade, mSpawnInterval, true);
+	}
+
+	void TwinBladeStage::TickStage(float deltaTime)
+	{
+		(void)deltaTime;
+		if (mFinishedSpawning)
+		{
+			FinishStageIfTrackedActorsDestroyed();
+		}
 	}
 
 	void TwinBladeStage::SpawnTwinBlade()
 	{
+		if (mFinishedSpawning)
+		{
+			return;
+		}
+
 		weak<TwinBlade> newTwinBlade = GetWorld()->SpawnActor<TwinBlade>();
 		newTwinBlade.lock()->SetActorLocation(mSpawnLoc);
+		TrackActor(newTwinBlade);
 		if (mSpawnLoc == mLeftSpawnLoc)
 		{
 			mSpawnLoc = mRightSpawnLoc;
@@ -38,12 +55,15 @@ namespace ly
 		++mCurrentSpawnCount;
 		if (mCurrentSpawnCount == mSpawnAmt)
 		{
-			FinishStage();
+			mFinishedSpawning = true;
+			TimerManager::Get().ClearTimer(mSpawnTimerHandle);
+			FinishStageIfTrackedActorsDestroyed();
 		}
 	}
 
 	void TwinBladeStage::StageFinished()
 	{
 		TimerManager::Get().ClearTimer(mSpawnTimerHandle);
+		ClearTrackedActors();
 	}
 }

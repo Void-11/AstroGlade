@@ -3,6 +3,7 @@
 #include "Level/MainMenuLevel.h"
 #include "widgets/MainMenuHUD.h"
 #include "framework/Application.h"
+#include "gameplay/GameAudio.h"
 #include "Level/GameLevelOne.h"
 #include "framework/Actor.h"
 
@@ -16,6 +17,7 @@ namespace ly
 
 	void MainMenuLevel::BeginPlay()
 	{
+		GameAudio::PlayMenuMusic();
 		mMainMenuHUD.lock()->onStartButtonClicked.BindAction(GetWeakRef(), &MainMenuLevel::StartGame);
 		mMainMenuHUD.lock()->onQuitButtonClicked.BindAction(GetWeakRef(), &MainMenuLevel::QuitGame);
 		weak<Actor> background = SpawnActor<Actor>("SpaceShooterRedux/mainMenuBg.png");
@@ -37,6 +39,7 @@ namespace ly
 
 	void MainMenuLevel::QuitGame()
 	{
+		GameAudio::StopMusic();
 		GetApplication()->QuitApplication();
 	}
 

@@ -13,6 +13,7 @@ namespace ly
 		shared<sf::Font> LoadFont(const std::string& path);
 		void CleanCycle();
 		void SetAssetRootDirectory(const std::string& directory);
+		const std::string& GetAssetRootDirectory() const { return mRootDirectory; }
 	protected:
 		AssetManager();
 	private:

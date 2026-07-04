@@ -12,19 +12,31 @@ namespace ly
 		mSpawnInterval{4.f},
 		mSpawnAmt{10},
 		mCurrentSpawnAmt{0},
-		mUFOSpeed{200.f}
+		mUFOSpeed{200.f},
+		mFinishedSpawning{false}
 	{
 
 	}
 
 	void UFOStage::StartStage()
 	{
+		mFinishedSpawning = false;
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &UFOStage::SpawnUFO, mSpawnInterval, true);
+	}
+
+	void UFOStage::TickStage(float deltaTime)
+	{
+		(void)deltaTime;
+		if (mFinishedSpawning)
+		{
+			FinishStageIfTrackedActorsDestroyed();
+		}
 	}
 
 	void UFOStage::StageFinished()
 	{
 		TimerManager::Get().ClearTimer(mSpawnTimer);
+		ClearTrackedActors();
 	}
 
 	sf::Vector2f UFOStage::GetRandomSpawnLoc() const
@@ -48,6 +60,11 @@ namespace ly
 
 	void UFOStage::SpawnUFO()
 	{
+		if (mFinishedSpawning)
+		{
+			return;
+		}
+
 		sf::Vector2f spawnLoc = GetRandomSpawnLoc();
 		auto windowSize = GetWorld()->GetWindowSize();
 		sf::Vector2f center{windowSize.x/2.f, windowSize.y/2.f};
@@ -63,10 +80,13 @@ namespace ly
 
 		weak<UFO> newUFO = GetWorld()->SpawnActor<UFO>(spawnVelocity);
 		newUFO.lock()->SetActorLocation(spawnLoc);
+		TrackActor(newUFO);
 
 		if (++mCurrentSpawnAmt == mSpawnAmt)
 		{
-			FinishStage();
+			mFinishedSpawning = true;
+			TimerManager::Get().ClearTimer(mSpawnTimer);
+			FinishStageIfTrackedActorsDestroyed();
 		}
 	}
 }

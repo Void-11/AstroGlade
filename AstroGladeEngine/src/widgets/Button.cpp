@@ -3,10 +3,10 @@
 namespace ly
 {
 	Button::Button(const std::string& textString, const std::string& buttonTexturePath)
-		: mButtonTexture{ AssetManager::Get().LoadTexture(buttonTexturePath) },
-		mButtonSprite{ *(mButtonTexture.get()) },
-		mButtonFont{ AssetManager::Get().LoadFont("SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf") },
-		mButtonText(textString, *(mButtonFont.get())),
+		: mButtonTexture{},
+		mButtonSprite{},
+		mButtonFont{},
+		mButtonText{},
 		mButtonDefaultColor{128,128,128,255},
 		mButtonDownColor{64,64,64, 255},
 		mButtonHoverColor{190, 190,190, 255},
@@ -15,7 +15,29 @@ namespace ly
 		mTextHoverColor{255, 255, 255, 255},
 		mIsButtonDown{false}
 	{
-		mButtonSprite.setColor(mButtonDefaultColor);
+		mButtonTexture = AssetManager::Get().LoadTexture(buttonTexturePath);
+		if (!mButtonTexture)
+		{
+			LOG("Failed to load button texture: %s", buttonTexturePath.c_str());
+		}
+		else
+		{
+			mButtonSprite.setTexture(*mButtonTexture);
+			mButtonSprite.setColor(mButtonDefaultColor);
+		}
+
+		const std::string buttonFontPath = "SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf";
+		mButtonFont = AssetManager::Get().LoadFont(buttonFontPath);
+		if (!mButtonFont)
+		{
+			LOG("Failed to load button font: %s", buttonFontPath.c_str());
+		}
+		else
+		{
+			mButtonText.setFont(*mButtonFont);
+		}
+
+		mButtonText.setString(textString);
 		mButtonText.setFillColor(mTextDefaultColor);
 		CenterText();
 	}

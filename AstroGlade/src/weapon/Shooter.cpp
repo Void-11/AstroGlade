@@ -2,22 +2,39 @@
 
 namespace ly
 {
-	void Shooter::Shoot()
+	bool Shooter::Shoot()
 	{
 		if (CanShoot() && !IsOnCooldown())
 		{
-			ShootImpl();
+			return ShootImpl();
 		}
+
+		return false;
 	}
 	
 	void Shooter::IncrementLevel(int amt)
 	{
-		if (mCurrentLevel == mMaxLevel) return;
-		++mCurrentLevel;
+		if (amt <= 0 || mCurrentLevel == mMaxLevel) return;
+
+		mCurrentLevel += amt;
+		if (mCurrentLevel > mMaxLevel)
+		{
+			mCurrentLevel = mMaxLevel;
+		}
 	}
 
 	void Shooter::SetCurrentLevel(int level)
 	{
+		if (level < 1)
+		{
+			level = 1;
+		}
+
+		if (level > mMaxLevel)
+		{
+			level = mMaxLevel;
+		}
+
 		mCurrentLevel = level;
 	}
 

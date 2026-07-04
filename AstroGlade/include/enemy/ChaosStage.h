@@ -11,6 +11,7 @@ namespace ly
 		ChaosStage(World* world);
 
 		virtual void StartStage() override;
+		virtual void TickStage(float deltaTime) override;
 
 	private:
 		virtual void StageFinished() override;
@@ -32,8 +33,10 @@ namespace ly
 		float mSpawnIntervalDecrmentInterval;
 
 		float mStageDuration;
+		bool mFinishedSpawning;
 
 		TimerHandle mDifficultTimerHandle;
 		TimerHandle mSpawnTimer;
+		TimerHandle mStageDurationTimer;
 	};
 }

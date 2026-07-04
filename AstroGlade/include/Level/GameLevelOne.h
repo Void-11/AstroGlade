@@ -13,14 +13,22 @@ namespace ly
 		        virtual void InitGameStages() override;
 		        virtual void AllGameStageFinished() override;
 		        virtual bool DispatchEvent(const sf::Event& event) override;
+		        virtual void OnGameStageStarted(GameStage& startedStage) override;
+		        virtual void OnGameStageFinished(GameStage& finishedStage) override;
 		    private:
 		        weak<PlayerSpaceship> mPlayerSpaceship;		weak<GameplayHUD> mGameplayHUD;
+		bool mGameFinished;
+		bool mBossFightActive;
 		void PlayerSpaceshipDestroyed(Actor* destoryedPlayerSpaceship);
-		TimerHandle timerHandle_Test;
+		TimerHandle mRespawnTimerHandle;
+		float mRespawnDelay;
 		void ResumeGame();
 		void QuitGame();
 		void Restart();
 		void GameOver();
+		void FinishGame(bool playerWon);
+		void RespawnPlayerSpaceship();
+		void ApplyBossRespawnLoadout(PlayerSpaceship& playerSpaceship);
 		void SpawnCosmetics();
 	};
 }

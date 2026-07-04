@@ -19,17 +19,18 @@ namespace ly
 
 		void GameFinished(bool playerWon);
 		void SetPause(bool paused);
+		void RefreshHealthBar();
 		Delegate<> onRestartBtnClicked;
 		Delegate<> onQuitBtnClicked;
 		Delegate<> onResumeBtnClicked;
 	private:
 		virtual void Init(const sf::RenderWindow& windowRef) override;
-		void RefreshHealthBar();
 		void ConnectPlayerStatus();
 		void PlayerHealthUpdated(float amt, float currentHealth, float maxHealth);
 		void PlayerLifeCountUpdated(int amt);
 		void PlayerScoreUpdated(int newScore);
 		void PlayerSpaceshipDestoryed(Actor* actor);
+		void UpdateFrameRate();
 		void ResumeButtonClicked();
 		void RestartButtonClicked();
 		void ControlsButtonClicked();
@@ -66,5 +67,8 @@ namespace ly
 		bool mIsPaused;
 
 		sf::Vector2u mWindowSize;
+		sf::Clock mFrameRateClock;
+		int mFramesSinceRateUpdate;
+		float mFrameRateUpdateInterval;
 	};
 }

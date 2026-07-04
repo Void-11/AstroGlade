@@ -54,7 +54,10 @@ namespace ly
 
 	unique<TimerManager> TimerManager::timerManager{ nullptr };
 	
-	TimerManager::TimerManager() : mTimers{}
+	TimerManager::TimerManager()
+		: mTimers{},
+		mPendingTimers{},
+		mIsUpdating{false}
 	{
 	}
 	TimerManager& TimerManager::Get()
@@ -69,6 +72,7 @@ namespace ly
 
 	void TimerManager::UpdateTimer(float deltaTime)
 	{
+		mIsUpdating = true;
 		for (auto iter = mTimers.begin(); iter != mTimers.end();)
 		{
 			if (iter->second.Expired())
@@ -78,9 +82,26 @@ namespace ly
 			else
 			{
 				iter->second.TickTime(deltaTime);
-				++iter;
+				if (iter->second.Expired())
+				{
+					iter = mTimers.erase(iter);
+				}
+				else
+				{
+					++iter;
+				}
 			}
 		}
+		mIsUpdating = false;
+
+		for (auto& pendingTimer : mPendingTimers)
+		{
+			if (!pendingTimer.second.Expired())
+			{
+				mTimers.insert(pendingTimer);
+			}
+		}
+		mPendingTimers.clear();
 	}
 
 	bool operator==(const TimerHandle& lhs, const TimerHandle& rhs)
@@ -94,6 +115,16 @@ namespace ly
 		if (iter != mTimers.end())
 		{
 			iter->second.SetExpired();
+			return;
+		}
+
+		for (auto& pendingTimer : mPendingTimers)
+		{
+			if (pendingTimer.first == timerHandle)
+			{
+				pendingTimer.second.SetExpired();
+				return;
+			}
 		}
 	}
 }

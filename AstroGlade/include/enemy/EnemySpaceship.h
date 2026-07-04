@@ -9,14 +9,15 @@ namespace ly
 	public:
 		EnemySpaceship(World* owningWorld, 
 			const std::string& texturePath,
-			float collisionDamage = 200.f,
+			float collisionDamage = 50.f,
 			float rewardSpawnWeight = 0.5f,
 			const List<RewardFactoryFunc> rewards = 
 			{
 				CreateHealthReward,
 				CreateThreewayShooterReward,
 				CreateFrontalWiperReward,
-				CreateLifeReward
+				CreateLifeReward,
+				CreateScoreMultiplierReward
 			}
 		);
 

@@ -12,6 +12,7 @@
 #include "framework/BackgroundLayer.h"
 #include "framework/TimerManager.h"
 #include "framework/World.h"
+#include "gameplay/GameAudio.h"
 #include "gameplay/GameStage.h"
 #include "gameplay/WaitStage.h"
 #include "player/PlayerSpaceship.h"
@@ -21,22 +22,63 @@
 
 #include "player/PlayerManager.h"
 #include "widgets/GameplayHUD.h"
+#include "weapon/ThreeWayShooter.h"
+
+#include <utility>
 
 namespace ly
 {
 	GameLevelOne::GameLevelOne(Application* owningApp)
-		: World{owningApp}
+		: World{owningApp},
+		mGameFinished{false},
+		mBossFightActive{false},
+		mRespawnTimerHandle{},
+		mRespawnDelay{1.5f}
 	{
 		
 	}
 
 	void GameLevelOne::AllGameStageFinished()
 	{
-		mGameplayHUD.lock()->GameFinished(true);
+		FinishGame(true);
+	}
+
+	void GameLevelOne::OnGameStageStarted(GameStage& startedStage)
+	{
+		mBossFightActive = dynamic_cast<BossStage*>(&startedStage) != nullptr;
+		if (mBossFightActive)
+		{
+			GameAudio::PlayBossMusic();
+		}
+	}
+
+	void GameLevelOne::OnGameStageFinished(GameStage& finishedStage)
+	{
+		bool combatStageFinished = dynamic_cast<VanguardStage*>(&finishedStage)
+			|| dynamic_cast<TwinBladeStage*>(&finishedStage)
+			|| dynamic_cast<HexagonStage*>(&finishedStage)
+			|| dynamic_cast<UFOStage*>(&finishedStage)
+			|| dynamic_cast<ChaosStage*>(&finishedStage);
+
+		if (combatStageFinished)
+		{
+			GameAudio::PlayStageClear();
+			Player* player = PlayerManager::Get().GetPlayer();
+			if (player)
+			{
+				player->IncreaseDefaultWeaponLevel();
+			}
+		}
+
+		if (dynamic_cast<BossStage*>(&finishedStage))
+		{
+			mBossFightActive = false;
+		}
 	}
 
 	void GameLevelOne::BeginPlay()
 	{
+		GameAudio::PlayGameplayMusic();
 		SpawnCosmetics();
 
 		Player& newPlayer = PlayerManager::Get().CreateNewPlayer();
@@ -50,10 +92,15 @@ namespace ly
 
 	void GameLevelOne::PlayerSpaceshipDestroyed(Actor* destroyedPlayerSpaceship)
 	{
-		mPlayerSpaceship = PlayerManager::Get().GetPlayer()->SpawnSpaceship(this);
-		if (!mPlayerSpaceship.expired())
+		if (mGameFinished)
 		{
-	mPlayerSpaceship.lock()->onActorDestroyed.BindAction(GetWeakRef(), &GameLevelOne::PlayerSpaceshipDestroyed);
+			return;
+		}
+
+		Player* player = PlayerManager::Get().GetPlayer();
+		if (player && player->ConsumeLife())
+		{
+			mRespawnTimerHandle = TimerManager::Get().SetTimer(GetWeakRef(), &GameLevelOne::RespawnPlayerSpaceship, mRespawnDelay);
 		}
 		else
 		{
@@ -84,6 +131,11 @@ namespace ly
 
 	bool GameLevelOne::DispatchEvent(const sf::Event& event)
 	{
+		if (mGameFinished)
+		{
+			return World::DispatchEvent(event);
+		}
+
 		if (IsPaused() && World::DispatchEvent(event))
 		{
 			return true;
@@ -93,6 +145,15 @@ namespace ly
 		{
 			bool isPaused = !IsPaused();
 			SetPaused(isPaused);
+			GameAudio::PlayPauseToggle();
+			if (isPaused)
+			{
+				GameAudio::PauseMusic();
+			}
+			else
+			{
+				GameAudio::ResumeMusic();
+			}
 			if (!mGameplayHUD.expired())
 			{
 				mGameplayHUD.lock()->SetPause(isPaused);
@@ -105,7 +166,13 @@ namespace ly
 
 	void GameLevelOne::ResumeGame()
 	{
+		if (mGameFinished)
+		{
+			return;
+		}
+
 		SetPaused(false);
+		GameAudio::ResumeMusic();
 		if (!mGameplayHUD.expired())
 		{
 			mGameplayHUD.lock()->SetPause(false);
@@ -114,18 +181,85 @@ namespace ly
 
 	void GameLevelOne::QuitGame()
 	{
+		GameAudio::StopMusic();
 		GetApplication()->QuitApplication();
 	}
 
 	void GameLevelOne::Restart()
 	{
+		GameAudio::StopMusic();
 		PlayerManager::Get().Reset();
 		GetApplication()->LoadWorld<GameLevelOne>();
 	}
 
 	void GameLevelOne::GameOver()
 	{
-		mGameplayHUD.lock()->GameFinished(false);
+		FinishGame(false);
+	}
+
+	void GameLevelOne::FinishGame(bool playerWon)
+	{
+		if (mGameFinished)
+		{
+			return;
+		}
+
+		mGameFinished = true;
+		SetPaused(true);
+		GameAudio::StopMusic();
+		if (playerWon)
+		{
+			GameAudio::PlayWin();
+		}
+		else
+		{
+			GameAudio::PlayGameOver();
+		}
+		if (!mGameplayHUD.expired())
+		{
+			mGameplayHUD.lock()->GameFinished(playerWon);
+		}
+	}
+
+	void GameLevelOne::RespawnPlayerSpaceship()
+	{
+		if (mGameFinished)
+		{
+			return;
+		}
+
+		Player* player = PlayerManager::Get().GetPlayer();
+		if (!player)
+		{
+			GameOver();
+			return;
+		}
+
+		mPlayerSpaceship = player->SpawnSpaceship(this);
+		if (!mPlayerSpaceship.expired())
+		{
+			if (mBossFightActive)
+			{
+				ApplyBossRespawnLoadout(*mPlayerSpaceship.lock());
+			}
+
+			mPlayerSpaceship.lock()->onActorDestroyed.BindAction(GetWeakRef(), &GameLevelOne::PlayerSpaceshipDestroyed);
+			if (!mGameplayHUD.expired())
+			{
+				mGameplayHUD.lock()->RefreshHealthBar();
+			}
+		}
+		else
+		{
+			GameOver();
+		}
+	}
+
+	void GameLevelOne::ApplyBossRespawnLoadout(PlayerSpaceship& playerSpaceship)
+	{
+		unique<Shooter> bossShooter{new ThreeWayShooter{&playerSpaceship, 0.4f, {50.f, 0.f}}};
+		bossShooter->SetCurrentLevel(3);
+		playerSpaceship.SetShooter(std::move(bossShooter));
 	}
 
 	void GameLevelOne::SpawnCosmetics()

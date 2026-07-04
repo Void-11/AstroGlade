@@ -9,6 +9,7 @@ namespace ly
 	public:
 		UFOStage(World* world);
 		virtual void StartStage() override;
+		virtual void TickStage(float deltaTime) override;
 	private:
 		virtual void StageFinished() override;
 		sf::Vector2f GetRandomSpawnLoc() const;
@@ -18,6 +19,7 @@ namespace ly
 		int mSpawnAmt;
 		int mCurrentSpawnAmt;
 		float mUFOSpeed;
+		bool mFinishedSpawning;
 		
 		TimerHandle mSpawnTimer;
 	};

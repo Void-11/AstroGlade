@@ -1,9 +1,8 @@
 #include "player/PlayerSpaceship.h"
 #include "SFML/System.hpp"
 #include "framework/MathUtility.h"
+#include "gameplay/GameAudio.h"
 #include "weapon/LaserShooter.h"
-#include "weapon/ThreeWayShooter.h"
-#include "weapon/FrontalWiper.h"
 #include "framework/World.h"
 
 namespace ly
@@ -12,7 +11,7 @@ namespace ly
 		: Spaceship{owningWorld, path},
 		mMoveInput{},
 		mSpeed{200.f, 200.f},
-		mShooter{ new LaserShooter{this, .5f, {50.f, 0.f}} },
+		mShooter{ new LaserShooter{this, .35f, {50.f, 0.f}} },
 		mInvulnerableTime{2.f},
 		mInvulnerable{true},
 	mInvulnerableFlashInterval{0.5f},
@@ -20,7 +19,6 @@ namespace ly
 		mInvulnerableFlashDir{1}
 	{
 		SetTeamID(1);
-		mShooter->SetCurrentLevel(4);
 
 		sf::Vector2u windowSize = owningWorld->GetWindowSize();
 		float scaleX = windowSize.x / 600.f;
@@ -31,17 +29,17 @@ namespace ly
 
 	void PlayerSpaceship::Tick(float deltaTime)
 	{
-		Spaceship::Tick(deltaTime);
 		HandleInput();
 		ConsumeInput(deltaTime);
+		Spaceship::Tick(deltaTime);
 		UpdateInvulnerable(deltaTime);
 	}
 
 	void PlayerSpaceship::Shoot()
 	{
-		if (mShooter)
+		if (mShooter && mShooter->Shoot())
 		{
-			mShooter->Shoot();
+			GameAudio::PlayPlayerShoot(*mShooter);
 		}
 	}
 
@@ -54,6 +52,21 @@ namespace ly
 		}
 
 		mShooter = std::move(newsShooter);
+	}
+
+	void PlayerSpaceship::ApplyDefaultWeapon(int weaponLevel)
+	{
+		mShooter = unique<Shooter>{new LaserShooter{this, .35f, {50.f, 0.f}}};
+		mShooter->SetCurrentLevel(weaponLevel);
+	}
+
+	void PlayerSpaceship::ApplyDefaultWeaponLevelIfUsingLaser(int weaponLevel)
+	{
+		LaserShooter* laserShooter = dynamic_cast<LaserShooter*>(mShooter.get());
+		if (laserShooter)
+		{
+			laserShooter->SetCurrentLevel(weaponLevel);
+		}
 	}
 
 	void PlayerSpaceship::ApplyDamage(float amt)
@@ -72,20 +85,20 @@ namespace ly
 
 	void PlayerSpaceship::HandleInput()
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
 			mMoveInput.y = -1.f;
 		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
 			mMoveInput.y = 1.f;
 		}
 		 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			mMoveInput.x = -1.f;
 		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
 			mMoveInput.x = 1.f;
 		}
@@ -105,22 +118,26 @@ namespace ly
 	void PlayerSpaceship::ClampInputOnEdge()
 	{
 		sf::Vector2f actorLocation = GetActorLocation();
-		if (actorLocation.x < 0 && mMoveInput.x == -1)
+		sf::FloatRect actorBounds = GetActorGlobalBounds();
+		float halfWidth = actorBounds.width / 2.f;
+		float halfHeight = actorBounds.height / 2.f;
+
+		if (actorLocation.x - halfWidth <= 0.f && mMoveInput.x < 0.f)
 		{
 			mMoveInput.x = 0.f;
 		}
 
-		if (actorLocation.x > GetWindowSize().x && mMoveInput.x == 1.f)
+		if (actorLocation.x + halfWidth >= GetWindowSize().x && mMoveInput.x > 0.f)
 		{
 			mMoveInput.x = 0.f;
 		}
 
-		if (actorLocation.y < 0 && mMoveInput.y == -1)
+		if (actorLocation.y - halfHeight <= 0.f && mMoveInput.y < 0.f)
 		{
 			mMoveInput.y = 0.f;
 		}
 
-		if (actorLocation.y > GetWindowSize().y && mMoveInput.y == 1.f)
+		if (actorLocation.y + halfHeight >= GetWindowSize().y && mMoveInput.y > 0.f)
 		{
 			mMoveInput.y = 0.f;
 		}

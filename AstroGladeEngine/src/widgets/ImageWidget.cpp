@@ -3,9 +3,17 @@
 namespace ly
 {
 	ImageWidget::ImageWidget(const std::string& imagePath)
-		: mTexture{AssetManager::Get().LoadTexture(imagePath)},
-		mSprite{*(mTexture.get())}
+		: mTexture{},
+		mSprite{}
 	{
+		mTexture = AssetManager::Get().LoadTexture(imagePath);
+		if (!mTexture)
+		{
+			LOG("Failed to load image widget texture: %s", imagePath.c_str());
+			return;
+		}
+
+		mSprite.setTexture(*mTexture);
 	}
 	void ImageWidget::SetImage(const shared<sf::Texture>& newTexture)
 	{

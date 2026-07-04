@@ -14,6 +14,8 @@ namespace ly
 		sf::Vector2f GetSpeed() const { return mSpeed; }
 		virtual void Shoot() override;
 		void SetShooter(unique<Shooter>&& newsShooter);
+		void ApplyDefaultWeapon(int weaponLevel);
+		void ApplyDefaultWeaponLevelIfUsingLaser(int weaponLevel);
 		virtual void ApplyDamage(float amt) override;
 		virtual void BeginPlay() override;
 	private:

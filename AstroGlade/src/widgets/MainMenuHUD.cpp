@@ -1,4 +1,5 @@
 #include "widgets/MainMenuHUD.h"
+#include "gameplay/GameAudio.h"
 
 namespace ly
 {
@@ -6,7 +7,7 @@ namespace ly
 		: mTitleAstroText{"ASTRO", "SpaceShooterRedux/Bonus/Oxanium-ExtraBold.ttf"},
 		mTitleGladeText{"GLADE", "SpaceShooterRedux/Bonus/Oxanium-ExtraBold.ttf"},
 		mControlsTitleText{"CONTROLS", "SpaceShooterRedux/Bonus/Oxanium-ExtraBold.ttf"},
-		mControlsKeysText{"W\nA\nS\nD\nSPACE\nESC"},
+		mControlsKeysText{"W / UP\nA / LEFT\nS / DOWN\nD / RIGHT\nSPACE\nESC"},
 		mControlsActionsText{"MOVE UP\nMOVE LEFT\nMOVE DOWN\nMOVE RIGHT\nSHOOT\nPAUSE/MENU"},
 		mStartButton{">> START"},
 		mControlsButton{">> CONTROLS"},
@@ -115,18 +116,22 @@ namespace ly
 	}
 	void MainMenuHUD::StartButtonClicked()
 	{
+		GameAudio::PlayUIButton();
 		onStartButtonClicked.Broadcast();
 	}
 	void MainMenuHUD::ControlsButtonClicked()
 	{
+		GameAudio::PlayUIButton();
 		SetControlsVisible(true);
 	}
 	void MainMenuHUD::BackButtonClicked()
 	{
+		GameAudio::PlayUIButton();
 		SetControlsVisible(false);
 	}
 	void MainMenuHUD::QuitButtonClicked()
 	{
+		GameAudio::PlayUIButton();
 		onQuitButtonClicked.Broadcast();
 	}
 	void MainMenuHUD::SetControlsVisible(bool visible)

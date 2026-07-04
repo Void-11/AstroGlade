@@ -36,7 +36,7 @@ namespace ly
 		mLaserTexturePath = laserTexturePath;
 	}
 
-	void LaserShooter::ShootImpl()
+	bool LaserShooter::ShootImpl()
 	{
 		sf::Vector2f ownerForwardDir = GetOwner()->GetActorForwardDirection();
 		sf::Vector2f ownerRightDir = GetOwner()->GetActorRightDirection();
@@ -45,5 +45,6 @@ namespace ly
 		weak<Laser> newLaser = GetOwner()->GetWorld()->SpawnActor<Laser>(GetOwner(), mLaserTexturePath);
 		newLaser.lock()->SetActorLocation(GetOwner()->GetActorLocation() + ownerForwardDir * mLocalPositionOffset.x + ownerRightDir * mLocalPositionOffset.y);
 		newLaser.lock()->SetActorRotation(GetOwner()->GetActorRotation() + mLocalRotationOffset);
+		return true;
 	}
 }

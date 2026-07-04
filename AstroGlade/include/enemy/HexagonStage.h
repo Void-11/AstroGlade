@@ -10,6 +10,7 @@ namespace ly
 		HexagonStage(World* world);
 		
 		virtual void StartStage() override;
+		virtual void TickStage(float deltaTime) override;
 	private:
 		virtual void StageFinished() override;
 		void SpawnHexagon();
@@ -19,6 +20,7 @@ namespace ly
 		float mSideSpawnOffset;
 		int mSpawnGroupAmt;
 		int mCurrentSpawnCount;
+		bool mFinishedSpawning;
 
 		sf::Vector2f mMidSpawnLoc;
 		sf::Vector2f mLeftSpawnLoc;

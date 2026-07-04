@@ -5,6 +5,7 @@
 
 namespace ly
 {
+	class Actor;
 	class World;
 	class GameStage : public Object
 	{
@@ -19,9 +20,15 @@ namespace ly
 		virtual void TickStage(float deltaTime);
 		void FinishStage();
 		bool IsStageFinished() const { return mStageFinished; }
+	protected:
+		void TrackActor(const weak<Actor>& actor);
+		void FinishStageIfTrackedActorsDestroyed();
+		void ClearTrackedActors();
 	private:
 		World* mWorld;
 		bool mStageFinished;
+		List<weak<Actor>> mTrackedActors;
 		virtual void StageFinished();
+		bool HasActiveTrackedActors();
 	};
 }

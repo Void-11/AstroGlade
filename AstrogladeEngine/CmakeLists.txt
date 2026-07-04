@@ -20,6 +20,9 @@ add_library(${ASTRO_GLADE_ENGINE_TARGET_NAME} STATIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/AssetManager.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/AssetManager.cpp
 
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/AudioManager.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/AudioManager.cpp
+
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/MathUtility.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/MathUtility.cpp
 
@@ -115,3 +118,20 @@ CopyLibToTarget(sfml-window ${ASTRO_GLADE_ENGINE_TARGET_NAME})
 CopyLibToTarget(sfml-system ${ASTRO_GLADE_ENGINE_TARGET_NAME})
 CopyLibToTarget(sfml-audio ${ASTRO_GLADE_ENGINE_TARGET_NAME})
 CopyLibToTarget(box2d ${ASTRO_GLADE_ENGINE_TARGET_NAME})
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	set(SFML_OPENAL_ARCH_DIR "x64")
+else()
+	set(SFML_OPENAL_ARCH_DIR "x86")
+endif()
+
+set(SFML_OPENAL_DLL "${SFML_SOURCE_DIR}/extlibs/bin/${SFML_OPENAL_ARCH_DIR}/openal32.dll")
+if(EXISTS "${SFML_OPENAL_DLL}")
+	add_custom_command(TARGET ${ASTRO_GLADE_ENGINE_TARGET_NAME}
+	POST_BUILD
+	COMMAND
+	${CMAKE_COMMAND} -E copy_if_different
+	${SFML_OPENAL_DLL}
+	$<TARGET_FILE_DIR:${ASTRO_GLADE_ENGINE_TARGET_NAME}>
+	)
+endif()

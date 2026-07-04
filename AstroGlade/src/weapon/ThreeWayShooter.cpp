@@ -32,16 +32,19 @@ namespace ly
 		mTopLevelShooterLeft.SetCurrentLevel(level);
 		mTopLevelShooterRight.SetCurrentLevel(level);
 	}
-	void ThreeWayShooter::ShootImpl()
+	bool ThreeWayShooter::ShootImpl()
 	{
-		mShooterLeft.Shoot();
-		mShooterMid.Shoot();
-		mShooterRight.Shoot();
+		bool fired = false;
+		fired = mShooterLeft.Shoot() || fired;
+		fired = mShooterMid.Shoot() || fired;
+		fired = mShooterRight.Shoot() || fired;
 
 		if (GetCurrentLevel() == GetMaxLevel())
 		{
-			mTopLevelShooterLeft.Shoot();
-			mTopLevelShooterRight.Shoot();
+			fired = mTopLevelShooterLeft.Shoot() || fired;
+			fired = mTopLevelShooterRight.Shoot() || fired;
 		}
+
+		return fired;
 	}
 }

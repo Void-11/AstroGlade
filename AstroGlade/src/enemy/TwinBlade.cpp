@@ -1,4 +1,5 @@
 #include "Enemy/TwinBlade.h"
+#include "gameplay/GameAudio.h"
 #include "weapon/LaserShooter.h"
 #include "framework/World.h"
 
@@ -12,6 +13,7 @@ namespace ly
 		sf::Vector2u windowSize = owningWorld->GetWindowSize();
 		float scaleX = windowSize.x / 600.f;
 		float scaleY = windowSize.y / 980.f;
+		GetHealthComp().SetInitialHealth(75.f, 75.f);
 		SetVelocity({velocity.x * scaleX, velocity.y * scaleY});
 		SetActorRotation(90.f);
 	}
@@ -22,7 +24,12 @@ namespace ly
 	}
 	void TwinBlade::Shoot()
 	{
-		mShooterLeft->Shoot();
-		mShooterRight->Shoot();
+		bool fired = false;
+		fired = mShooterLeft->Shoot() || fired;
+		fired = mShooterRight->Shoot() || fired;
+		if (fired)
+		{
+			GameAudio::PlayEnemyShoot();
+		}
 	}
 }

@@ -15,13 +15,15 @@ namespace ly
 		mRowsToSpawn{2},
 		mRowSpawnCount{0},
 		mVarguardsPerRow{5},
-		mCurrentRowVanguardCount{0}
+		mCurrentRowVanguardCount{0},
+		mFinishedSpawning{false}
 	{
 
 	}
 
 	void VanguardStage::StartStage()
 	{
+		mFinishedSpawning = false;
 		auto windowSize = GetWorld()->GetWindowSize();
 		mLeftSpawnLoc = sf::Vector2f{ mSpawnDistanceToEdge, -100.f };
 		mRightSpawnLoc = sf::Vector2f(windowSize.x - mSpawnDistanceToEdge, -100.f);
@@ -29,16 +31,32 @@ namespace ly
 		SwithRow();
 	}
 
+	void VanguardStage::TickStage(float deltaTime)
+	{
+		(void)deltaTime;
+		if (mFinishedSpawning)
+		{
+			FinishStageIfTrackedActorsDestroyed();
+		}
+	}
+
 	void VanguardStage::StageFinished()
 	{
 		TimerManager::Get().ClearTimer(mSpawnTimerHandle);
 		TimerManager::Get().ClearTimer(mSwitchTimerHandle);
+		ClearTrackedActors();
 	}
 
 	void VanguardStage::SpawnVanguard()
 	{
+		if (mFinishedSpawning)
+		{
+			return;
+		}
+
 		weak<Vanguard> newVanguard = GetWorld()->SpawnActor<Vanguard>();
 		newVanguard.lock()->SetActorLocation(mSpawnLoc);
+		TrackActor(newVanguard);
 		++mCurrentRowVanguardCount;
 		if (mCurrentRowVanguardCount == mVarguardsPerRow)
 		{
@@ -52,7 +70,10 @@ namespace ly
 	{
 		if (mRowSpawnCount == mRowsToSpawn)
 		{
-			FinishStage();
+			mFinishedSpawning = true;
+			TimerManager::Get().ClearTimer(mSpawnTimerHandle);
+			TimerManager::Get().ClearTimer(mSwitchTimerHandle);
+			FinishStageIfTrackedActorsDestroyed();
 			return;
 		}
 

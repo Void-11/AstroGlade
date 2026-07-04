@@ -1,5 +1,7 @@
 #include "player/PlayerManager.h"
 
+#include <cstddef>
+
 namespace ly
 {
 	unique<PlayerManager> PlayerManager::playerManager {nullptr};
@@ -10,19 +12,19 @@ namespace ly
 
 	Player& PlayerManager::CreateNewPlayer()
 	{
-		mPlayers.emplace(mPlayers.begin(), Player());
+		mPlayers.emplace_back(Player());
 		return mPlayers.back();
 	}
 
 	Player* PlayerManager::GetPlayer(int playerIndex)
 	{
-		if(playerIndex >= 0 && playerIndex <= mPlayers.size())
+		if(playerIndex >= 0 && static_cast<std::size_t>(playerIndex) < mPlayers.size())
 			return &(mPlayers[playerIndex]);
 		return nullptr;
 	}
 	const Player* PlayerManager::GetPlayer(int playerIndex) const
 	{
-		if (playerIndex >= 0 && playerIndex <= mPlayers.size())
+		if (playerIndex >= 0 && static_cast<std::size_t>(playerIndex) < mPlayers.size())
 			return &(mPlayers[playerIndex]);
 		return nullptr;
 	}

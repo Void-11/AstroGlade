@@ -1,4 +1,5 @@
 #include "framework/Actor.h"
+#include "gameplay/GameAudio.h"
 #include "widgets/GameplayHUD.h"
 #include "player/Player.h"
 #include "player/PlayerManager.h"
@@ -20,7 +21,7 @@ namespace ly
 		mFinalScoreText{""},
 		mPauseText{"PAUSED", "SpaceShooterRedux/Bonus/Oxanium-ExtraBold.ttf"},
 		mControlsTitleText{"CONTROLS", "SpaceShooterRedux/Bonus/Oxanium-ExtraBold.ttf"},
-		mControlsKeysText{"W\nA\nS\nD\nSPACE\nESC"},
+		mControlsKeysText{"W / UP\nA / LEFT\nS / DOWN\nD / RIGHT\nSPACE\nESC"},
 		mControlsActionsText{"MOVE UP\nMOVE LEFT\nMOVE DOWN\nMOVE RIGHT\nSHOOT\nPAUSE/MENU"},
 		mResumeButton{">> RESUME"},
 		mRestartButton{">> RESTART"},
@@ -29,7 +30,10 @@ namespace ly
 		mReturnButton{">> RETURN"},
 		mShowingControls{false},
 		mIsPaused{false},
-		mWindowSize{}
+		mWindowSize{},
+		mFrameRateClock{},
+		mFramesSinceRateUpdate{0},
+		mFrameRateUpdateInterval{0.25f}
 	{
 		const sf::Color astroWhite{245, 248, 255, 255};
 		const sf::Color menuGreen{40, 255, 95, 255};
@@ -86,6 +90,7 @@ namespace ly
 	}
 	void GameplayHUD::Draw(sf::RenderWindow& windowRef)
 	{
+		UpdateFrameRate();
 		mWindowSize = windowRef.getSize();
 		mFramerateText.NativeDraw(windowRef);
 		mPlayerHealthBar.NativeDraw(windowRef);
@@ -113,9 +118,7 @@ namespace ly
 
 	void GameplayHUD::Tick(float deltaTime)
 	{
-		int frameRate = int(1 / deltaTime);
-		std::string frameRateStr = "Frame Rate: " + std::to_string(frameRate);
-		mFramerateText.SetString(frameRateStr);
+		(void)deltaTime;
 	}
 
 	bool GameplayHUD::HandleEvent(const sf::Event& event)
@@ -218,7 +221,14 @@ namespace ly
 
 	void GameplayHUD::PlayerScoreUpdated(int newScore)
 	{
-		mPlayerScoreText.SetString(std::to_string(newScore));
+		std::string scoreText = std::to_string(newScore);
+		Player* player = PlayerManager::Get().GetPlayer();
+		if (player && player->GetScoreMultiplier() > 1)
+		{
+			scoreText += " x" + std::to_string(player->GetScoreMultiplier());
+		}
+
+		mPlayerScoreText.SetString(scoreText);
 	}
 
 	void GameplayHUD::RefreshHealthBar()
@@ -244,7 +254,7 @@ namespace ly
 			player->onLifeChange.BindAction(GetWeakRef(), &GameplayHUD::PlayerLifeCountUpdated);
 
 			int playerScore = player->GetScore();
-			mPlayerScoreText.SetString(std::to_string(playerScore));
+			PlayerScoreUpdated(playerScore);
 			player->onScoreChange.BindAction(GetWeakRef(), &GameplayHUD::PlayerScoreUpdated);
 		}
 	}
@@ -253,28 +263,46 @@ namespace ly
 		RefreshHealthBar();
 	}
 
+	void GameplayHUD::UpdateFrameRate()
+	{
+		++mFramesSinceRateUpdate;
+		float elapsedTime = mFrameRateClock.getElapsedTime().asSeconds();
+		if (elapsedTime >= mFrameRateUpdateInterval)
+		{
+			int frameRate = static_cast<int>(mFramesSinceRateUpdate / elapsedTime + 0.5f);
+			mFramerateText.SetString("Frame Rate: " + std::to_string(frameRate));
+			mFramesSinceRateUpdate = 0;
+			mFrameRateClock.restart();
+		}
+	}
+
 	void GameplayHUD::ResumeButtonClicked()
 	{
+		GameAudio::PlayUIButton();
 		onResumeBtnClicked.Broadcast();
 	}
 
 	void GameplayHUD::RestartButtonClicked()
 	{
+		GameAudio::PlayUIButton();
 		onRestartBtnClicked.Broadcast();
 	}
 
 	void GameplayHUD::ControlsButtonClicked()
 	{
+		GameAudio::PlayUIButton();
 		SetControlsVisible(true);
 	}
 
 	void GameplayHUD::ReturnButtonClicked()
 	{
+		GameAudio::PlayUIButton();
 		SetControlsVisible(false);
 	}
 
 	void GameplayHUD::QuitButtonClicked()
 	{
+		GameAudio::PlayUIButton();
 		onQuitBtnClicked.Broadcast();
 	}
 

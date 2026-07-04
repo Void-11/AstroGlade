@@ -44,14 +44,22 @@ namespace ly
 			{
 				iter->get()->TickInternal(deltaTime);
 				++iter;
+				if (mIsPaused)
+				{
+					break;
+				}
 			}
 
-			if (mCurrentStage != mGameStages.end())
+			if (!mIsPaused && mCurrentStage != mGameStages.end())
 			{
-				mCurrentStage->get()->TickStage(deltaTime);
+				shared<GameStage> currentStage = *mCurrentStage;
+				currentStage->TickStage(deltaTime);
 			}
 
-			Tick(deltaTime);
+			if (!mIsPaused)
+			{
+				Tick(deltaTime);
+			}
 		}
 
 		if (mHUD)
@@ -140,11 +148,27 @@ namespace ly
 		LOG("All Stage Finished");
 	}
 
+	void World::OnGameStageStarted(GameStage& startedStage)
+	{
+		(void)startedStage;
+	}
+
+	void World::OnGameStageFinished(GameStage& finishedStage)
+	{
+		(void)finishedStage;
+	}
+
 	void World::NextGameStage()
 	{
+		if (mCurrentStage != mGameStages.end())
+		{
+			OnGameStageFinished(*mCurrentStage->get());
+		}
+
 		mCurrentStage = mGameStages.erase(mCurrentStage);
 		if (mCurrentStage != mGameStages.end())
 		{
+			OnGameStageStarted(*mCurrentStage->get());
 			mCurrentStage->get()->StartStage();
 			mCurrentStage->get()->onStageFinished.BindAction(GetWeakRef(), &World::NextGameStage);
 		}
@@ -159,6 +183,7 @@ namespace ly
 		mCurrentStage = mGameStages.begin();
 		if (mCurrentStage != mGameStages.end())
 		{
+			OnGameStageStarted(*mCurrentStage->get());
 			mCurrentStage->get()->StartStage();
 			mCurrentStage->get()->onStageFinished.BindAction(GetWeakRef(), &World::NextGameStage);
 		}

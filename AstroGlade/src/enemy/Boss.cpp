@@ -1,10 +1,11 @@
 #include "Enemy/Boss.h"
 #include "gameplay/HealthComponent.h"
+#include "gameplay/GameAudio.h"
 #include "framework/World.h"
 namespace ly
 {
 	Boss::Boss(World* world)
-		: EnemySpaceship{world, "SpaceShooterRedux/PNG/Enemies/boss.png" },
+		: EnemySpaceship{world, "SpaceShooterRedux/PNG/Enemies/boss.png", 200.f },
 		mSpeed{100.f},
 		mBaseSpeed{100.f},
 		mSwitchDistanceToEdge{100.f},
@@ -36,8 +37,13 @@ namespace ly
 		ShootThreeWayShooter();
 		if (mStage == 4)
 		{
-			mFinalStageShooterLeft.Shoot();
-			mFinalStageShooterRight.Shoot();
+			bool fired = false;
+			fired = mFinalStageShooterLeft.Shoot() || fired;
+			fired = mFinalStageShooterRight.Shoot() || fired;
+			if (fired)
+			{
+				GameAudio::PlayBossShoot();
+			}
 		}
 		CheckMove();
 	}
@@ -64,19 +70,32 @@ namespace ly
 
 	void Boss::ShootBaseShooters()
 	{
-		mBaseShooterLeft.Shoot();
-		mBaseShooterRight.Shoot();
+		bool fired = false;
+		fired = mBaseShooterLeft.Shoot() || fired;
+		fired = mBaseShooterRight.Shoot() || fired;
+		if (fired)
+		{
+			GameAudio::PlayBossShoot();
+		}
 	}
 	
 	void Boss::ShootThreeWayShooter()
 	{
-		mThreeWayShooter.Shoot();
+		if (mThreeWayShooter.Shoot())
+		{
+			GameAudio::PlayBossShoot();
+		}
 	}
 
 	void Boss::ShootFrotnalWipers()
 	{
-		mFrontalWiperLeft.Shoot();
-		mFrontalWiperRight.Shoot();
+		bool fired = false;
+		fired = mFrontalWiperLeft.Shoot() || fired;
+		fired = mFrontalWiperRight.Shoot() || fired;
+		if (fired)
+		{
+			GameAudio::PlayBossShoot();
+		}
 	}
 
 	void Boss::HealthChanged(float amt, float currentHealth, float maxHealth)

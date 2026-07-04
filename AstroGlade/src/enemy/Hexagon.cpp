@@ -1,4 +1,5 @@
 #include "Enemy/Hexagon.h"
+#include "gameplay/GameAudio.h"
 #include "weapon/LaserShooter.h"
 #include "framework/World.h"
 namespace ly
@@ -15,6 +16,7 @@ namespace ly
 		        sf::Vector2u windowSize = owingWorld->GetWindowSize();
 		        float scaleX = windowSize.x / 600.f;
 		        float scaleY = windowSize.y / 980.f;
+		        GetHealthComp().SetInitialHealth(85.f, 85.f);
 		        SetVelocity({velocity.x * scaleX, velocity.y * scaleY});
 		        SetActorRotation(90.f);
 		    }	void Hexagon::Tick(float deltaTime)
@@ -24,11 +26,16 @@ namespace ly
 	}
 	void Hexagon::Shoot()
 	{
-		mShooter1->Shoot();
-		mShooter2->Shoot();
-		mShooter3->Shoot();
-		mShooter4->Shoot();
-		mShooter5->Shoot();
-		mShooter6->Shoot();
+		bool fired = false;
+		fired = mShooter1->Shoot() || fired;
+		fired = mShooter2->Shoot() || fired;
+		fired = mShooter3->Shoot() || fired;
+		fired = mShooter4->Shoot() || fired;
+		fired = mShooter5->Shoot() || fired;
+		fired = mShooter6->Shoot() || fired;
+		if (fired)
+		{
+			GameAudio::PlayEnemyShoot();
+		}
 	}
 }

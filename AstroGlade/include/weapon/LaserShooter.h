@@ -18,7 +18,7 @@ namespace ly
 
 		void SetLaserTexturePath(const std::string& laserTexturePath);
 	private:
-		virtual void ShootImpl() override;
+		virtual bool ShootImpl() override;
 		sf::Clock mCooldownClock;
 		float mCooldownTime;
 		sf::Vector2f mLocalPositionOffset;

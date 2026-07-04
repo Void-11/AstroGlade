@@ -6,7 +6,7 @@ namespace ly
 	class Shooter
 	{
 	public:
-		void Shoot();
+		bool Shoot();
 
 		virtual bool CanShoot() const { return true; }
 		virtual bool IsOnCooldown() const { return false; }
@@ -20,7 +20,7 @@ namespace ly
 	protected:
 		Shooter(Actor* owner);
 	private:
-		virtual void ShootImpl() = 0;
+		virtual bool ShootImpl() = 0;
 		Actor* mOwner;
 
 		int mCurrentLevel;

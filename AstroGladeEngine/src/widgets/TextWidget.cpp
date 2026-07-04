@@ -3,10 +3,21 @@
 namespace ly
 {
 	TextWidget::TextWidget(const std::string& textStr, const std::string& fontPath, unsigned int characterSize)
-		:mFont{AssetManager::Get().LoadFont(fontPath)},
-		mText {textStr, *(mFont.get()), characterSize}
+		:mFont{},
+		mText{}
 	{
-		
+		mFont = AssetManager::Get().LoadFont(fontPath);
+		if (!mFont)
+		{
+			LOG("Failed to load text widget font: %s", fontPath.c_str());
+		}
+		else
+		{
+			mText.setFont(*mFont);
+		}
+
+		mText.setString(textStr);
+		mText.setCharacterSize(characterSize);
 	}
 	
 	void TextWidget::SetString(const std::string& newStr)

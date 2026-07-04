@@ -1,4 +1,5 @@
 #include "Enemy/Vanguard.h"
+#include "gameplay/GameAudio.h"
 #include "weapon/LaserShooter.h"
 #include "framework/World.h"
 namespace ly
@@ -10,6 +11,7 @@ namespace ly
 		sf::Vector2u windowSize = owningWorld->GetWindowSize();
 		float scaleX = windowSize.x / 600.f;
 		float scaleY = windowSize.y / 980.f;
+		GetHealthComp().SetInitialHealth(50.f, 50.f);
 		SetVelocity({velocity.x * scaleX, velocity.y * scaleY});
 		SetActorRotation(90.f);
 	}
@@ -22,7 +24,10 @@ namespace ly
 
 	void Vanguard::Shoot()
 	{
-		mShooter->Shoot();
+		if (mShooter->Shoot())
+		{
+			GameAudio::PlayEnemyShoot();
+		}
 	}
 
 }

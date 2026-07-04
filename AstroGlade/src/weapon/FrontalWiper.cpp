@@ -37,17 +37,20 @@ namespace ly
 		mShooter6.SetCurrentLevel(newLevel);
 	}
 
-	void FrontalWiper::ShootImpl()
+	bool FrontalWiper::ShootImpl()
 	{
-		mShooter1.Shoot();
-		mShooter2.Shoot();
-		mShooter3.Shoot();
-		mShooter4.Shoot();
+		bool fired = false;
+		fired = mShooter1.Shoot() || fired;
+		fired = mShooter2.Shoot() || fired;
+		fired = mShooter3.Shoot() || fired;
+		fired = mShooter4.Shoot() || fired;
 
 		if (GetCurrentLevel() == GetMaxLevel())
 		{
-			mShooter5.Shoot();
-			mShooter6.Shoot();
+			fired = mShooter5.Shoot() || fired;
+			fired = mShooter6.Shoot() || fired;
 		}
+
+		return fired;
 	}
 }

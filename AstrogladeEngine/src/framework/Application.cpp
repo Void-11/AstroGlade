@@ -2,6 +2,7 @@
 #include "framework/Core.h"
 #include "framework/World.h"
 #include "framework/AssetManager.h"
+#include "framework/AudioManager.h"
 #include "framework/PhysicsSystem.h"
 #include "framework/TimerManager.h"
 
@@ -71,14 +72,18 @@ namespace ly
 			mCurrentWorld->TickInternal(deltaTime);
 		}
 
-		TimerManager::Get().UpdateTimer(deltaTime);
-
-		PhysicsSystem::Get().Step(deltaTime);
+		bool simulationPaused = mCurrentWorld && mCurrentWorld->IsPaused();
+		if (!simulationPaused)
+		{
+			TimerManager::Get().UpdateTimer(deltaTime);
+			PhysicsSystem::Get().Step(deltaTime);
+		}
 
 		if (mCleanCycleClock.getElapsedTime().asSeconds() >= mCleanCycleIterval)
 		{
 			mCleanCycleClock.restart();
 			AssetManager::Get().CleanCycle();
+			AudioManager::Get().CleanCycle();
 			if (mCurrentWorld)
 			{
 				mCurrentWorld->CleanCycle();

@@ -30,9 +30,7 @@ namespace ly
 
 	float RandomRange(float min, float max)
 	{
-		std::random_device rd;
-		std::mt19937 gen(rd());
-
+		static std::mt19937 gen{ std::random_device{}() };
 		std::uniform_real_distribution<float> distribution{min, max};
 
 		return distribution(gen);

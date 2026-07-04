@@ -51,7 +51,16 @@ namespace ly
 		TimerHandle SetTimer(weak<Object> weakRef, void(ClassName::* callback)(), float duration, bool repeat = false)
 		{
 			TimerHandle newHanle{};
-			mTimers.insert({ newHanle, Timer(weakRef, [=] {(static_cast<ClassName*>(weakRef.lock().get())->*callback)(); }, duration, repeat) });
+			Timer newTimer{ weakRef, [=] {(static_cast<ClassName*>(weakRef.lock().get())->*callback)(); }, duration, repeat };
+			if (mIsUpdating)
+			{
+				mPendingTimers.push_back({ newHanle, newTimer });
+			}
+			else
+			{
+				mTimers.insert({ newHanle, newTimer });
+			}
+
 			return newHanle;
 		}
 
@@ -63,5 +72,7 @@ namespace ly
 	private:
 		static unique<TimerManager> timerManager;
 		Dictionary<TimerHandle, Timer, TimerHandleHashFunction> mTimers;
+		List<std::pair<TimerHandle, Timer>> mPendingTimers;
+		bool mIsUpdating;
 	};
 }

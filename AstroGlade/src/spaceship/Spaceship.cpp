@@ -1,5 +1,6 @@
 #include "spaceship/Spaceship.h"
 #include "framework/MathUtility.h"
+#include "gameplay/GameAudio.h"
 #include "VFX/Explosion.h"
 
 namespace ly
@@ -72,11 +73,13 @@ namespace ly
 
 	void Spaceship::OnTakenDamage(float amt, float health, float maxHealth)
 	{
+		GameAudio::PlayShipHit(*this);
 		Blink();
 	}
 
 	void Spaceship::Blow()
 	{
+		GameAudio::PlayShipDeath(*this);
 		Explosion exp{};
 		exp.SpawnExplosion(GetWorld(), GetActorLocation());
 		Blew();

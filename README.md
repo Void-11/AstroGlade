@@ -53,7 +53,7 @@ Game-specific implementation using the engine:
 - **C++14 Standard** - Modern C++ features
 
 ### Design Patterns
-- **Entity-Component System** - Flexible game object architecture
+- **Actor-Based Object Model** - Game objects derive from `Actor`, with lightweight components for shared behavior such as health
 - **Template Programming** - Type-safe generic containers and smart pointers
 - **Resource Management** - RAII principles with smart pointers
 - **Observer Pattern** - Delegates for event handling
@@ -182,6 +182,7 @@ This project is open source. Feel free to use, modify, and distribute according 
 - **SFML Team** - For the excellent multimedia library
 - **Box2D** - For robust 2D physics simulation  
 - **Game assets** - Space Shooter Redux pack for visual resources
+- **Audio assets** - CC0 sounds and music listed in `AstroGlade/assets/Audio/AUDIO_SOURCES.md`
 - **Modern C++** - For powerful language features enabling clean architecture
 
 ## 📞 Support

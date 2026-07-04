@@ -1,4 +1,5 @@
 #include "weapon/Laser.h"
+#include "gameplay/GameAudio.h"
 
 namespace ly
 {
@@ -41,6 +42,11 @@ namespace ly
 	{
 		if (IsOtherHostile(other))
 		{
+			if (dynamic_cast<Laser*>(other))
+			{
+				GameAudio::PlayLaserCancel();
+			}
+
 			other->ApplyDamage(GetDamage());
 			Destroy();
 		}

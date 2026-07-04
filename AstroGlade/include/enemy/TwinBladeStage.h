@@ -9,6 +9,7 @@ namespace ly
 	public:
 		TwinBladeStage(World* world);
 		virtual void StartStage() override;
+		virtual void TickStage(float deltaTime) override;
 	private:
 
 		void SpawnTwinBlade();
@@ -23,6 +24,7 @@ namespace ly
 
 		int mSpawnAmt;
 		int mCurrentSpawnCount;
+		bool mFinishedSpawning;
 
 		TimerHandle mSpawnTimerHandle;
 	};

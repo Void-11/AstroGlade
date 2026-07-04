@@ -16,44 +16,79 @@ namespace ly
 		mMinSpawnInterval{0.8f},
 		mSpawnIntervalDecrement{0.5f},
 		mSpawnIntervalDecrmentInterval{5.f},
-		mStageDuration{60.f}
+		mStageDuration{60.f},
+		mFinishedSpawning{false}
 	{
 	}
 
 	void ChaosStage::StartStage()
 	{
+		mFinishedSpawning = false;
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::SpawnVanguard, mSpawnInterval);
 		mDifficultTimerHandle = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::IncreseDifficulity, mSpawnIntervalDecrmentInterval, true);
-		TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::StageDurationReached, mStageDuration);
+		mStageDurationTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::StageDurationReached, mStageDuration);
+	}
+
+	void ChaosStage::TickStage(float deltaTime)
+	{
+		(void)deltaTime;
+		if (mFinishedSpawning)
+		{
+			FinishStageIfTrackedActorsDestroyed();
+		}
 	}
 
 	void ChaosStage::StageFinished()
 	{
 		TimerManager::Get().ClearTimer(mDifficultTimerHandle);
 		TimerManager::Get().ClearTimer(mSpawnTimer);
+		TimerManager::Get().ClearTimer(mStageDurationTimer);
+		ClearTrackedActors();
 	}
 	void ChaosStage::SpawnVanguard()
 	{
+		if (mFinishedSpawning)
+		{
+			return;
+		}
+
 		weak<Vanguard> newVanguard = GetWorld()->SpawnActor<Vanguard>();
 		newVanguard.lock()->SetActorLocation(GetRandomSpawnLocationTop());
+		TrackActor(newVanguard);
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::SpawnTwinBlade, mSpawnInterval);
 	}
 	void ChaosStage::SpawnTwinBlade()
 	{
+		if (mFinishedSpawning)
+		{
+			return;
+		}
+
 		weak<TwinBlade> newTwinBlade = GetWorld()->SpawnActor<TwinBlade>();
 		newTwinBlade.lock()->SetActorLocation(GetRandomSpawnLocationTop());
+		TrackActor(newTwinBlade);
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::SpawnHexgon, mSpawnInterval);
 	}
 	
 	void ChaosStage::SpawnHexgon()
 	{
+		if (mFinishedSpawning)
+		{
+			return;
+		}
+
 		weak<Hexagon> newHexagon = GetWorld()->SpawnActor<Hexagon>();
 		newHexagon.lock()->SetActorLocation(GetRandomSpawnLocationTop());
+		TrackActor(newHexagon);
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::SpawnUFO, mSpawnInterval);
 	}
 
 	void ChaosStage::SpawnUFO()
 	{
+		if (mFinishedSpawning)
+		{
+			return;
+		}
 
 		sf::Vector2f spawnLoc = GetRandomSpawnLocationSide();
 
@@ -64,12 +99,18 @@ namespace ly
 		
 		weak<UFO> newUFO = GetWorld()->SpawnActor<UFO>(dirToCenter * 200.f);
 		newUFO.lock()->SetActorLocation(spawnLoc);
+		TrackActor(newUFO);
 
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::SpawnVanguard, mSpawnInterval);
 	}
 
 	void ChaosStage::IncreseDifficulity()
 	{
+		if (mFinishedSpawning)
+		{
+			return;
+		}
+
 		mSpawnInterval -= mSpawnIntervalDecrement;
 		if (mSpawnInterval < mMinSpawnInterval)
 		{
@@ -79,7 +120,10 @@ namespace ly
 
 	void ChaosStage::StageDurationReached()
 	{
-		FinishStage();
+		mFinishedSpawning = true;
+		TimerManager::Get().ClearTimer(mDifficultTimerHandle);
+		TimerManager::Get().ClearTimer(mSpawnTimer);
+		FinishStageIfTrackedActorsDestroyed();
 	}
 
 	sf::Vector2f ChaosStage::GetRandomSpawnLocationTop() const

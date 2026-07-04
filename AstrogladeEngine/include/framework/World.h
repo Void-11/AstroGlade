@@ -57,6 +57,8 @@ namespace ly
 
 		virtual void InitGameStages();
 		virtual void AllGameStageFinished();
+		virtual void OnGameStageStarted(GameStage& startedStage);
+		virtual void OnGameStageFinished(GameStage& finishedStage);
 		void NextGameStage();
 		void StartStages();
 	};
