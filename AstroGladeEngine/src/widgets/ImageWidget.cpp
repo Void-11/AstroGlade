@@ -24,6 +24,11 @@ namespace ly
 		}
 	}
 
+	void ImageWidget::SetImageScale(const sf::Vector2f& newScale)
+	{
+		mSprite.setScale(newScale);
+	}
+
 	void ImageWidget::LocationUpdated(const sf::Vector2f& newLocation)
 	{
 		mSprite.setPosition(newLocation);

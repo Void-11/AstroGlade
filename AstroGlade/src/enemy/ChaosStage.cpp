@@ -10,6 +10,20 @@
 #include "weapon/LaserShooter.h"
 namespace ly
 {
+	namespace
+	{
+		constexpr float kChaosEnemyHealth = 100.f;
+
+		template<typename EnemyType>
+		void SetChaosEnemyHealth(const weak<EnemyType>& enemy)
+		{
+			if (!enemy.expired())
+			{
+				enemy.lock()->GetHealthComp().SetInitialHealth(kChaosEnemyHealth, kChaosEnemyHealth);
+			}
+		}
+	}
+
 	ChaosStage::ChaosStage(World* world)
 		: GameStage{world},
 		mSpawnInterval{4.f},
@@ -54,6 +68,7 @@ namespace ly
 
 		weak<Vanguard> newVanguard = GetWorld()->SpawnActor<Vanguard>();
 		newVanguard.lock()->SetActorLocation(GetRandomSpawnLocationTop());
+		SetChaosEnemyHealth(newVanguard);
 		TrackActor(newVanguard);
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::SpawnTwinBlade, mSpawnInterval);
 	}
@@ -66,6 +81,7 @@ namespace ly
 
 		weak<TwinBlade> newTwinBlade = GetWorld()->SpawnActor<TwinBlade>();
 		newTwinBlade.lock()->SetActorLocation(GetRandomSpawnLocationTop());
+		SetChaosEnemyHealth(newTwinBlade);
 		TrackActor(newTwinBlade);
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::SpawnHexgon, mSpawnInterval);
 	}
@@ -79,6 +95,7 @@ namespace ly
 
 		weak<Hexagon> newHexagon = GetWorld()->SpawnActor<Hexagon>();
 		newHexagon.lock()->SetActorLocation(GetRandomSpawnLocationTop());
+		SetChaosEnemyHealth(newHexagon);
 		TrackActor(newHexagon);
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::SpawnUFO, mSpawnInterval);
 	}
@@ -99,6 +116,7 @@ namespace ly
 		
 		weak<UFO> newUFO = GetWorld()->SpawnActor<UFO>(dirToCenter * 200.f);
 		newUFO.lock()->SetActorLocation(spawnLoc);
+		SetChaosEnemyHealth(newUFO);
 		TrackActor(newUFO);
 
 		mSpawnTimer = TimerManager::Get().SetTimer(GetWeakRef(), &ChaosStage::SpawnVanguard, mSpawnInterval);

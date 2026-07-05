@@ -17,6 +17,7 @@ namespace ly
 		        float scaleX = windowSize.x / 600.f;
 		        float scaleY = windowSize.y / 980.f;
 		        GetHealthComp().SetInitialHealth(85.f, 85.f);
+		        SetScoreAwardAmt(15);
 		        SetVelocity({velocity.x * scaleX, velocity.y * scaleY});
 		        SetActorRotation(90.f);
 		    }	void Hexagon::Tick(float deltaTime)

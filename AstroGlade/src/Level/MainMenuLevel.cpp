@@ -4,7 +4,7 @@
 #include "widgets/MainMenuHUD.h"
 #include "framework/Application.h"
 #include "gameplay/GameAudio.h"
-#include "Level/GameLevelOne.h"
+#include "Level/ScoreBriefingLevel.h"
 #include "framework/Actor.h"
 
 namespace ly
@@ -34,7 +34,7 @@ namespace ly
 
 	void MainMenuLevel::StartGame()
 	{
-		GetApplication()->LoadWorld<GameLevelOne>();
+		GetApplication()->LoadWorld<ScoreBriefingLevel>();
 	}
 
 	void MainMenuLevel::QuitGame()

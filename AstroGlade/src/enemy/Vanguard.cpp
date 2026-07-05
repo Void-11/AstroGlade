@@ -12,6 +12,7 @@ namespace ly
 		float scaleX = windowSize.x / 600.f;
 		float scaleY = windowSize.y / 980.f;
 		GetHealthComp().SetInitialHealth(50.f, 50.f);
+		SetScoreAwardAmt(5);
 		SetVelocity({velocity.x * scaleX, velocity.y * scaleY});
 		SetActorRotation(90.f);
 	}

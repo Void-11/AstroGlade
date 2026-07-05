@@ -27,6 +27,7 @@ namespace ly
 
 		SetVelocity({mSpeed, 0.f});
 		SetRewardSpawnWeight(0.f);
+		SetScoreAwardAmt(100);
 	}
 
 	void Boss::Tick(float deltaTime)

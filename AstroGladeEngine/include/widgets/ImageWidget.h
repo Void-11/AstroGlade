@@ -10,6 +10,7 @@ namespace ly
 		ImageWidget(const std::string& imagePath);
 
 		void SetImage(const shared<sf::Texture>& newTexture);
+		void SetImageScale(const sf::Vector2f& newScale);
 		virtual sf::FloatRect GetBounds() const override;
 	private:
 		virtual void LocationUpdated(const sf::Vector2f& newLocation) override;

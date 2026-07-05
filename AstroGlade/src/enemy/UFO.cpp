@@ -12,6 +12,7 @@ namespace ly
 		mRotationSpeed{rotationSpeed}
 	{
 		GetHealthComp().SetInitialHealth(85.f, 85.f);
+		SetScoreAwardAmt(20);
 		SetVelocity(velocity);
 		SetActorRotation(90.f);
 	}
