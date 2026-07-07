@@ -24,6 +24,7 @@ namespace ly
 		virtual void Tick(float deltaTime) override;
 		void SetScoreAwardAmt(unsigned int amt);
 		void SetRewardSpawnWeight(float weight);
+		Delegate<EnemySpaceship*> onEnemyKilled;
 	private:
 		void SpawnReward();
 		float mCollisionDamage;

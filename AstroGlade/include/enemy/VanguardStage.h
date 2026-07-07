@@ -5,6 +5,8 @@
 
 namespace ly
 {
+	class EnemySpaceship;
+
 	class VanguardStage : public GameStage
 	{
 	public:
@@ -17,6 +19,7 @@ namespace ly
 		float mSpawnDistanceToEdge;
 
 		sf::Vector2f mLeftSpawnLoc;
+		sf::Vector2f mMiddleSpawnLoc;
 		sf::Vector2f mRightSpawnLoc;
 		sf::Vector2f mSpawnLoc;
 
@@ -28,10 +31,14 @@ namespace ly
 
 		int mVarguardsPerRow;
 		int mCurrentRowVanguardCount;
+		int mVanguardsKilled;
+		int mGuaranteedWeaponRewardKillCount;
+		bool mGuaranteedWeaponRewardSpawned;
 		bool mFinishedSpawning;
 
 		virtual void StageFinished() override;
 		void SpawnVanguard();
 		void SwithRow();
+		void VanguardKilled(EnemySpaceship* enemy);
 	};
 }

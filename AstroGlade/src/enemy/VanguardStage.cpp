@@ -1,21 +1,27 @@
 #include "Enemy/Vanguard.h"
 #include "Enemy/VanguardStage.h"
+#include "Enemy/EnemySpaceship.h"
 #include "framework/World.h"
+#include "player/Reward.h"
 #include "weapon/LaserShooter.h"
 namespace ly
 {
 	VanguardStage::VanguardStage(World* world)
 		: GameStage{world},
-		mSpawnInterval{1.5f},
+		mSpawnInterval{2.f},
 		mSwitchInterval{5.f},
 		mSpawnDistanceToEdge{100.f},
 		mLeftSpawnLoc{0.0f, 0.0f},
+		mMiddleSpawnLoc{0.0f, 0.0f},
 		mRightSpawnLoc{0.0f, 0.0f},
 		mSpawnLoc{0.0f,0.0f},
-		mRowsToSpawn{2},
+		mRowsToSpawn{3},
 		mRowSpawnCount{0},
-		mVarguardsPerRow{5},
+		mVarguardsPerRow{3},
 		mCurrentRowVanguardCount{0},
+		mVanguardsKilled{0},
+		mGuaranteedWeaponRewardKillCount{3},
+		mGuaranteedWeaponRewardSpawned{false},
 		mFinishedSpawning{false}
 	{
 
@@ -24,8 +30,13 @@ namespace ly
 	void VanguardStage::StartStage()
 	{
 		mFinishedSpawning = false;
+		mRowSpawnCount = 0;
+		mCurrentRowVanguardCount = 0;
+		mVanguardsKilled = 0;
+		mGuaranteedWeaponRewardSpawned = false;
 		auto windowSize = GetWorld()->GetWindowSize();
 		mLeftSpawnLoc = sf::Vector2f{ mSpawnDistanceToEdge, -100.f };
+		mMiddleSpawnLoc = sf::Vector2f{ windowSize.x / 2.f, -100.f };
 		mRightSpawnLoc = sf::Vector2f(windowSize.x - mSpawnDistanceToEdge, -100.f);
 
 		SwithRow();
@@ -56,6 +67,7 @@ namespace ly
 
 		weak<Vanguard> newVanguard = GetWorld()->SpawnActor<Vanguard>();
 		newVanguard.lock()->SetActorLocation(mSpawnLoc);
+		newVanguard.lock()->onEnemyKilled.BindAction(GetWeakRef(), &VanguardStage::VanguardKilled);
 		TrackActor(newVanguard);
 		++mCurrentRowVanguardCount;
 		if (mCurrentRowVanguardCount == mVarguardsPerRow)
@@ -77,17 +89,39 @@ namespace ly
 			return;
 		}
 
-		if (mSpawnLoc == mLeftSpawnLoc)
+		if (mRowSpawnCount == 0)
 		{
-			mSpawnLoc = mRightSpawnLoc;
+			mSpawnLoc = mLeftSpawnLoc;
+		}
+		else if (mRowSpawnCount == 1)
+		{
+			mSpawnLoc = mMiddleSpawnLoc;
 		}
 		else
 		{
-			mSpawnLoc = mLeftSpawnLoc;
+			mSpawnLoc = mRightSpawnLoc;
 		}
 
 		mSpawnTimerHandle = TimerManager::Get().SetTimer(GetWeakRef(), &VanguardStage::SpawnVanguard, mSpawnInterval, true);
 		
 		++mRowSpawnCount;
+	}
+
+	void VanguardStage::VanguardKilled(EnemySpaceship* enemy)
+	{
+		++mVanguardsKilled;
+		if (mGuaranteedWeaponRewardSpawned || mVanguardsKilled < mGuaranteedWeaponRewardKillCount || !enemy)
+		{
+			return;
+		}
+
+		weak<Reward> reward = CreateThreewayShooterReward(GetWorld());
+		if (!reward.expired())
+		{
+			reward.lock()->SetActorLocation(enemy->GetActorLocation());
+		}
+
+		enemy->SetRewardSpawnWeight(0.f);
+		mGuaranteedWeaponRewardSpawned = true;
 	}
 }

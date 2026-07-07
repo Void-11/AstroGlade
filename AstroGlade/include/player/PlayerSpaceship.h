@@ -23,10 +23,12 @@ namespace ly
 		void NormalizeInput();
 		void ClampInputOnEdge();
 		void ConsumeInput(float deltaTime);
+		bool IsBoosting() const;
 		void StopInvulnerable();
 		void UpdateInvulnerable(float deltaTime);
 		sf::Vector2f mMoveInput;
 		sf::Vector2f mSpeed;
+		float mBoostSpeedMultiplier;
 
 		unique<Shooter> mShooter;
 	

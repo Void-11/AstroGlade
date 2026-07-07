@@ -11,6 +11,7 @@ namespace ly
 		: Spaceship{owningWorld, path},
 		mMoveInput{},
 		mSpeed{200.f, 200.f},
+		mBoostSpeedMultiplier{1.6f},
 		mShooter{ new LaserShooter{this, .35f, {50.f, 0.f}} },
 		mInvulnerableTime{2.f},
 		mInvulnerable{true},
@@ -111,6 +112,7 @@ namespace ly
 			Shoot();
 		}
 	}
+
 	void PlayerSpaceship::NormalizeInput()
 	{
 		Normalize(mMoveInput);
@@ -144,8 +146,14 @@ namespace ly
 	}
 	void PlayerSpaceship::ConsumeInput(float deltaTime)
 	{
-		SetVelocity({mMoveInput.x * mSpeed.x, mMoveInput.y * mSpeed.y});
+		float boostSpeedMultiplier = IsBoosting() ? mBoostSpeedMultiplier : 1.f;
+		SetVelocity({mMoveInput.x * mSpeed.x * boostSpeedMultiplier, mMoveInput.y * mSpeed.y * boostSpeedMultiplier});
 		mMoveInput.x = mMoveInput.y = 0.f;
+	}
+
+	bool PlayerSpaceship::IsBoosting() const
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
 	}
 
 	void PlayerSpaceship::StopInvulnerable()

@@ -59,6 +59,7 @@ namespace ly
 	}
 	void EnemySpaceship::Blew()
 	{
+		onEnemyKilled.Broadcast(this);
 		SpawnReward();
 		Player* player = PlayerManager::Get().GetPlayer();
 		if (player)

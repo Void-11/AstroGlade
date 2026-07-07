@@ -101,6 +101,7 @@ Game-specific implementation using the engine:
 ## 🎮 Controls
 
 - **WASD / Arrow Keys** - Move spaceship
+- **Left Shift** - Hold to boost
 - **Spacebar** - Shoot
 - **Mouse** - Navigate menus
 - **ESC** - Pause/Menu
