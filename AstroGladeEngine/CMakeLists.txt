@@ -31,8 +31,8 @@ add_library(${ASTRO_GLADE_ENGINE_TARGET_NAME} STATIC
 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Delegate.h
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/VFX/Particle.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/VFX/Particle.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/vfx/Particle.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/vfx/Particle.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/TimerManager.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/TimerManager.cpp
@@ -55,8 +55,8 @@ add_library(${ASTRO_GLADE_ENGINE_TARGET_NAME} STATIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/TextWidget.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/TextWidget.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/ValueGuage.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/ValueGuage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/ValueGauge.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/ValueGauge.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/widgets/ImageWidget.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/ImageWidget.cpp

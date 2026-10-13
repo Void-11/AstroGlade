@@ -1,11 +1,11 @@
 #include <algorithm>
 
-#include "Enemy/ChaosStage.h"
-#include "Enemy/Hexagon.h"
-#include "Enemy/SpawnLocations.h"
-#include "Enemy/TwinBlade.h"
-#include "Enemy/UFO.h"
-#include "Enemy/Vanguard.h"
+#include "enemy/ChaosStage.h"
+#include "enemy/Hexagon.h"
+#include "enemy/SpawnLocations.h"
+#include "enemy/TwinBlade.h"
+#include "enemy/UFO.h"
+#include "enemy/Vanguard.h"
 #include "framework/World.h"
 
 namespace ly

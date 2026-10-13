@@ -1,7 +1,7 @@
 #include "gameplay/GameAudio.h"
 
-#include "Enemy/Boss.h"
-#include "Enemy/EnemySpaceship.h"
+#include "enemy/Boss.h"
+#include "enemy/EnemySpaceship.h"
 #include "framework/AudioManager.h"
 #include "player/PlayerSpaceship.h"
 #include "player/Reward.h"

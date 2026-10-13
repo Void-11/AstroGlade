@@ -7,7 +7,7 @@
 #include "widgets/HUD.h"
 #include "widgets/ImageWidget.h"
 #include "widgets/TextWidget.h"
-#include "widgets/ValueGuage.h"
+#include "widgets/ValueGauge.h"
 
 namespace ly
 {

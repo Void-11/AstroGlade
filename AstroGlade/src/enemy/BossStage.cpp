@@ -1,5 +1,5 @@
-#include "Enemy/Boss.h"
-#include "Enemy/BossStage.h"
+#include "enemy/Boss.h"
+#include "enemy/BossStage.h"
 #include "framework/World.h"
 
 namespace ly

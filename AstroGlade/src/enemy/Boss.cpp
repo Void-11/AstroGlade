@@ -1,6 +1,6 @@
 #include <initializer_list>
 
-#include "Enemy/Boss.h"
+#include "enemy/Boss.h"
 #include "framework/World.h"
 #include "gameplay/GameAudio.h"
 #include "gameplay/HealthComponent.h"

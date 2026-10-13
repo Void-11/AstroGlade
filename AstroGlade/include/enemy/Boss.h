@@ -1,7 +1,7 @@
 #ifndef ASTROGLADE_GAME_ENEMY_BOSS_H
 #define ASTROGLADE_GAME_ENEMY_BOSS_H
 
-#include "Enemy/EnemySpaceship.h"
+#include "enemy/EnemySpaceship.h"
 #include "weapon/FrontalWiper.h"
 #include "weapon/LaserShooter.h"
 #include "weapon/ThreeWayShooter.h"

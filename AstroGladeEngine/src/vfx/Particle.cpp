@@ -1,4 +1,4 @@
-#include "VFX/Particle.h"
+#include "vfx/Particle.h"
 #include "framework/MathUtility.h"
 
 namespace ly

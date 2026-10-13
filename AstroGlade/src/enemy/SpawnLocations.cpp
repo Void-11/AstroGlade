@@ -1,4 +1,4 @@
-#include "Enemy/SpawnLocations.h"
+#include "enemy/SpawnLocations.h"
 #include "framework/MathUtility.h"
 
 namespace ly

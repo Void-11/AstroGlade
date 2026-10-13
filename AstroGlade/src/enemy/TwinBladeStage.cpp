@@ -1,5 +1,5 @@
-#include "Enemy/TwinBlade.h"
-#include "Enemy/TwinBladeStage.h"
+#include "enemy/TwinBlade.h"
+#include "enemy/TwinBladeStage.h"
 #include "framework/World.h"
 
 namespace ly

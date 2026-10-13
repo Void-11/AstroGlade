@@ -1,7 +1,7 @@
 #include "framework/MathUtility.h"
 #include "framework/World.h"
-#include "VFX/Explosion.h"
-#include "VFX/Particle.h"
+#include "vfx/Explosion.h"
+#include "vfx/Particle.h"
 
 namespace ly
 {

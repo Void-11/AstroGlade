@@ -3,7 +3,7 @@
 #include "spaceship/Spaceship.h"
 #include "framework/MathUtility.h"
 #include "gameplay/GameAudio.h"
-#include "VFX/Explosion.h"
+#include "vfx/Explosion.h"
 
 namespace ly
 {

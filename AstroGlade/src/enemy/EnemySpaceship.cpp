@@ -1,6 +1,6 @@
 #include <utility>
 
-#include "Enemy/EnemySpaceship.h"
+#include "enemy/EnemySpaceship.h"
 #include "framework/MathUtility.h"
 #include "player/PlayerManager.h"
 

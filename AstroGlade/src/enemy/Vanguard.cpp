@@ -1,4 +1,4 @@
-#include "Enemy/Vanguard.h"
+#include "enemy/Vanguard.h"
 #include "framework/World.h"
 #include "gameplay/GameAudio.h"
 #include "gameplay/ResolutionScale.h"

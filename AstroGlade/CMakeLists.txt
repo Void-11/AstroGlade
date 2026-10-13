@@ -31,59 +31,59 @@ add_executable(${ASTRO_GLADE_GAME_TARGET_NAME}
 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/gameplay/ResolutionScale.h
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/VFX/Explosion.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/VFX/Explosion.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/vfx/Explosion.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/vfx/Explosion.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/EnemySpaceship.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/EnemySpaceship.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/EnemySpaceship.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/EnemySpaceship.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/SpawnLocations.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/SpawnLocations.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/SpawnLocations.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/SpawnLocations.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/Vanguard.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/Vanguard.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/Vanguard.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/Vanguard.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/VanguardStage.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/VanguardStage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/VanguardStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/VanguardStage.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/TwinBlade.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/TwinBlade.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/TwinBlade.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/TwinBlade.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/UFO.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/UFO.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/UFO.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/UFO.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/UFOStage.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/UFOStage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/UFOStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/UFOStage.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/Hexagon.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/Hexagon.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/Hexagon.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/Hexagon.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/HexagonStage.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/HexagonStage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/HexagonStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/HexagonStage.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/TwinBladeStage.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/TwinBladeStage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/TwinBladeStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/TwinBladeStage.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/ChaosStage.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/ChaosStage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/ChaosStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/ChaosStage.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/Boss.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/Boss.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/Boss.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/Boss.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Enemy/BossStage.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Enemy/BossStage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/enemy/BossStage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enemy/BossStage.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Level/GameLevelOne.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Level/GameLevelOne.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/level/GameLevelOne.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/level/GameLevelOne.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Level/MainMenuLevel.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Level/MainMenuLevel.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/level/MainMenuLevel.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/level/MainMenuLevel.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Level/ScoreBriefingLevel.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Level/ScoreBriefingLevel.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/level/ScoreBriefingLevel.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/level/ScoreBriefingLevel.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/Level/MenuBackground.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Level/MenuBackground.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/level/MenuBackground.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/level/MenuBackground.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/player/Reward.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/player/Reward.cpp

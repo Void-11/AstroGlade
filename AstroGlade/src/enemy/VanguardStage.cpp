@@ -1,6 +1,6 @@
-#include "Enemy/EnemySpaceship.h"
-#include "Enemy/Vanguard.h"
-#include "Enemy/VanguardStage.h"
+#include "enemy/EnemySpaceship.h"
+#include "enemy/Vanguard.h"
+#include "enemy/VanguardStage.h"
 #include "framework/World.h"
 #include "player/Reward.h"
 

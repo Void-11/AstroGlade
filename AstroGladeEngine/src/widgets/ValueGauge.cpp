@@ -1,7 +1,7 @@
 #include <cmath>
 #include <string>
 
-#include "widgets/ValueGuage.h"
+#include "widgets/ValueGauge.h"
 #include "framework/AssetManager.h"
 #include "framework/Log.h"
 

@@ -1,4 +1,4 @@
-#include "Enemy/Hexagon.h"
+#include "enemy/Hexagon.h"
 #include "framework/World.h"
 #include "gameplay/GameAudio.h"
 #include "gameplay/ResolutionScale.h"

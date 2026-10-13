@@ -1,6 +1,6 @@
-#include "Enemy/SpawnLocations.h"
-#include "Enemy/UFO.h"
-#include "Enemy/UFOStage.h"
+#include "enemy/SpawnLocations.h"
+#include "enemy/UFO.h"
+#include "enemy/UFOStage.h"
 #include "framework/World.h"
 #include "gameplay/ResolutionScale.h"
 

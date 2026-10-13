@@ -149,24 +149,26 @@ AstroGlade/
 ├── AstroGladeEngine/          # Reusable game engine
 │   ├── include/
 │   │   ├── framework/         # Core engine systems
-│   │   ├── widgets/          # UI components
-│   │   ├── VFX/             # Visual effects
-│   │   └── gameplay/         # Game mechanics
-│   └── src/                 # Engine implementation
-├── AstroGlade/              # Game-specific code
+│   │   ├── gameplay/          # Game stage system
+│   │   ├── vfx/               # Particles
+│   │   └── widgets/           # UI components
+│   └── src/                   # Engine implementation
+├── AstroGlade/                # Game-specific code
 │   ├── include/
-│   │   ├── gameFramework/   # Game application
-│   │   ├── spaceship/       # Ship implementations  
-│   │   ├── weapon/          # Weapon system
-│   │   ├── Enemy/           # Enemy types and AI
-│   │   ├── player/          # Player management
-│   │   ├── Level/           # Game levels
-│   │   └── widgets/         # Game UI
-│   ├── src/                 # Game implementation
-│   └── assets/              # Game resources
-├── build/                   # Generated build files
-├── CMakeLists.txt          # Main build configuration
-└── README.md               # This file
+│   │   ├── enemy/             # Enemy types, AI and stages
+│   │   ├── gameFramework/     # Game application
+│   │   ├── gameplay/          # Health, audio and resolution scaling
+│   │   ├── level/             # Game levels
+│   │   ├── player/            # Player management and rewards
+│   │   ├── spaceship/         # Ship base class
+│   │   ├── vfx/               # Explosions
+│   │   ├── weapon/            # Weapon system
+│   │   └── widgets/           # Game UI
+│   ├── src/                   # Game implementation
+│   └── assets/                # Game resources
+├── build/                     # Generated build files
+├── CMakeLists.txt             # Main build configuration
+└── README.md                  # This file
 ```
 
 ## 📚 Documentation

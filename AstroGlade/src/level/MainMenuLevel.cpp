@@ -1,8 +1,8 @@
-#include "Level/MainMenuLevel.h"
-#include "Level/MenuBackground.h"
-#include "Level/ScoreBriefingLevel.h"
 #include "framework/Application.h"
 #include "gameplay/GameAudio.h"
+#include "level/MainMenuLevel.h"
+#include "level/MenuBackground.h"
+#include "level/ScoreBriefingLevel.h"
 #include "widgets/MainMenuHUD.h"
 
 namespace ly

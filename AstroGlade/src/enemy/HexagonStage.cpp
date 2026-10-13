@@ -1,7 +1,7 @@
 #include <initializer_list>
 
-#include "Enemy/Hexagon.h"
-#include "Enemy/HexagonStage.h"
+#include "enemy/Hexagon.h"
+#include "enemy/HexagonStage.h"
 #include "framework/World.h"
 
 namespace ly

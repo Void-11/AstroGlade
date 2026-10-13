@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "Enemy/EnemySpaceship.h"
+#include "enemy/EnemySpaceship.h"
 #include "weapon/LaserShooter.h"
 
 namespace ly
