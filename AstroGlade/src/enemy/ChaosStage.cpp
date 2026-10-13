@@ -7,13 +7,22 @@
 #include "enemy/UFO.h"
 #include "enemy/Vanguard.h"
 #include "framework/World.h"
+#include "gameplay/ResolutionScale.h"
 
 namespace ly
 {
 	namespace
 	{
 		constexpr float kChaosEnemyHealth = 100.f;
-		constexpr float kChaosUFOSpeed = 200.f;
+
+		// Chaos UFOs are deliberately slow, so they linger on screen and keep firing, which makes the stage harder.
+		// The speed was tuned by playing fullscreen at 2560x1440, where it is 200 px/s. Converted to reference-window
+		// units per axis, it scales like every other speed, so the stage is equally hard on every screen.
+		constexpr float kChaosUFOTunedSpeed = 200.f;
+		constexpr float kChaosUFOTuningWindowWidth = 2560.f;
+		constexpr float kChaosUFOTuningWindowHeight = 1440.f;
+		constexpr float kChaosUFOSpeedX = kChaosUFOTunedSpeed * kReferenceWindowWidth / kChaosUFOTuningWindowWidth;
+		constexpr float kChaosUFOSpeedY = kChaosUFOTunedSpeed * kReferenceWindowHeight / kChaosUFOTuningWindowHeight;
 
 		// Places a freshly spawned chaos enemy and gives it the shared chaos health.
 		template<typename EnemyType>
@@ -94,8 +103,10 @@ namespace ly
 
 		const sf::Vector2u windowSize = GetWorld()->GetWindowSize();
 		const sf::Vector2f spawnLoc = RandomSideSpawnLocation(windowSize);
+		const sf::Vector2f direction = DirectionToWindowCenter(spawnLoc, windowSize);
+		const sf::Vector2f velocity = ScaleToResolution({ direction.x * kChaosUFOSpeedX, direction.y * kChaosUFOSpeedY }, windowSize);
 
-		const weak<UFO> newUFO = GetWorld()->SpawnActor<UFO>(DirectionToWindowCenter(spawnLoc, windowSize) * kChaosUFOSpeed);
+		const weak<UFO> newUFO = GetWorld()->SpawnActor<UFO>(velocity);
 		SetUpChaosEnemy(newUFO, spawnLoc);
 		TrackActor(newUFO);
 

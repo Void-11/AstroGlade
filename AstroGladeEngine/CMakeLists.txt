@@ -29,6 +29,9 @@ add_library(${ASTRO_GLADE_ENGINE_TARGET_NAME} STATIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/PhysicsSystem.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/PhysicsSystem.cpp
 
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Platform.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Platform.cpp
+
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Delegate.h
 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/vfx/Particle.h
@@ -76,6 +79,11 @@ target_include_directories(${ASTRO_GLADE_ENGINE_TARGET_NAME} PUBLIC
 # The engine headers use C++17 features, so every consumer must compile as C++17 too.
 target_compile_features(${ASTRO_GLADE_ENGINE_TARGET_NAME} PUBLIC cxx_std_17)
 target_link_libraries(${ASTRO_GLADE_ENGINE_TARGET_NAME} PRIVATE AstroGladeCompilerOptions)
+
+# Keep <windows.h> lean and stop its min/max macros from clashing with std::min and std::max.
+if(WIN32)
+	target_compile_definitions(${ASTRO_GLADE_ENGINE_TARGET_NAME} PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+endif()
 
 include(FetchContent)
 

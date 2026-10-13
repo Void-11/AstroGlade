@@ -98,6 +98,9 @@ Game-specific implementation using the engine:
    ./AstroGlade.exe --windowed
    ```
 
+   The game looks for its `assets` folder next to `AstroGlade.exe`, so it also runs from shortcuts, terminals and launchers.
+   Keep the `assets` folder and the DLLs next to the executable when copying the game elsewhere.
+
    Release builds open only the game window.
    Debug builds also open a console that shows the debug log, such as stage changes and unloaded assets.
    Problems such as an asset that fails to load are written to standard error in every build.
