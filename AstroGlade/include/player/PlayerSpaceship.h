@@ -1,43 +1,55 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_PLAYER_PLAYERSPACESHIP_H
+#define ASTROGLADE_GAME_PLAYER_PLAYERSPACESHIP_H
+
+#include <string>
+
+#include "framework/Core.h"
 #include "spaceship/Spaceship.h"
-#include "framework/TimerManager.h"
+
 namespace ly
 {
 	class Shooter;
+
 	class PlayerSpaceship : public Spaceship
 	{
 	public:
-		PlayerSpaceship(World* owningWorld, const std::string& path = "SpaceShooterRedux/PNG/playerShip.png");
-	
-		virtual void Tick(float deltaTime) override;
-		void SetSpeed(sf::Vector2f newSpeed) { mSpeed = newSpeed; }
-		sf::Vector2f GetSpeed() const { return mSpeed; }
-		virtual void Shoot() override;
-		void SetShooter(unique<Shooter>&& newsShooter);
+		explicit PlayerSpaceship(World* owningWorld, const std::string& path = "SpaceShooterRedux/PNG/playerShip.png");
+		~PlayerSpaceship() override;
+
+		void Tick(float deltaTime) override;
+		void SetSpeed(const sf::Vector2f& newSpeed) { mSpeed = newSpeed; }
+		[[nodiscard]] sf::Vector2f GetSpeed() const { return mSpeed; }
+		void Shoot() override;
+		// Equips newShooter, or levels up the current shooter when it is of the same type.
+		void SetShooter(unique<Shooter> newShooter);
 		void ApplyDefaultWeapon(int weaponLevel);
 		void ApplyDefaultWeaponLevelIfUsingLaser(int weaponLevel);
-		virtual void ApplyDamage(float amt) override;
-		virtual void BeginPlay() override;
+		void ApplyDamage(float amt) override;
+		void BeginPlay() override;
+
 	private:
+		[[nodiscard]] unique<Shooter> CreateDefaultShooter();
 		void HandleInput();
 		void NormalizeInput();
 		void ClampInputOnEdge();
-		void ConsumeInput(float deltaTime);
-		bool IsBoosting() const;
+		void ConsumeInput();
+		[[nodiscard]] bool IsBoosting() const;
 		void StopInvulnerable();
 		void UpdateInvulnerable(float deltaTime);
+
 		sf::Vector2f mMoveInput;
 		sf::Vector2f mSpeed;
-		float mBoostSpeedMultiplier;
+		float mBoostSpeedMultiplier = 1.6f;
 
 		unique<Shooter> mShooter;
-	
-		float mInvulnerableTime;
-		TimerHandle mInvulnerableTimerHandle;
-		bool mInvulnerable;
 
-		float mInvulnerableFlashInterval;
-		float mInvulnerableFlashTimer;
-		float mInvulnerableFlashDir;
+		float mInvulnerableTime = 2.f;
+		bool mInvulnerable = true;
+
+		float mInvulnerableFlashInterval = 0.5f;
+		float mInvulnerableFlashTimer = 0.f;
+		float mInvulnerableFlashDir = 1.f;
 	};
 }
+
+#endif // ASTROGLADE_GAME_PLAYER_PLAYERSPACESHIP_H

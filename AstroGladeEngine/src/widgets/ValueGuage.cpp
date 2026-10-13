@@ -1,45 +1,45 @@
+#include <cmath>
+#include <string>
+
 #include "widgets/ValueGuage.h"
 #include "framework/AssetManager.h"
+#include "framework/Log.h"
+
 namespace ly
 {
-
-	ValueGauge::ValueGauge(const sf::Vector2f& size, float initialPercent, const sf::Color& foreGroundColor, const sf::Color& backgroundColor)
-		: mTextFont{},
-		mText{},
+	ValueGauge::ValueGauge(const sf::Vector2f& size, float initialPercent, const sf::Color& foregroundColor, const sf::Color& backgroundColor)
+		: mTextFont{ AssetManager::Get().LoadFont(kDefaultFontPath) },
 		mBarFront{ size },
 		mBarBack{ size },
-		mPercent{ initialPercent },
-		mForegroundColor{foreGroundColor},
-		mBackgroundColor{backgroundColor}
+		mPercent{ initialPercent }
 	{
-		const std::string textFontPath = "SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf";
-		mTextFont = AssetManager::Get().LoadFont(textFontPath);
-		if (!mTextFont)
-		{
-			LOG("Failed to load value gauge font: %s", textFontPath.c_str());
-		}
-		else
+		if (mTextFont)
 		{
 			mText.setFont(*mTextFont);
 		}
+		else
+		{
+			LogError("Failed to load value gauge font: ", kDefaultFontPath);
+		}
 
-		mBarFront.setFillColor(mForegroundColor);
-		mBarBack.setFillColor(mBackgroundColor);
+		mBarFront.setFillColor(foregroundColor);
+		mBarBack.setFillColor(backgroundColor);
 		SetTextSize(20);
 	}
+
 	void ValueGauge::UpdateValue(float value, float maxValue)
 	{
-		if (maxValue == 0) return;
-		mPercent = value / maxValue;
-		std::string displayStr = std::to_string((int)value) + "/" + std::to_string((int)maxValue);
-		mText.setString(displayStr);
+		if (maxValue == 0.f) return;
 
-		sf::Vector2f barSize = mBarBack.getSize();
-		mBarFront.setSize({barSize.x * mPercent, barSize.y});
+		mPercent = value / maxValue;
+		mText.setString(std::to_string(static_cast<int>(value)) + "/" + std::to_string(static_cast<int>(maxValue)));
+
+		const sf::Vector2f barSize = mBarBack.getSize();
+		mBarFront.setSize({ barSize.x * mPercent, barSize.y });
 		CenterText();
 	}
 
-sf::FloatRect ValueGauge::GetBounds() const
+	sf::FloatRect ValueGauge::GetBounds() const
 	{
 		return mBarBack.getGlobalBounds();
 	}
@@ -52,6 +52,13 @@ sf::FloatRect ValueGauge::GetBounds() const
 	void ValueGauge::SetTextColor(const sf::Color& color)
 	{
 		mText.setFillColor(color);
+	}
+
+	void ValueGauge::SetTextOutline(const sf::Color& color, float thickness)
+	{
+		mText.setOutlineColor(color);
+		mText.setOutlineThickness(thickness);
+		CenterText();
 	}
 
 	void ValueGauge::SetForegroundColor(const sf::Color& color)
@@ -77,7 +84,7 @@ sf::FloatRect ValueGauge::GetBounds() const
 		mBarBack.setPosition(newLocation);
 		CenterText();
 	}
-	
+
 	void ValueGauge::RotationUpdated(float newRotation)
 	{
 		mText.setRotation(newRotation);
@@ -87,8 +94,10 @@ sf::FloatRect ValueGauge::GetBounds() const
 
 	void ValueGauge::CenterText()
 	{
-		sf::Vector2f widgetCenter = GetCenterPosition();
-		sf::FloatRect textBound = mText.getLocalBounds();
-		mText.setPosition(widgetCenter - sf::Vector2f{textBound.left + textBound.width / 2.f, textBound.top + textBound.height / 2.f});
+		const sf::Vector2f widgetCenter = GetCenterPosition();
+		const sf::FloatRect textBounds = mText.getLocalBounds();
+		const sf::Vector2f textLocation = widgetCenter - sf::Vector2f{ textBounds.left + textBounds.width / 2.f, textBounds.top + textBounds.height / 2.f };
+		// Whole pixel positions keep the glyphs crisp.
+		mText.setPosition(std::round(textLocation.x), std::round(textLocation.y));
 	}
 }

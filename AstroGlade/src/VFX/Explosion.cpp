@@ -2,38 +2,27 @@
 #include "framework/World.h"
 #include "VFX/Explosion.h"
 #include "VFX/Particle.h"
+
 namespace ly
 {
-	Explosion::Explosion(int particleAmt, float lifeTimeMin, float lifeTimeMax, float sizeMin, float sizeMax, float speedMin, float speedMax, const sf::Color& particleColor, const List<std::string>& particleImagePaths)
-		: mParticleAmt{particleAmt},
-		mLifeTimeMin{lifeTimeMin},
-		mLifeTimeMax{lifeTimeMax},
-		mSizeMin{sizeMin},
-		mSizeMax{sizeMax},
-		mSpeedMin{speedMin},
-		mSpeedMax{speedMax},
-		mParticleColor{particleColor},
-		mParticleImagePaths{particleImagePaths}
+	void SpawnExplosion(World& world, const sf::Vector2f& location, const ExplosionSettings& settings)
 	{
-	}
-
-	void Explosion::SpawnExplosion(World* world, const sf::Vector2f& location)
-	{
-		if (!world)
+		if (settings.particleImagePaths.empty())
 		{
 			return;
 		}
 
-		for(int i = 0; i < mParticleAmt; ++i)
+		for (int i = 0; i < settings.particleAmount; ++i)
 		{
-			std::string particleImagePath = mParticleImagePaths[(int)RandomRange(0, mParticleImagePaths.size())];
-			weak<Particle> newParticle = world->SpawnActor<Particle>(particleImagePath);
-
-			newParticle.lock()->RandomLifeTime(mLifeTimeMin, mLifeTimeMax);
-			newParticle.lock()->SetActorLocation(location);
-			newParticle.lock()->RandomSize(mSizeMin, mSizeMax);
-			newParticle.lock()->RandomVelocity(mSpeedMin, mSpeedMax);
-			newParticle.lock()->GetSprite().setColor(mParticleColor);
+			const std::string& particleImagePath = settings.particleImagePaths[RandomIndex(settings.particleImagePaths.size())];
+			if (const shared<Particle> particle = world.SpawnActor<Particle>(particleImagePath).lock())
+			{
+				particle->RandomLifeTime(settings.lifeTimeMin, settings.lifeTimeMax);
+				particle->SetActorLocation(location);
+				particle->RandomSize(settings.sizeMin, settings.sizeMax);
+				particle->RandomVelocity(settings.speedMin, settings.speedMax);
+				particle->GetSprite().setColor(settings.particleColor);
+			}
 		}
 	}
 }

@@ -1,54 +1,42 @@
+#include <initializer_list>
+
 #include "weapon/FrontalWiper.h"
 
 namespace ly
 {
-	FrontalWiper::FrontalWiper(Actor* ownerActor, float cooldownTime, const sf::Vector2f& localOffset, float width)
-		: Shooter{ ownerActor },
-		mWidth{width},
-		mShooter1{ ownerActor, cooldownTime, {localOffset.x, localOffset.y - width/2.f}, 0.f, "SpaceShooterRedux/PNG/Lasers/laserGreen11.png" },
-		mShooter2{ ownerActor, cooldownTime, {localOffset.x, localOffset.y - width/6.f}, 0.f, "SpaceShooterRedux/PNG/Lasers/laserBlue07.png" },
-		mShooter3{ ownerActor, cooldownTime, {localOffset.x, localOffset.y + width / 6.f}, 0.f, "SpaceShooterRedux/PNG/Lasers/laserBlue07.png" },
-		mShooter4{ ownerActor, cooldownTime, {localOffset.x, localOffset.y + width / 2.f}, 0.f, "SpaceShooterRedux/PNG/Lasers/laserGreen11.png" },
-		mShooter5{ ownerActor, cooldownTime/1.5f, {localOffset.x, localOffset.y + width / 1.5f}, 15.f, "SpaceShooterRedux/PNG/Lasers/laserGreen11.png" },
-		mShooter6{ ownerActor, cooldownTime/1.5f, {localOffset.x, localOffset.y - width / 1.5f}, -15.f, "SpaceShooterRedux/PNG/Lasers/laserGreen11.png" }
+	namespace
 	{
-
+		constexpr const char* kOuterLaserTexture = "SpaceShooterRedux/PNG/Lasers/laserGreen11.png";
+		constexpr const char* kInnerLaserTexture = "SpaceShooterRedux/PNG/Lasers/laserBlue07.png";
 	}
 
-	void FrontalWiper::IncrementLevel(int amt)
+	FrontalWiper::FrontalWiper(Actor* ownerActor, float cooldownTime, const sf::Vector2f& localOffset, float width)
+		: Shooter{ ownerActor },
+		mShooter1{ ownerActor, cooldownTime, { localOffset.x, localOffset.y - width / 2.f }, 0.f, kOuterLaserTexture },
+		mShooter2{ ownerActor, cooldownTime, { localOffset.x, localOffset.y - width / 6.f }, 0.f, kInnerLaserTexture },
+		mShooter3{ ownerActor, cooldownTime, { localOffset.x, localOffset.y + width / 6.f }, 0.f, kInnerLaserTexture },
+		mShooter4{ ownerActor, cooldownTime, { localOffset.x, localOffset.y + width / 2.f }, 0.f, kOuterLaserTexture },
+		mShooter5{ ownerActor, cooldownTime / 1.5f, { localOffset.x, localOffset.y + width / 1.5f }, 15.f, kOuterLaserTexture },
+		mShooter6{ ownerActor, cooldownTime / 1.5f, { localOffset.x, localOffset.y - width / 1.5f }, -15.f, kOuterLaserTexture }
 	{
-		Shooter::IncrementLevel(amt);
-		mShooter1.IncrementLevel(amt);
-		mShooter2.IncrementLevel(amt);
-		mShooter3.IncrementLevel(amt);
-		mShooter4.IncrementLevel(amt);
-		mShooter5.IncrementLevel(amt);
-		mShooter6.IncrementLevel(amt);
 	}
 
 	void FrontalWiper::SetCurrentLevel(int newLevel)
 	{
 		Shooter::SetCurrentLevel(newLevel);
-		mShooter1.SetCurrentLevel(newLevel);
-		mShooter2.SetCurrentLevel(newLevel);
-		mShooter3.SetCurrentLevel(newLevel);
-		mShooter4.SetCurrentLevel(newLevel);
-		mShooter5.SetCurrentLevel(newLevel);
-		mShooter6.SetCurrentLevel(newLevel);
+		for (LaserShooter* shooter : { &mShooter1, &mShooter2, &mShooter3, &mShooter4, &mShooter5, &mShooter6 })
+		{
+			shooter->SetCurrentLevel(newLevel);
+		}
 	}
 
 	bool FrontalWiper::ShootImpl()
 	{
-		bool fired = false;
-		fired = mShooter1.Shoot() || fired;
-		fired = mShooter2.Shoot() || fired;
-		fired = mShooter3.Shoot() || fired;
-		fired = mShooter4.Shoot() || fired;
+		bool fired = ShootAll(mShooter1, mShooter2, mShooter3, mShooter4);
 
-		if (GetCurrentLevel() == GetMaxLevel())
+		if (IsAtMaxLevel())
 		{
-			fired = mShooter5.Shoot() || fired;
-			fired = mShooter6.Shoot() || fired;
+			fired = ShootAll(mShooter5, mShooter6) || fired;
 		}
 
 		return fired;

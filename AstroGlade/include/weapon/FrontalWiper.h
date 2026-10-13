@@ -1,24 +1,26 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_WEAPON_FRONTALWIPER_H
+#define ASTROGLADE_GAME_WEAPON_FRONTALWIPER_H
+
 #include <SFML/Graphics.hpp>
+
 #include "weapon/LaserShooter.h"
 
 namespace ly
 {
+	// Fires a wall of four parallel lasers across width, plus two angled ones at the maximum level.
 	class FrontalWiper : public Shooter
 	{
 	public:
-		FrontalWiper(Actor* ownerActor, 
+		explicit FrontalWiper(Actor* ownerActor,
 			float cooldownTime = 0.3f,
 			const sf::Vector2f& localOffset = { 0.f, 0.f },
 			float width = 60.f
 		);
-		
-		virtual void IncrementLevel(int amt = 1) override;
-		virtual void SetCurrentLevel(int newLevel) override;
-	private:
-		virtual bool ShootImpl() override;
 
-		float mWidth;
+		void SetCurrentLevel(int newLevel) override;
+
+	private:
+		bool ShootImpl() override;
 
 		LaserShooter mShooter1;
 		LaserShooter mShooter2;
@@ -28,3 +30,5 @@ namespace ly
 		LaserShooter mShooter6;
 	};
 }
+
+#endif // ASTROGLADE_GAME_WEAPON_FRONTALWIPER_H

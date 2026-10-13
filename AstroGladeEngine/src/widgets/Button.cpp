@@ -1,46 +1,59 @@
+#include <cmath>
+
 #include "framework/AssetManager.h"
+#include "framework/Log.h"
 #include "widgets/Button.h"
+
 namespace ly
 {
-	Button::Button(const std::string& textString, const std::string& buttonTexturePath)
-		: mButtonTexture{},
-		mButtonSprite{},
-		mButtonFont{},
-		mButtonText{},
-		mButtonDefaultColor{128,128,128,255},
-		mButtonDownColor{64,64,64, 255},
-		mButtonHoverColor{190, 190,190, 255},
-		mTextDefaultColor{255, 255, 255, 255},
-		mTextDownColor{200, 200, 200, 255},
-		mTextHoverColor{255, 255, 255, 255},
-		mIsButtonDown{false}
+	namespace
 	{
-		mButtonTexture = AssetManager::Get().LoadTexture(buttonTexturePath);
-		if (!mButtonTexture)
+		// The vertical middle of a capital letter in the text's local space, where SFML puts the baseline at the character size.
+		// Centering on it rather than on the string's own bounds keeps every label on the same baseline,
+		// whatever its descenders, such as the tail of a "Q".
+		[[nodiscard]] float CapHeightCenter(const sf::Text& text)
 		{
-			LOG("Failed to load button texture: %s", buttonTexturePath.c_str());
+			const sf::Font* const font = text.getFont();
+			if (!font)
+			{
+				const sf::FloatRect textBounds = text.getLocalBounds();
+				return textBounds.top + textBounds.height / 2.f;
+			}
+
+			const bool isBold = (text.getStyle() & sf::Text::Bold) != 0;
+			const sf::FloatRect capBounds = font->getGlyph(U'H', text.getCharacterSize(), isBold).bounds;
+			return static_cast<float>(text.getCharacterSize()) + capBounds.top + capBounds.height / 2.f;
 		}
-		else
+	}
+
+	Button::Button(const std::string& textString, const std::string& buttonTexturePath)
+		: mButtonTexture{ AssetManager::Get().LoadTexture(buttonTexturePath) },
+		mButtonFont{ AssetManager::Get().LoadFont(kDefaultFontPath) }
+	{
+		if (mButtonTexture)
 		{
 			mButtonSprite.setTexture(*mButtonTexture);
 			mButtonSprite.setColor(mButtonDefaultColor);
 		}
-
-		const std::string buttonFontPath = "SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf";
-		mButtonFont = AssetManager::Get().LoadFont(buttonFontPath);
-		if (!mButtonFont)
+		else
 		{
-			LOG("Failed to load button font: %s", buttonFontPath.c_str());
+			LogError("Failed to load button texture: ", buttonTexturePath);
+		}
+
+		if (mButtonFont)
+		{
+			mButtonText.setFont(*mButtonFont);
 		}
 		else
 		{
-			mButtonText.setFont(*mButtonFont);
+			LogError("Failed to load button font: ", kDefaultFontPath);
 		}
 
 		mButtonText.setString(textString);
 		mButtonText.setFillColor(mTextDefaultColor);
 		CenterText();
 	}
+
 	void Button::Draw(sf::RenderWindow& windowRef)
 	{
 		windowRef.draw(mButtonSprite);
@@ -59,16 +72,24 @@ namespace ly
 		mButtonText.setRotation(rotation);
 	}
 
-sf::FloatRect Button::GetBounds() const
+	sf::FloatRect Button::GetBounds() const
 	{
 		return mButtonSprite.getGlobalBounds();
 	}
 
 	void Button::CenterText()
 	{
-		sf::Vector2f widgetCenter = GetCenterPosition();
-		sf::FloatRect textBound = mButtonText.getGlobalBounds();
-		mButtonText.setPosition(widgetCenter - sf::Vector2f{ textBound.width / 2.f, textBound.height });
+		const sf::Vector2f widgetCenter = GetCenterPosition();
+		const sf::FloatRect textBounds = mButtonText.getLocalBounds();
+		const sf::Vector2f textCenter{ textBounds.left + textBounds.width / 2.f, CapHeightCenter(mButtonText) };
+
+		// Whole pixel positions keep the glyphs crisp.
+		mButtonText.setPosition(std::round(widgetCenter.x - textCenter.x), std::round(widgetCenter.y - textCenter.y));
+	}
+
+	bool Button::ContainsPoint(int x, int y) const
+	{
+		return GetBounds().contains(static_cast<float>(x), static_cast<float>(y));
 	}
 
 	void Button::SetTextString(const std::string& newStr)
@@ -104,31 +125,31 @@ sf::FloatRect Button::GetBounds() const
 		if (!GetVisibility()) return false;
 
 		bool handled = false;
-		if (windowEvent.type == sf::Event::MouseButtonReleased)
+		switch (windowEvent.type)
 		{
-			if (windowEvent.mouseButton.button == sf::Mouse::Left)
+		case sf::Event::MouseButtonReleased:
+			if (windowEvent.mouseButton.button == sf::Mouse::Left
+				&& mIsButtonDown
+				&& ContainsPoint(windowEvent.mouseButton.x, windowEvent.mouseButton.y))
 			{
-				if (mButtonSprite.getGlobalBounds().contains(windowEvent.mouseButton.x, windowEvent.mouseButton.y) && mIsButtonDown)
-				{
-					onButtonClicked.Broadcast();
-					handled = true;
-				}
+				onButtonClicked.Broadcast();
+				handled = true;
 			}
 			ButtonUp();
-		}
-		else if (windowEvent.type == sf::Event::MouseButtonPressed)
-		{
-			if (mButtonSprite.getGlobalBounds().contains(windowEvent.mouseButton.x, windowEvent.mouseButton.y))
+			break;
+
+		case sf::Event::MouseButtonPressed:
+			if (ContainsPoint(windowEvent.mouseButton.x, windowEvent.mouseButton.y))
 			{
 				ButtonDown();
 				handled = true;
 			}
-		}
-		else if (windowEvent.type == sf::Event::MouseMoved)
-		{
+			break;
+
+		case sf::Event::MouseMoved:
 			if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
-				if (mButtonSprite.getGlobalBounds().contains(windowEvent.mouseMove.x, windowEvent.mouseMove.y))
+				if (ContainsPoint(windowEvent.mouseMove.x, windowEvent.mouseMove.y))
 				{
 					MouseHovered();
 				}
@@ -137,6 +158,10 @@ sf::FloatRect Button::GetBounds() const
 					ButtonUp();
 				}
 			}
+			break;
+
+		default:
+			break;
 		}
 
 		return handled || Widget::HandleEvent(windowEvent);
@@ -148,12 +173,14 @@ sf::FloatRect Button::GetBounds() const
 		mButtonSprite.setColor(mButtonDefaultColor);
 		mButtonText.setFillColor(mTextDefaultColor);
 	}
+
 	void Button::ButtonDown()
 	{
 		mIsButtonDown = true;
 		mButtonSprite.setColor(mButtonDownColor);
 		mButtonText.setFillColor(mTextDownColor);
 	}
+
 	void Button::MouseHovered()
 	{
 		mButtonSprite.setColor(mButtonHoverColor);

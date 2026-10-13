@@ -1,21 +1,46 @@
-#include "gameFramework/GameApplication.h"
-#include "Level/GameLevelOne.h"
-#include "Level/MainMenuLevel.h"
-#include "framework/AssetManager.h"
-#include "config.h"
+#include <algorithm>
+#include <filesystem>
+#include <string_view>
 
-ly::Application* GetApplication()
-{
-	return new ly::GameApplication{};
-}
+#include "EntryPoint.h"
+#include "config.h"
+#include "framework/AssetManager.h"
+#include "gameFramework/GameApplication.h"
+#include "Level/MainMenuLevel.h"
 
 namespace ly
 {
-	GameApplication::GameApplication()
-		: Application{sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, "AstroGlade" , sf::Style::Fullscreen }
+	namespace
 	{
-		AssetManager::Get().SetAssetRootDirectory(GetResourceDir());
-		weak<MainMenuLevel> newWorld = LoadWorld<MainMenuLevel>();
+		constexpr std::string_view kWindowedFlag = "--windowed";
+		constexpr unsigned int kWindowedWidth = 1280;
+		constexpr unsigned int kWindowedHeight = 720;
+	}
+
+	unique<Application> CreateApplication(const List<std::string_view>& commandLine)
+	{
+		const bool windowed = std::find(commandLine.begin(), commandLine.end(), kWindowedFlag) != commandLine.end();
+		return std::make_unique<GameApplication>(windowed ? WindowMode::Windowed : WindowMode::Fullscreen);
+	}
+
+	GameApplication::GameApplication(WindowMode windowMode)
+		: Application{ GetVideoMode(windowMode).width, GetVideoMode(windowMode).height, "AstroGlade", GetWindowStyle(windowMode) }
+	{
+		AssetManager::Get().SetAssetRootDirectory(std::filesystem::path{ config::kResourceDirectory });
+		LoadWorld<MainMenuLevel>();
+	}
+
+	sf::VideoMode GameApplication::GetVideoMode(WindowMode windowMode)
+	{
+		return windowMode == WindowMode::Windowed
+			? sf::VideoMode{ kWindowedWidth, kWindowedHeight }
+			: sf::VideoMode::getDesktopMode();
+	}
+
+	sf::Uint32 GameApplication::GetWindowStyle(WindowMode windowMode)
+	{
+		return windowMode == WindowMode::Windowed
+			? sf::Style::Titlebar | sf::Style::Close
+			: sf::Style::Fullscreen;
 	}
 }
-

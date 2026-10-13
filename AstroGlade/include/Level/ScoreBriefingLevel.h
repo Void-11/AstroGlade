@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_LEVEL_SCOREBRIEFINGLEVEL_H
+#define ASTROGLADE_GAME_LEVEL_SCOREBRIEFINGLEVEL_H
 
 #include "framework/World.h"
 
@@ -6,17 +7,19 @@ namespace ly
 {
 	class ScoreBriefingHUD;
 
+	// Explains the scoring rules before a run starts.
 	class ScoreBriefingLevel : public World
 	{
 	public:
-		ScoreBriefingLevel(Application* owningApplication);
-		virtual void BeginPlay() override;
+		explicit ScoreBriefingLevel(Application* owningApplication);
 
 	private:
-		weak<ScoreBriefingHUD> mScoreBriefingHUD;
-
+		void BeginPlay() override;
 		void StartRun();
 		void ReturnToMainMenu();
-		void SpawnBackground();
+
+		weak<ScoreBriefingHUD> mScoreBriefingHUD;
 	};
 }
+
+#endif // ASTROGLADE_GAME_LEVEL_SCOREBRIEFINGLEVEL_H

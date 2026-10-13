@@ -1,31 +1,35 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_PLAYER_PLAYER_H
+#define ASTROGLADE_GAME_PLAYER_PLAYER_H
 
-#include "framework/Object.h"
+#include "framework/Core.h"
 #include "framework/Delegate.h"
+#include "framework/Object.h"
 
 namespace ly
 {
 	class PlayerSpaceship;
 	class World;
 
+	// The persistent state of a player across spaceship respawns: lives, score and weapon progress.
 	class Player : public Object
 	{
 	public:
-		Player();
+		Player() = default;
+
 		weak<PlayerSpaceship> SpawnSpaceship(World* world);
-		const weak<PlayerSpaceship> GetCurrentSpaceship() const { return mCurrentPlayerSpaceship; };
+		[[nodiscard]] weak<PlayerSpaceship> GetCurrentSpaceship() const { return mCurrentPlayerSpaceship; }
 
 		bool ConsumeLife();
-		void AddLifeCount(unsigned int count);
-		int GetLifeCount() const { return mLifeCount; }
-		
-		void AddScore(unsigned int amt);
-		int GetScore() const { return mScore; }
-		void IncreaseScoreMultiplier(unsigned int amt = 1);
-		unsigned int GetScoreMultiplier() const { return mScoreMultiplier; }
+		void AddLifeCount(int count);
+		[[nodiscard]] int GetLifeCount() const { return mLifeCount; }
 
-		void IncreaseDefaultWeaponLevel(unsigned int amt = 1);
-		int GetDefaultWeaponLevel() const { return mDefaultWeaponLevel; }
+		void AddScore(int amt);
+		[[nodiscard]] int GetScore() const { return mScore; }
+		void IncreaseScoreMultiplier(int amt = 1);
+		[[nodiscard]] int GetScoreMultiplier() const { return mScoreMultiplier; }
+
+		void IncreaseDefaultWeaponLevel(int amt = 1);
+		[[nodiscard]] int GetDefaultWeaponLevel() const { return mDefaultWeaponLevel; }
 
 		Delegate<int> onLifeChange;
 		Delegate<int> onScoreChange;
@@ -33,11 +37,15 @@ namespace ly
 
 	private:
 		void ApplyDefaultWeaponToCurrentSpaceship();
-		unsigned int mLifeCount;
-		unsigned int mScore;
-		unsigned int mScoreMultiplier;
-		unsigned int mMaxScoreMultiplier;
-		int mDefaultWeaponLevel;
+
+		static constexpr int kMaxScoreMultiplier = 5;
+
+		int mLifeCount = 3;
+		int mScore = 0;
+		int mScoreMultiplier = 1;
+		int mDefaultWeaponLevel = 1;
 		weak<PlayerSpaceship> mCurrentPlayerSpaceship;
 	};
 }
+
+#endif // ASTROGLADE_GAME_PLAYER_PLAYER_H

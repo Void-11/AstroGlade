@@ -1,41 +1,41 @@
-#include "player/PlayerManager.h"
-
 #include <cstddef>
+
+#include "player/PlayerManager.h"
 
 namespace ly
 {
-	unique<PlayerManager> PlayerManager::playerManager {nullptr};
-	PlayerManager::PlayerManager()
+	namespace
 	{
-		
+		Player* FindPlayer(const List<unique<Player>>& players, int playerIndex)
+		{
+			if (playerIndex < 0 || static_cast<std::size_t>(playerIndex) >= players.size())
+			{
+				return nullptr;
+			}
+
+			return players[static_cast<std::size_t>(playerIndex)].get();
+		}
+	}
+
+	PlayerManager& PlayerManager::Get()
+	{
+		static PlayerManager playerManager;
+		return playerManager;
 	}
 
 	Player& PlayerManager::CreateNewPlayer()
 	{
-		mPlayers.emplace_back(Player());
-		return mPlayers.back();
+		return *mPlayers.emplace_back(std::make_unique<Player>());
 	}
 
 	Player* PlayerManager::GetPlayer(int playerIndex)
 	{
-		if(playerIndex >= 0 && static_cast<std::size_t>(playerIndex) < mPlayers.size())
-			return &(mPlayers[playerIndex]);
-		return nullptr;
+		return FindPlayer(mPlayers, playerIndex);
 	}
+
 	const Player* PlayerManager::GetPlayer(int playerIndex) const
 	{
-		if (playerIndex >= 0 && static_cast<std::size_t>(playerIndex) < mPlayers.size())
-			return &(mPlayers[playerIndex]);
-		return nullptr;
-	}
-	PlayerManager& PlayerManager::Get()
-	{
-		if (!playerManager)
-		{
-			playerManager = std::move(unique<PlayerManager>{new PlayerManager{}});
-		}
-
-		return *playerManager;
+		return FindPlayer(mPlayers, playerIndex);
 	}
 
 	void PlayerManager::Reset()

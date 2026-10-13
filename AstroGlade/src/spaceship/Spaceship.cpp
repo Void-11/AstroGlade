@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "spaceship/Spaceship.h"
 #include "framework/MathUtility.h"
 #include "gameplay/GameAudio.h"
@@ -5,17 +7,10 @@
 
 namespace ly
 {
-	Spaceship::Spaceship(World* owningWord, const std::string& texturePath)
-		: Actor{ owningWord, texturePath },
-		mVelocity{},
-		mHealthComp{100.f, 100.f},
-		mBlinkTime{0.f},
-		mBlinkDuration{0.2f},
-		mBlinkColorOffset{255, 0, 0, 255}
+	Spaceship::Spaceship(World* owningWorld, const std::string& texturePath)
+		: Actor{ owningWorld, texturePath }
 	{
-
 	}
-
 
 	void Spaceship::Tick(float deltaTime)
 	{
@@ -31,7 +26,6 @@ namespace ly
 
 	void Spaceship::Shoot()
 	{
-
 	}
 
 	void Spaceship::BeginPlay()
@@ -42,6 +36,7 @@ namespace ly
 		mHealthComp.onTakenDamage.BindAction(GetWeakRef(), &Spaceship::OnTakenDamage);
 		mHealthComp.onHealthEmpty.BindAction(GetWeakRef(), &Spaceship::Blow);
 	}
+
 	void Spaceship::ApplyDamage(float amt)
 	{
 		mHealthComp.ChangeHealth(-amt);
@@ -57,21 +52,18 @@ namespace ly
 
 	void Spaceship::UpdateBlink(float deltaTime)
 	{
-		if (mBlinkTime > 0)
+		if (mBlinkTime > 0.f)
 		{
-			mBlinkTime -= deltaTime;
-			mBlinkTime = mBlinkTime > 0 ? mBlinkTime : 0.f;
-
+			mBlinkTime = std::max(mBlinkTime - deltaTime, 0.f);
 			GetSprite().setColor(LerpColor(sf::Color::White, mBlinkColorOffset, mBlinkTime));
 		}
 	}
 
-	void Spaceship::OnHealthChanged(float amt, float health, float maxHealth)
+	void Spaceship::OnHealthChanged([[maybe_unused]] float amt, [[maybe_unused]] float health, [[maybe_unused]] float maxHealth)
 	{
-
 	}
 
-	void Spaceship::OnTakenDamage(float amt, float health, float maxHealth)
+	void Spaceship::OnTakenDamage([[maybe_unused]] float amt, [[maybe_unused]] float health, [[maybe_unused]] float maxHealth)
 	{
 		GameAudio::PlayShipHit(*this);
 		Blink();
@@ -80,14 +72,12 @@ namespace ly
 	void Spaceship::Blow()
 	{
 		GameAudio::PlayShipDeath(*this);
-		Explosion exp{};
-		exp.SpawnExplosion(GetWorld(), GetActorLocation());
+		SpawnExplosion(*GetWorld(), GetActorLocation());
 		Blew();
 		Destroy();
 	}
 
 	void Spaceship::Blew()
 	{
-
 	}
 }

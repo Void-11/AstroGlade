@@ -1,26 +1,27 @@
 #include "widgets/ImageWidget.h"
 #include "framework/AssetManager.h"
+#include "framework/Log.h"
+
 namespace ly
 {
 	ImageWidget::ImageWidget(const std::string& imagePath)
-		: mTexture{},
-		mSprite{}
+		: mTexture{ AssetManager::Get().LoadTexture(imagePath) }
 	{
-		mTexture = AssetManager::Get().LoadTexture(imagePath);
 		if (!mTexture)
 		{
-			LOG("Failed to load image widget texture: %s", imagePath.c_str());
+			LogError("Failed to load image widget texture: ", imagePath);
 			return;
 		}
 
 		mSprite.setTexture(*mTexture);
 	}
+
 	void ImageWidget::SetImage(const shared<sf::Texture>& newTexture)
 	{
 		if (newTexture)
 		{
 			mTexture = newTexture;
-			mSprite.setTexture(*(mTexture.get()));
+			mSprite.setTexture(*mTexture);
 		}
 	}
 
@@ -39,12 +40,12 @@ namespace ly
 		mSprite.setRotation(newRotation);
 	}
 
-	void ImageWidget::Draw(sf::RenderWindow& winowRef)
+	void ImageWidget::Draw(sf::RenderWindow& windowRef)
 	{
-		winowRef.draw(mSprite);
+		windowRef.draw(mSprite);
 	}
 
-sf::FloatRect ImageWidget::GetBounds() const
+	sf::FloatRect ImageWidget::GetBounds() const
 	{
 		return mSprite.getGlobalBounds();
 	}

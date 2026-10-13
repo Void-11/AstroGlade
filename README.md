@@ -50,7 +50,7 @@ Game-specific implementation using the engine:
 - **Box2D 2.4.1** - 2D physics simulation
 - **CMake 3.27.7+** - Build system
 - **Visual Studio 2022** - C++ compiler (Windows)
-- **C++14 Standard** - Modern C++ features
+- **C++17 Standard** - `inline` and `constexpr` variables, `if constexpr`, fold expressions, structured bindings, `[[nodiscard]]`, `std::string_view`, `std::filesystem` and more, written to the C++ Core Guidelines
 
 ### Design Patterns
 - **Actor-Based Object Model** - Game objects derive from `Actor`, with lightweight components for shared behavior such as health
@@ -91,6 +91,22 @@ Game-specific implementation using the engine:
    cd build/AstroGlade/Release
    ./AstroGlade.exe
    ```
+
+   The game starts fullscreen at the desktop resolution.
+   Pass `--windowed` to play in a 1280x720 window instead:
+   ```bash
+   ./AstroGlade.exe --windowed
+   ```
+
+   Release builds open only the game window.
+   Debug builds also open a console that shows the debug log, such as stage changes and unloaded assets.
+   Problems such as an asset that fails to load are written to standard error in every build.
+
+### Build Options
+- `ASTROGLADE_WARNINGS_AS_ERRORS` (default `ON`) - Treats compiler warnings in the engine and game code as errors.
+  The code builds warning free at `/W4 /permissive-` on MSVC and `-Wall -Wextra -Wpedantic` on GCC and Clang.
+  Third-party code (SFML, Box2D) is not affected.
+  Turn it off with `-DASTROGLADE_WARNINGS_AS_ERRORS=OFF` when trying a newer compiler that adds new warnings.
 
 ### Build Outputs
 - `AstroGlade.exe` - Main game executable
@@ -142,7 +158,7 @@ AstroGlade/
 │   │   ├── gameFramework/   # Game application
 │   │   ├── spaceship/       # Ship implementations  
 │   │   ├── weapon/          # Weapon system
-│   │   ├── enemy/           # Enemy types and AI
+│   │   ├── Enemy/           # Enemy types and AI
 │   │   ├── player/          # Player management
 │   │   ├── Level/           # Game levels
 │   │   └── widgets/         # Game UI
@@ -155,7 +171,6 @@ AstroGlade/
 
 ## 📚 Documentation
 
-- [AstroGladeEngine.md](AstroGladeEngine.md) - Detailed engine documentation for developers
 - Code is extensively commented with clear class hierarchies
 - Header files provide comprehensive API documentation
 
@@ -169,7 +184,8 @@ AstroGlade/
 
 ### Coding Standards
 - Follow existing code style and naming conventions
-- Use modern C++ features appropriately
+- Target ISO C++17 and follow the C++ Core Guidelines
+- Keep the build warning free with `ASTROGLADE_WARNINGS_AS_ERRORS` on
 - Maintain clean separation between engine and game code
 - Add comments for complex algorithms and public APIs
 - Test changes thoroughly before submitting
@@ -189,7 +205,7 @@ This project is open source. Feel free to use, modify, and distribute according 
 ## 📞 Support
 
 If you encounter any issues or have questions:
-- Check the documentation in `AstroGladeEngine.md`
+- Check the documentation in this README and in the engine headers
 - Review the source code for implementation details
 - Open an issue on the repository
 

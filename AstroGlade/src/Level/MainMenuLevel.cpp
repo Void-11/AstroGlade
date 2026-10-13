@@ -1,35 +1,27 @@
-#include <algorithm>
-
 #include "Level/MainMenuLevel.h"
-#include "widgets/MainMenuHUD.h"
+#include "Level/MenuBackground.h"
+#include "Level/ScoreBriefingLevel.h"
 #include "framework/Application.h"
 #include "gameplay/GameAudio.h"
-#include "Level/ScoreBriefingLevel.h"
-#include "framework/Actor.h"
+#include "widgets/MainMenuHUD.h"
 
 namespace ly
 {
 	MainMenuLevel::MainMenuLevel(Application* owningApplication)
-		: World{owningApplication}
+		: World{ owningApplication },
+		mMainMenuHUD{ SpawnHUD<MainMenuHUD>() }
 	{
-		mMainMenuHUD = SpawnHUD<MainMenuHUD>();
 	}
 
 	void MainMenuLevel::BeginPlay()
 	{
 		GameAudio::PlayMenuMusic();
-		mMainMenuHUD.lock()->onStartButtonClicked.BindAction(GetWeakRef(), &MainMenuLevel::StartGame);
-		mMainMenuHUD.lock()->onQuitButtonClicked.BindAction(GetWeakRef(), &MainMenuLevel::QuitGame);
-		weak<Actor> background = SpawnActor<Actor>("SpaceShooterRedux/mainMenuBg.png");
-		if (!background.expired())
+		if (const shared<MainMenuHUD> mainMenuHUD = mMainMenuHUD.lock())
 		{
-			sf::Vector2u windowSize = GetWindowSize();
-			sf::FloatRect bounds = background.lock()->GetActorGlobalBounds();
-			float scale = std::max(windowSize.x / bounds.width, windowSize.y / bounds.height);
-
-			background.lock()->GetSprite().setScale(scale, scale);
-			background.lock()->SetActorLocation({ windowSize.x / 2.f, windowSize.y / 2.f });
+			mainMenuHUD->onStartButtonClicked.BindAction(GetWeakRef(), &MainMenuLevel::StartGame);
+			mainMenuHUD->onQuitButtonClicked.BindAction(GetWeakRef(), &MainMenuLevel::QuitGame);
 		}
+		SpawnMenuBackground(*this);
 	}
 
 	void MainMenuLevel::StartGame()
@@ -42,6 +34,4 @@ namespace ly
 		GameAudio::StopMusic();
 		GetApplication()->QuitApplication();
 	}
-
-
 }

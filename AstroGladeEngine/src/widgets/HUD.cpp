@@ -11,23 +11,16 @@ namespace ly
 		}
 	}
 
-	bool HUD::HandleEvent(const sf::Event& event)
+	bool HUD::HandleEvent([[maybe_unused]] const sf::Event& event)
 	{
 		return false;
 	}
 
-	HUD::HUD()
-		: mAlreadyInit{false}
+	void HUD::Init([[maybe_unused]] const sf::RenderWindow& windowRef)
 	{
-
-	}
-	void HUD::Init(const sf::RenderWindow& windowRef)
-	{
-
 	}
 
-	void HUD::Tick(float deltaTime)
+	void HUD::Tick([[maybe_unused]] float deltaTime)
 	{
-
 	}
 }

@@ -1,48 +1,40 @@
+#include <initializer_list>
+
 #include "weapon/ThreeWayShooter.h"
 
 namespace ly
 {
-	ThreeWayShooter::ThreeWayShooter(Actor* owner, float cooldownTime, const sf::Vector2f& localOffset)
-		: Shooter{owner},
-		mShooterLeft{ owner, cooldownTime, localOffset + sf::Vector2f{10, -10}, -30.f, "SpaceShooterRedux/PNG/Lasers/laserRed01.png" },
-		mShooterMid{owner, cooldownTime, localOffset, 0.f, "SpaceShooterRedux/PNG/Lasers/laserRed01.png" },
-		mShooterRight{ owner, cooldownTime, localOffset + sf::Vector2f{10, 10}, 30.f, "SpaceShooterRedux/PNG/Lasers/laserRed01.png" },
-		mTopLevelShooterLeft{ owner, cooldownTime, localOffset + sf::Vector2f{10, 10}, 15.f, "SpaceShooterRedux/PNG/Lasers/laserRed01.png" },
-		mTopLevelShooterRight{ owner, cooldownTime, localOffset + sf::Vector2f{10, -10}, -15.f, "SpaceShooterRedux/PNG/Lasers/laserRed01.png" }
+	namespace
 	{
+		constexpr const char* kThreeWayLaserTexture = "SpaceShooterRedux/PNG/Lasers/laserRed01.png";
+	}
 
-	}
-	void ThreeWayShooter::IncrementLevel(int amt)
+	ThreeWayShooter::ThreeWayShooter(Actor* owner, float cooldownTime, const sf::Vector2f& localOffset)
+		: Shooter{ owner },
+		mShooterLeft{ owner, cooldownTime, localOffset + sf::Vector2f{ 10.f, -10.f }, -30.f, kThreeWayLaserTexture },
+		mShooterMid{ owner, cooldownTime, localOffset, 0.f, kThreeWayLaserTexture },
+		mShooterRight{ owner, cooldownTime, localOffset + sf::Vector2f{ 10.f, 10.f }, 30.f, kThreeWayLaserTexture },
+		mTopLevelShooterLeft{ owner, cooldownTime, localOffset + sf::Vector2f{ 10.f, 10.f }, 15.f, kThreeWayLaserTexture },
+		mTopLevelShooterRight{ owner, cooldownTime, localOffset + sf::Vector2f{ 10.f, -10.f }, -15.f, kThreeWayLaserTexture }
 	{
-		Shooter::IncrementLevel(amt);
-		mShooterLeft.IncrementLevel(amt);
-		mShooterMid.IncrementLevel(amt);
-		mShooterRight.IncrementLevel(amt);
-		
-		mTopLevelShooterLeft.IncrementLevel(amt);
-		mTopLevelShooterRight.IncrementLevel(amt);
 	}
+
 	void ThreeWayShooter::SetCurrentLevel(int level)
 	{
 		Shooter::SetCurrentLevel(level);
-		mShooterLeft.SetCurrentLevel(level);
-		mShooterMid.SetCurrentLevel(level);
-		mShooterRight.SetCurrentLevel(level);
-
-		mTopLevelShooterLeft.SetCurrentLevel(level);
-		mTopLevelShooterRight.SetCurrentLevel(level);
+		for (LaserShooter* shooter : { &mShooterLeft, &mShooterMid, &mShooterRight, &mTopLevelShooterLeft, &mTopLevelShooterRight })
+		{
+			shooter->SetCurrentLevel(level);
+		}
 	}
+
 	bool ThreeWayShooter::ShootImpl()
 	{
-		bool fired = false;
-		fired = mShooterLeft.Shoot() || fired;
-		fired = mShooterMid.Shoot() || fired;
-		fired = mShooterRight.Shoot() || fired;
+		bool fired = ShootAll(mShooterLeft, mShooterMid, mShooterRight);
 
-		if (GetCurrentLevel() == GetMaxLevel())
+		if (IsAtMaxLevel())
 		{
-			fired = mTopLevelShooterLeft.Shoot() || fired;
-			fired = mTopLevelShooterRight.Shoot() || fired;
+			fired = ShootAll(mTopLevelShooterLeft, mTopLevelShooterRight) || fired;
 		}
 
 		return fired;

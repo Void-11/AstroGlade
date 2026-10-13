@@ -1,12 +1,16 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_PLAYER_REWARD_H
+#define ASTROGLADE_GAME_PLAYER_REWARD_H
 
 #include <functional>
+#include <string>
+
 #include "framework/Actor.h"
+
 namespace ly
 {
 	class PlayerSpaceship;
 	class Reward;
-	using RewardFunc = std::function<void(PlayerSpaceship*)>;
+	using RewardFunc = std::function<void(PlayerSpaceship&)>;
 	using RewardFactoryFunc = std::function<weak<Reward>(World*)>;
 
 	enum class RewardAudioType
@@ -18,30 +22,27 @@ namespace ly
 		ScoreMultiplier
 	};
 
+	// A pickup that falls down the screen and applies its reward to the player spaceship that touches it.
 	class Reward : public Actor
 	{
 	public:
 		Reward(World* world, const std::string& texturePath, RewardFunc rewardFunc, RewardAudioType audioType = RewardAudioType::Generic, float speed = 200.f);
-		virtual void BeginPlay() override;
-		virtual void Tick(float deltaTime) override;
+		void BeginPlay() override;
+		void Tick(float deltaTime) override;
+
 	private:
-		virtual void OnActorBeginOverlap(Actor* otherActor) override;
+		void OnActorBeginOverlap(Actor* otherActor) override;
+
 		RewardFunc mRewardFunc;
 		RewardAudioType mAudioType;
 		float mSpeed;
 	};
 
-	weak<Reward> CreateHealthReward(World* world);
-	weak<Reward> CreateThreewayShooterReward(World* world);
-	weak<Reward> CreateFrontalWiperReward(World* world);
-	weak<Reward> CreateLifeReward(World* world);
-	weak<Reward> CreateScoreMultiplierReward(World* world);
-
-	weak<Reward> CreateReward(World* world, const std::string& texturePath, RewardFunc rewardFunc, RewardAudioType audioType);
-
-	void RewardHealth(PlayerSpaceship* player);
-	void RewardThreewayShooter(PlayerSpaceship* player);
-	void RewardFrontalWiper(PlayerSpaceship* player);
-	void RewardLife(PlayerSpaceship* player);
-	void RewardScoreMultiplier(PlayerSpaceship* player);
+	[[nodiscard]] weak<Reward> CreateHealthReward(World* world);
+	[[nodiscard]] weak<Reward> CreateThreewayShooterReward(World* world);
+	[[nodiscard]] weak<Reward> CreateFrontalWiperReward(World* world);
+	[[nodiscard]] weak<Reward> CreateLifeReward(World* world);
+	[[nodiscard]] weak<Reward> CreateScoreMultiplierReward(World* world);
 }
+
+#endif // ASTROGLADE_GAME_PLAYER_REWARD_H

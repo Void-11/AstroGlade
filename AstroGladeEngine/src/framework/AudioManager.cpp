@@ -2,19 +2,27 @@
 
 #include "framework/AssetManager.h"
 #include "framework/AudioManager.h"
+#include "framework/Log.h"
 
 namespace ly
 {
-	unique<AudioManager> AudioManager::audioManager{ nullptr };
+	namespace
+	{
+		float ClampVolume(float volume)
+		{
+			return std::clamp(volume, 0.f, 100.f);
+		}
+
+		std::string ResolveAssetPath(const std::string& path)
+		{
+			return AssetManager::Get().ResolveAssetPath(path);
+		}
+	}
 
 	AudioManager& AudioManager::Get()
 	{
-		if (!audioManager)
-		{
-			audioManager = unique<AudioManager>{ new AudioManager };
-		}
-
-		return *audioManager;
+		static AudioManager audioManager;
+		return audioManager;
 	}
 
 	void AudioManager::PlaySound(const std::string& path, float volume, float pitch, float cooldown)
@@ -24,7 +32,7 @@ namespace ly
 			return;
 		}
 
-		shared<sf::SoundBuffer> buffer = LoadSoundBuffer(path);
+		const shared<sf::SoundBuffer> buffer = LoadSoundBuffer(path);
 		if (!buffer)
 		{
 			return;
@@ -32,12 +40,10 @@ namespace ly
 
 		CleanCycle();
 
-		unique<sf::Sound> sound{ new sf::Sound };
-		sound->setBuffer(*buffer);
+		const unique<sf::Sound>& sound = mActiveSounds.emplace_back(std::make_unique<sf::Sound>(*buffer));
 		sound->setVolume(ClampVolume(volume));
 		sound->setPitch(pitch);
 		sound->play();
-		mActiveSounds.push_back(std::move(sound));
 
 		if (cooldown > 0.f)
 		{
@@ -61,7 +67,7 @@ namespace ly
 		StopMusic();
 		if (!mMusic.openFromFile(ResolveAssetPath(path)))
 		{
-			LOG("Failed to load music: %s", path.c_str());
+			LogError("Failed to load music: ", path);
 			return;
 		}
 
@@ -100,65 +106,38 @@ namespace ly
 
 	void AudioManager::CleanCycle()
 	{
-		for (auto iter = mActiveSounds.begin(); iter != mActiveSounds.end();)
+		const auto finished = [](const unique<sf::Sound>& sound)
 		{
-			if (!(*iter) || (*iter)->getStatus() == sf::SoundSource::Stopped)
-			{
-				iter = mActiveSounds.erase(iter);
-			}
-			else
-			{
-				++iter;
-			}
-		}
-	}
-
-	AudioManager::AudioManager()
-		: mLoadedSoundBuffers{},
-		mActiveSounds{},
-		mSoundCooldownClocks{},
-		mMusic{},
-		mCurrentMusicPath{}
-	{
+			return !sound || sound->getStatus() == sf::SoundSource::Stopped;
+		};
+		mActiveSounds.erase(std::remove_if(mActiveSounds.begin(), mActiveSounds.end(), finished), mActiveSounds.end());
 	}
 
 	shared<sf::SoundBuffer> AudioManager::LoadSoundBuffer(const std::string& path)
 	{
-		auto found = mLoadedSoundBuffers.find(path);
-		if (found != mLoadedSoundBuffers.end())
+		if (const auto found = mLoadedSoundBuffers.find(path); found != mLoadedSoundBuffers.end())
 		{
 			return found->second;
 		}
 
-		shared<sf::SoundBuffer> buffer{ new sf::SoundBuffer };
+		auto buffer = std::make_shared<sf::SoundBuffer>();
 		if (!buffer->loadFromFile(ResolveAssetPath(path)))
 		{
-			LOG("Failed to load sound: %s", path.c_str());
-			return shared<sf::SoundBuffer>{ nullptr };
+			LogError("Failed to load sound: ", path);
+			return nullptr;
 		}
 
-		mLoadedSoundBuffers.insert({ path, buffer });
+		mLoadedSoundBuffers.try_emplace(path, buffer);
 		return buffer;
-	}
-
-	std::string AudioManager::ResolveAssetPath(const std::string& path) const
-	{
-		return AssetManager::Get().GetAssetRootDirectory() + path;
-	}
-
-	float AudioManager::ClampVolume(float volume) const
-	{
-		return std::max(0.f, std::min(volume, 100.f));
 	}
 
 	bool AudioManager::IsSoundOnCooldown(const std::string& path, float cooldown) const
 	{
-		auto found = mSoundCooldownClocks.find(path);
-		if (found == mSoundCooldownClocks.end())
+		if (const auto found = mSoundCooldownClocks.find(path); found != mSoundCooldownClocks.end())
 		{
-			return false;
+			return found->second.getElapsedTime().asSeconds() < cooldown;
 		}
 
-		return found->second.getElapsedTime().asSeconds() < cooldown;
+		return false;
 	}
 }

@@ -1,7 +1,14 @@
+#include <algorithm>
+
 #include "weapon/Shooter.h"
 
 namespace ly
 {
+	Shooter::Shooter(Actor* owner)
+		: mOwner{ owner }
+	{
+	}
+
 	bool Shooter::Shoot()
 	{
 		if (CanShoot() && !IsOnCooldown())
@@ -11,38 +18,16 @@ namespace ly
 
 		return false;
 	}
-	
+
 	void Shooter::IncrementLevel(int amt)
 	{
-		if (amt <= 0 || mCurrentLevel == mMaxLevel) return;
+		if (amt <= 0 || IsAtMaxLevel()) return;
 
-		mCurrentLevel += amt;
-		if (mCurrentLevel > mMaxLevel)
-		{
-			mCurrentLevel = mMaxLevel;
-		}
+		SetCurrentLevel(mCurrentLevel + amt);
 	}
 
 	void Shooter::SetCurrentLevel(int level)
 	{
-		if (level < 1)
-		{
-			level = 1;
-		}
-
-		if (level > mMaxLevel)
-		{
-			level = mMaxLevel;
-		}
-
-		mCurrentLevel = level;
-	}
-
-	Shooter::Shooter(Actor* owner)
-		: mOwner{owner},
-		mCurrentLevel{1},
-		mMaxLevel{4}
-	{
-
+		mCurrentLevel = std::clamp(level, 1, kMaxLevel);
 	}
 }

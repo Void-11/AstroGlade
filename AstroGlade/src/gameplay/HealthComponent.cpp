@@ -1,42 +1,32 @@
+#include <algorithm>
+
 #include "gameplay/HealthComponent.h"
-#include "framework/Core.h"
 
 namespace ly
 {
 	HealthComponent::HealthComponent(float health, float maxHealth)
-		: mHealth{health},
-		mMaxHealth{maxHealth}
+		: mHealth{ health },
+		mMaxHealth{ maxHealth }
 	{
-
 	}
 
 	void HealthComponent::ChangeHealth(float amt)
 	{
-		if (amt == 0) return;
-		if (mHealth == 0) return;
+		if (amt == 0.f) return;
+		if (mHealth == 0.f) return;
 
-		mHealth += amt;
-		if (mHealth < 0)
-		{
-			mHealth = 0;
-		}
-
-		if (mHealth > mMaxHealth)
-		{
-			mHealth = mMaxHealth;
-		}
+		mHealth = std::clamp(mHealth + amt, 0.f, mMaxHealth);
 
 		onHealthChanged.Broadcast(amt, mHealth, mMaxHealth);
 
-		if (amt < 0)
+		if (amt < 0.f)
 		{
 			TakenDamage(-amt);
-			if (mHealth <= 0)
+			if (mHealth <= 0.f)
 			{
 				HealthEmpty();
 			}
 		}
-
 	}
 
 	void HealthComponent::SetInitialHealth(float health, float maxHealth)
@@ -54,5 +44,4 @@ namespace ly
 	{
 		onHealthEmpty.Broadcast();
 	}
-
 }

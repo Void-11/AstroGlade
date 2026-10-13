@@ -1,25 +1,70 @@
+#include <utility>
+
 #include "framework/World.h"
 #include "gameplay/GameAudio.h"
-#include "player/Reward.h"
-#include "player/PlayerSpaceship.h"
 #include "player/PlayerManager.h"
+#include "player/PlayerSpaceship.h"
+#include "player/Reward.h"
 #include "weapon/FrontalWiper.h"
 #include "weapon/ThreeWayShooter.h"
 
 namespace ly
 {
+	namespace
+	{
+		constexpr float kHealthRewardAmount = 10.f;
+
+		weak<Reward> CreateReward(World* world, const std::string& texturePath, RewardFunc rewardFunc, RewardAudioType audioType)
+		{
+			return world->SpawnActor<Reward>(texturePath, std::move(rewardFunc), audioType);
+		}
+
+		void RewardHealth(PlayerSpaceship& player)
+		{
+			player.GetHealthComp().ChangeHealth(kHealthRewardAmount);
+		}
+
+		void RewardThreewayShooter(PlayerSpaceship& player)
+		{
+			player.SetShooter(std::make_unique<ThreeWayShooter>(&player, 0.4f, sf::Vector2f{ 50.f, 0.f }));
+		}
+
+		void RewardFrontalWiper(PlayerSpaceship& player)
+		{
+			player.SetShooter(std::make_unique<FrontalWiper>(&player, 0.4f, sf::Vector2f{ 50.f, 0.f }));
+		}
+
+		void RewardLife([[maybe_unused]] PlayerSpaceship& player)
+		{
+			if (Player* const owningPlayer = PlayerManager::Get().GetPlayer())
+			{
+				owningPlayer->AddLifeCount(1);
+			}
+		}
+
+		void RewardScoreMultiplier([[maybe_unused]] PlayerSpaceship& player)
+		{
+			if (Player* const owningPlayer = PlayerManager::Get().GetPlayer())
+			{
+				owningPlayer->IncreaseScoreMultiplier();
+			}
+		}
+	}
+
 	Reward::Reward(World* world, const std::string& texturePath, RewardFunc rewardFunc, RewardAudioType audioType, float speed)
 		: Actor{ world, texturePath },
-		mRewardFunc{ rewardFunc },
+		mRewardFunc{ std::move(rewardFunc) },
 		mAudioType{ audioType },
 		mSpeed{ speed }
 	{
 	}
+
 	void Reward::BeginPlay()
 	{
 		Actor::BeginPlay();
 		SetEnablePhysics(true);
 	}
+
 	void Reward::Tick(float deltaTime)
 	{
 		Actor::Tick(deltaTime);
@@ -35,16 +80,17 @@ namespace ly
 		if (!otherActor || otherActor->IsPendingDestroy())
 			return;
 
-		if (!PlayerManager::Get().GetPlayer())
+		const Player* const player = PlayerManager::Get().GetPlayer();
+		if (!player)
 			return;
 
-		weak<PlayerSpaceship> playerSpaceship = PlayerManager::Get().GetPlayer()->GetCurrentSpaceship();
-		if (playerSpaceship.expired() || playerSpaceship.lock()->IsPendingDestroy())
+		const shared<PlayerSpaceship> playerSpaceship = player->GetCurrentSpaceship().lock();
+		if (!playerSpaceship || playerSpaceship->IsPendingDestroy())
 			return;
 
-		if (playerSpaceship.lock()->GetUniqueID() == otherActor->GetUniqueID())
+		if (playerSpaceship->GetUniqueID() == otherActor->GetUniqueID())
 		{
-			mRewardFunc(playerSpaceship.lock().get());
+			mRewardFunc(*playerSpaceship);
 			GameAudio::PlayRewardPickup(mAudioType);
 			Destroy();
 		}
@@ -73,50 +119,5 @@ namespace ly
 	weak<Reward> CreateScoreMultiplierReward(World* world)
 	{
 		return CreateReward(world, "SpaceShooterRedux/PNG/Power-ups/star_gold.png", RewardScoreMultiplier, RewardAudioType::ScoreMultiplier);
-	}
-
-	weak<Reward> CreateReward(World* world, const std::string& texturePath, RewardFunc rewardFunc, RewardAudioType audioType)
-	{
-		weak<Reward> reward = world->SpawnActor<Reward>(texturePath, rewardFunc, audioType);
-		return reward;
-	}
-
-	void RewardHealth(PlayerSpaceship* player)
-	{
-		static float rewardAmt = 10.f;
-		if (player && !player->IsPendingDestroy())
-		{
-			player->GetHealthComp().ChangeHealth(rewardAmt);
-		}
-	}
-
-	void RewardThreewayShooter(PlayerSpaceship* player)
-	{
-		if (!player || player->IsPendingDestroy())
-			return;
-
-		player->SetShooter(unique<Shooter>{new ThreeWayShooter{player, 0.4f, {50.f, 0.f} }});
-	}
-	void RewardFrontalWiper(PlayerSpaceship* player)
-	{
-		if (!player || player->IsPendingDestroy())
-			return;
-
-		player->SetShooter(unique<Shooter>{new FrontalWiper{ player, 0.4f, {50.f, 0.f} }});
-	}
-	void RewardLife(PlayerSpaceship* player)
-	{
-		if (!PlayerManager::Get().GetPlayer())
-			return;
-
-		PlayerManager::Get().GetPlayer()->AddLifeCount(1);
-	}
-
-	void RewardScoreMultiplier(PlayerSpaceship* player)
-	{
-		if (!player || player->IsPendingDestroy() || !PlayerManager::Get().GetPlayer())
-			return;
-
-		PlayerManager::Get().GetPlayer()->IncreaseScoreMultiplier();
 	}
 }

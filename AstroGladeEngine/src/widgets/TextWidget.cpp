@@ -1,25 +1,25 @@
 #include "widgets/TextWidget.h"
 #include "framework/AssetManager.h"
+#include "framework/Log.h"
+
 namespace ly
 {
 	TextWidget::TextWidget(const std::string& textStr, const std::string& fontPath, unsigned int characterSize)
-		:mFont{},
-		mText{}
+		: mFont{ AssetManager::Get().LoadFont(fontPath) }
 	{
-		mFont = AssetManager::Get().LoadFont(fontPath);
-		if (!mFont)
+		if (mFont)
 		{
-			LOG("Failed to load text widget font: %s", fontPath.c_str());
+			mText.setFont(*mFont);
 		}
 		else
 		{
-			mText.setFont(*mFont);
+			LogError("Failed to load text widget font: ", fontPath);
 		}
 
 		mText.setString(textStr);
 		mText.setCharacterSize(characterSize);
 	}
-	
+
 	void TextWidget::SetString(const std::string& newStr)
 	{
 		mText.setString(newStr);
@@ -35,7 +35,7 @@ namespace ly
 		mText.setFillColor(color);
 	}
 
-sf::FloatRect TextWidget::GetBounds() const
+	sf::FloatRect TextWidget::GetBounds() const
 	{
 		return mText.getGlobalBounds();
 	}
@@ -44,10 +44,12 @@ sf::FloatRect TextWidget::GetBounds() const
 	{
 		mText.setPosition(newLocation);
 	}
+
 	void TextWidget::RotationUpdated(float newRotation)
 	{
 		mText.setRotation(newRotation);
 	}
+
 	void TextWidget::Draw(sf::RenderWindow& windowRef)
 	{
 		windowRef.draw(mText);

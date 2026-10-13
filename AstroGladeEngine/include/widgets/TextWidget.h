@@ -1,4 +1,8 @@
-#pragma once
+#ifndef ASTROGLADE_ENGINE_WIDGETS_TEXTWIDGET_H
+#define ASTROGLADE_ENGINE_WIDGETS_TEXTWIDGET_H
+
+#include <string>
+
 #include <SFML/Graphics.hpp>
 
 #include "framework/Core.h"
@@ -9,20 +13,24 @@ namespace ly
 	class TextWidget : public Widget
 	{
 	public:
-		TextWidget(const std::string& textStr, const std::string& fontPath
-			= "SpaceShooterRedux/Bonus/Oxanium-SemiBold.ttf",
+		explicit TextWidget(const std::string& textStr,
+			const std::string& fontPath = kDefaultFontPath,
 			unsigned int characterSize = 10
 		);
 
 		void SetString(const std::string& newStr);
 		void SetTextSize(unsigned int newSize);
 		void SetTextColor(const sf::Color& color);
-		virtual sf::FloatRect GetBounds() const override;
+		[[nodiscard]] sf::FloatRect GetBounds() const override;
+
 	private:
-		virtual void LocationUpdated(const sf::Vector2f& newLocation) override;
-		virtual void RotationUpdated(float newRotation) override;
-		virtual void Draw(sf::RenderWindow& windowRef) override;
+		void LocationUpdated(const sf::Vector2f& newLocation) override;
+		void RotationUpdated(float newRotation) override;
+		void Draw(sf::RenderWindow& windowRef) override;
+
 		shared<sf::Font> mFont;
 		sf::Text mText;
 	};
 }
+
+#endif // ASTROGLADE_ENGINE_WIDGETS_TEXTWIDGET_H

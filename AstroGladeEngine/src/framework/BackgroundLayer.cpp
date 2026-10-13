@@ -1,24 +1,27 @@
+#include <cstddef>
+
 #include "framework/AssetManager.h"
 #include "framework/BackgroundLayer.h"
 #include "framework/MathUtility.h"
 #include "framework/World.h"
+
 namespace ly
 {
-	BackgroundLayer::BackgroundLayer(World* ownningWorld, 
+	BackgroundLayer::BackgroundLayer(World* owningWorld,
 		const List<std::string>& assetPaths,
 		const sf::Vector2f& minVel,
 		const sf::Vector2f& maxVel,
-		float sizeMin, 
-		float sizeMax, 
+		float sizeMin,
+		float sizeMax,
 		int spriteCount,
 		const sf::Color& colorTint)
-		: Actor{ownningWorld},
-		mMinVelocity{minVel},
-		mMaxVelocity{maxVel},
-		mSizeMin{sizeMin},
-		mSizeMax{sizeMax},
-		mSpriteCount{spriteCount},
-		mTintColor{colorTint}
+		: Actor{ owningWorld },
+		mMinVelocity{ minVel },
+		mMaxVelocity{ maxVel },
+		mSizeMin{ sizeMin },
+		mSizeMax{ sizeMax },
+		mSpriteCount{ spriteCount },
+		mTintColor{ colorTint }
 	{
 		SetAssets(assetPaths);
 		SetEnablePhysics(false);
@@ -26,10 +29,14 @@ namespace ly
 
 	void BackgroundLayer::SetAssets(const List<std::string>& assetPaths)
 	{
+		mTextures.clear();
 		for (const std::string& texturePath : assetPaths)
 		{
-			shared<sf::Texture> newTexture = AssetManager::Get().LoadTexture(texturePath);
-			mTextures.push_back(newTexture);
+			// A missing asset is logged by the AssetManager; the layer simply uses the remaining ones.
+			if (shared<sf::Texture> newTexture = AssetManager::Get().LoadTexture(texturePath))
+			{
+				mTextures.push_back(std::move(newTexture));
+			}
 		}
 		RefreshSprites();
 	}
@@ -41,57 +48,64 @@ namespace ly
 
 		for (int i = 0; i < mSpriteCount; ++i)
 		{
-			sf::Sprite newSprite{};
+			sf::Sprite& newSprite = mSprites.emplace_back();
 			RandomSpriteTexture(newSprite);
 			RandomSpriteTransform(newSprite, true);
-			mSprites.push_back(newSprite);
 
-			float velX = RandomRange(mMinVelocity.x, mMaxVelocity.x);
-			float velY = RandomRange(mMinVelocity.y, mMaxVelocity.y);
-			mVelocities.push_back(sf::Vector2f{velX, velY});
+			mVelocities.push_back(RandomVelocity());
 		}
 
 		SetColorTint(mTintColor);
 	}
 
-	void BackgroundLayer::RandomSpriteTexture(sf::Sprite& sprite)
+	void BackgroundLayer::RandomSpriteTexture(sf::Sprite& sprite) const
 	{
-		if (mTextures.size() > 0)
+		if (mTextures.empty())
 		{
-			shared<sf::Texture> pickedTexture = GetRandomTexture();
-			sprite.setTexture(*(pickedTexture.get()));
-			sprite.setTextureRect(sf::IntRect{ 0,0, (int)pickedTexture->getSize().x, (int)pickedTexture->getSize().y });
-			sf::FloatRect bound = sprite.getGlobalBounds();
-			sprite.setOrigin(bound.width/2.f, bound.height/2.f);
+			return;
 		}
+
+		const shared<sf::Texture>& pickedTexture = mTextures[RandomIndex(mTextures.size())];
+		sprite.setTexture(*pickedTexture, true);
+
+		// The origin is in local (untransformed) coordinates, so center it on the local bounds.
+		const sf::FloatRect localBounds = sprite.getLocalBounds();
+		sprite.setOrigin(localBounds.width / 2.f, localBounds.height / 2.f);
 	}
-	void BackgroundLayer::RandomSpriteTransform(sf::Sprite& sprite, bool randomY)
+
+	void BackgroundLayer::RandomSpriteTransform(sf::Sprite& sprite, bool randomY) const
 	{
-		RandomSpritePosition(sprite, randomY);
+		// Size and rotation come first so the position can use the final bounds of the sprite.
 		RandomSpriteRotation(sprite);
 		RandomSpriteSize(sprite);
+		RandomSpritePosition(sprite, randomY);
 	}
 
-	void BackgroundLayer::RandomSpritePosition(sf::Sprite& sprite, bool randomY)
+	void BackgroundLayer::RandomSpritePosition(sf::Sprite& sprite, bool randomY) const
 	{
-		auto windowSize = GetWorld()->GetWindowSize();
-		auto bound = sprite.getGlobalBounds();
+		const sf::Vector2u windowSize = GetWorld()->GetWindowSize();
+		const sf::FloatRect bounds = sprite.getGlobalBounds();
 
-		float posX = RandomRange(0, windowSize.x);
-		float posY = randomY ? RandomRange(0, windowSize.y) : -bound.height;
+		const float posX = RandomRange(0.f, static_cast<float>(windowSize.x));
+		const float posY = randomY ? RandomRange(0.f, static_cast<float>(windowSize.y)) : -bounds.height;
 
-		sprite.setPosition(sf::Vector2f{posX, posY});
+		sprite.setPosition(sf::Vector2f{ posX, posY });
 	}
 
-	void BackgroundLayer::RandomSpriteRotation(sf::Sprite& sprite)
+	void BackgroundLayer::RandomSpriteRotation(sf::Sprite& sprite) const
 	{
-		sprite.setRotation(RandomRange(0, 360.f));
+		sprite.setRotation(RandomRange(0.f, 360.f));
 	}
 
-	void BackgroundLayer::RandomSpriteSize(sf::Sprite& sprite)
+	void BackgroundLayer::RandomSpriteSize(sf::Sprite& sprite) const
 	{
-		float size = RandomRange(mSizeMin, mSizeMax);
+		const float size = RandomRange(mSizeMin, mSizeMax);
 		sprite.setScale(size, size);
+	}
+
+	sf::Vector2f BackgroundLayer::RandomVelocity() const
+	{
+		return sf::Vector2f{ RandomRange(mMinVelocity.x, mMaxVelocity.x), RandomRange(mMinVelocity.y, mMaxVelocity.y) };
 	}
 
 	void BackgroundLayer::SetColorTint(const sf::Color& color)
@@ -109,12 +123,6 @@ namespace ly
 		RefreshSprites();
 	}
 
-	shared<sf::Texture> BackgroundLayer::GetRandomTexture() const
-	{
-		int randomPickIndex = (int)(RandomRange(0, mTextures.size()));
-		return mTextures[randomPickIndex];
-	}
-
 	void BackgroundLayer::Render(sf::RenderWindow& windowRef)
 	{
 		Actor::Render(windowRef);
@@ -127,40 +135,29 @@ namespace ly
 	void BackgroundLayer::Tick(float deltaTime)
 	{
 		Actor::Tick(deltaTime);
-		for (int i = 0; i < mSprites.size(); ++i)
+		for (std::size_t i = 0; i < mSprites.size(); ++i)
 		{
 			sf::Sprite& sprite = mSprites[i];
-			sf::Vector2f& vel = mVelocities[i];
+			sprite.move(mVelocities[i] * deltaTime);
 
-			sprite.setPosition(sprite.getPosition() + vel * deltaTime);
 			if (IsSpriteOffScreen(sprite))
 			{
 				RandomSpriteTexture(sprite);
 				RandomSpriteTransform(sprite);
-				float velX = RandomRange(mMinVelocity.x, mMaxVelocity.x);
-				float velY = RandomRange(mMinVelocity.y, mMaxVelocity.y);
-				mVelocities[i] = sf::Vector2f{ velX, velY };
+				mVelocities[i] = RandomVelocity();
 			}
 		}
 	}
 
-	bool BackgroundLayer::IsSpriteOffScreen(sf::Sprite& sprite) const
+	bool BackgroundLayer::IsSpriteOffScreen(const sf::Sprite& sprite) const
 	{
-		auto bound = sprite.getGlobalBounds();
-		auto windowSize = GetWorld()->GetWindowSize();
-		auto spritePos = sprite.getPosition();
+		const sf::FloatRect bounds = sprite.getGlobalBounds();
+		const sf::Vector2u windowSize = GetWorld()->GetWindowSize();
+		const sf::Vector2f spritePos = sprite.getPosition();
 
-		if (spritePos.x < -bound.width || spritePos.x > windowSize.x + bound.width)
-		{
-			return true;
-		}
-
-		if (spritePos.y < -bound.height || spritePos.y > windowSize.y + bound.height)
-		{
-			return true;
-		}
-
-		return false;
+		const bool offScreenX = spritePos.x < -bounds.width || spritePos.x > static_cast<float>(windowSize.x) + bounds.width;
+		const bool offScreenY = spritePos.y < -bounds.height || spritePos.y > static_cast<float>(windowSize.y) + bounds.height;
+		return offScreenX || offScreenY;
 	}
 
 	void BackgroundLayer::SetVelocities(const sf::Vector2f& min, const sf::Vector2f& max)
@@ -168,11 +165,9 @@ namespace ly
 		mMinVelocity = min;
 		mMaxVelocity = max;
 
-		for (int i = 0; i < mVelocities.size(); ++i)
+		for (sf::Vector2f& velocity : mVelocities)
 		{
-			float velX = RandomRange(mMinVelocity.x, mMaxVelocity.x);
-			float velY = RandomRange(mMinVelocity.y, mMaxVelocity.y);
-			mVelocities[i] = sf::Vector2f{velX, velY};
+			velocity = RandomVelocity();
 		}
 	}
 
@@ -181,9 +176,9 @@ namespace ly
 		mSizeMin = min;
 		mSizeMax = max;
 
-		for (int i = 0; i < mSprites.size(); ++i)
+		for (sf::Sprite& sprite : mSprites)
 		{
-			RandomSpriteSize(mSprites[i]);
+			RandomSpriteSize(sprite);
 		}
 	}
 }

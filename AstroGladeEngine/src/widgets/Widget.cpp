@@ -9,7 +9,8 @@ namespace ly
 			Draw(windowRef);
 		}
 	}
-	bool Widget::HandleEvent(const sf::Event& event)
+
+	bool Widget::HandleEvent([[maybe_unused]] const sf::Event& event)
 	{
 		return false;
 	}
@@ -33,28 +34,19 @@ namespace ly
 
 	sf::Vector2f Widget::GetCenterPosition() const
 	{
-		sf::FloatRect bound = GetBounds();
-		return sf::Vector2f{bound.left + bound.width/2.f, bound.top + bound.height/2.f};
+		const sf::FloatRect bounds = GetBounds();
+		return sf::Vector2f{ bounds.left + bounds.width / 2.f, bounds.top + bounds.height / 2.f };
 	}
 
-	Widget::Widget()
-		: mIsVisible{true},
-		mWidgetTransform{}
+	void Widget::Draw([[maybe_unused]] sf::RenderWindow& windowRef)
 	{
-
 	}
 
-	void Widget::Draw(sf::RenderWindow& windowRef)
+	void Widget::LocationUpdated([[maybe_unused]] const sf::Vector2f& newLocation)
 	{
-
 	}
 
-	void Widget::LocationUpdated(const sf::Vector2f& newLocation)
+	void Widget::RotationUpdated([[maybe_unused]] float newRotation)
 	{
-
-	}
-	void Widget::RotationUpdated(float newRotaion)
-	{
-
 	}
 }

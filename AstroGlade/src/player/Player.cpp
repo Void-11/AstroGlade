@@ -1,68 +1,42 @@
-#include "player/Player.h"
+#include <algorithm>
+
 #include "framework/World.h"
+#include "player/Player.h"
 #include "player/PlayerSpaceship.h"
+#include "weapon/Shooter.h"
 
 namespace ly
 {
-	namespace
-	{
-		int ClampWeaponLevel(int level)
-		{
-			const int minWeaponLevel = 1;
-			const int maxWeaponLevel = 4;
-			if (level < minWeaponLevel)
-			{
-				return minWeaponLevel;
-			}
-
-			if (level > maxWeaponLevel)
-			{
-				return maxWeaponLevel;
-			}
-
-			return level;
-		}
-	}
-
-	Player::Player()
-		: mLifeCount{3},
-		mScore{0},
-		mScoreMultiplier{1},
-		mMaxScoreMultiplier{5},
-		mDefaultWeaponLevel{1},
-		mCurrentPlayerSpaceship{}
-	{
-	}
 	weak<PlayerSpaceship> Player::SpawnSpaceship(World* world)
 	{
-		if (mLifeCount > 0)
+		if (mLifeCount <= 0)
 		{
-			auto windowSize = world->GetWindowSize();
-			mCurrentPlayerSpaceship = world->SpawnActor<PlayerSpaceship>();
-			mCurrentPlayerSpaceship.lock()->SetActorLocation(sf::Vector2f(windowSize.x/2.f, windowSize.y - 100.f));
-			mCurrentPlayerSpaceship.lock()->SetActorRotation(-90.f);
-			ApplyDefaultWeaponToCurrentSpaceship();
-			return mCurrentPlayerSpaceship;
-		}
-		else
-		{
-			mCurrentPlayerSpaceship = weak<PlayerSpaceship>{};
+			mCurrentPlayerSpaceship.reset();
 			onLifeExhausted.Broadcast();
+			return {};
 		}
 
-		return weak<PlayerSpaceship>{};
+		mCurrentPlayerSpaceship = world->SpawnActor<PlayerSpaceship>();
+		if (const shared<PlayerSpaceship> spaceship = mCurrentPlayerSpaceship.lock())
+		{
+			const sf::Vector2u windowSize = world->GetWindowSize();
+			spaceship->SetActorLocation(sf::Vector2f{ static_cast<float>(windowSize.x) / 2.f, static_cast<float>(windowSize.y) - 100.f });
+			spaceship->SetActorRotation(-90.f);
+		}
+		ApplyDefaultWeaponToCurrentSpaceship();
+		return mCurrentPlayerSpaceship;
 	}
 
 	bool Player::ConsumeLife()
 	{
-		if (mLifeCount == 0)
+		if (mLifeCount <= 0)
 		{
 			onLifeExhausted.Broadcast();
 			return false;
 		}
 
 		--mLifeCount;
-		mCurrentPlayerSpaceship = weak<PlayerSpaceship>{};
+		mCurrentPlayerSpaceship.reset();
 		onLifeChange.Broadcast(mLifeCount);
 		if (mLifeCount == 0)
 		{
@@ -73,7 +47,7 @@ namespace ly
 		return true;
 	}
 
-	void Player::AddLifeCount(unsigned int count)
+	void Player::AddLifeCount(int count)
 	{
 		if (count > 0)
 		{
@@ -81,7 +55,8 @@ namespace ly
 			onLifeChange.Broadcast(mLifeCount);
 		}
 	}
-	void Player::AddScore(unsigned int amt)
+
+	void Player::AddScore(int amt)
 	{
 		if (amt > 0)
 		{
@@ -90,41 +65,36 @@ namespace ly
 		}
 	}
 
-	void Player::IncreaseScoreMultiplier(unsigned int amt)
+	void Player::IncreaseScoreMultiplier(int amt)
 	{
-		if (amt == 0 || mScoreMultiplier == mMaxScoreMultiplier)
+		if (amt <= 0 || mScoreMultiplier == kMaxScoreMultiplier)
 		{
 			return;
 		}
 
-		mScoreMultiplier += amt;
-		if (mScoreMultiplier > mMaxScoreMultiplier)
-		{
-			mScoreMultiplier = mMaxScoreMultiplier;
-		}
-
+		mScoreMultiplier = std::min(mScoreMultiplier + amt, kMaxScoreMultiplier);
 		onScoreChange.Broadcast(mScore);
 	}
 
-	void Player::IncreaseDefaultWeaponLevel(unsigned int amt)
+	void Player::IncreaseDefaultWeaponLevel(int amt)
 	{
-		if (amt == 0)
+		if (amt <= 0)
 		{
 			return;
 		}
 
-		mDefaultWeaponLevel = ClampWeaponLevel(mDefaultWeaponLevel + static_cast<int>(amt));
-		if (!mCurrentPlayerSpaceship.expired() && !mCurrentPlayerSpaceship.lock()->IsPendingDestroy())
+		mDefaultWeaponLevel = std::clamp(mDefaultWeaponLevel + amt, 1, Shooter::kMaxLevel);
+		if (const shared<PlayerSpaceship> spaceship = mCurrentPlayerSpaceship.lock(); spaceship && !spaceship->IsPendingDestroy())
 		{
-			mCurrentPlayerSpaceship.lock()->ApplyDefaultWeaponLevelIfUsingLaser(mDefaultWeaponLevel);
+			spaceship->ApplyDefaultWeaponLevelIfUsingLaser(mDefaultWeaponLevel);
 		}
 	}
 
 	void Player::ApplyDefaultWeaponToCurrentSpaceship()
 	{
-		if (!mCurrentPlayerSpaceship.expired() && !mCurrentPlayerSpaceship.lock()->IsPendingDestroy())
+		if (const shared<PlayerSpaceship> spaceship = mCurrentPlayerSpaceship.lock(); spaceship && !spaceship->IsPendingDestroy())
 		{
-			mCurrentPlayerSpaceship.lock()->ApplyDefaultWeapon(mDefaultWeaponLevel);
+			spaceship->ApplyDefaultWeapon(mDefaultWeaponLevel);
 		}
 	}
 }

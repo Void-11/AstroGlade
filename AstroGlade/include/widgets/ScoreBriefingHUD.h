@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_WIDGETS_SCOREBRIEFINGHUD_H
+#define ASTROGLADE_GAME_WIDGETS_SCOREBRIEFINGHUD_H
 
 #include <SFML/Graphics.hpp>
 
@@ -15,14 +16,14 @@ namespace ly
 	public:
 		ScoreBriefingHUD();
 
-		virtual void Draw(sf::RenderWindow& windowRef) override;
-		virtual bool HandleEvent(const sf::Event& event) override;
+		void Draw(sf::RenderWindow& windowRef) override;
+		bool HandleEvent(const sf::Event& event) override;
 
 		Delegate<> onStartRunClicked;
 		Delegate<> onBackClicked;
 
 	private:
-		virtual void Init(const sf::RenderWindow& windowRef) override;
+		void Init(const sf::RenderWindow& windowRef) override;
 
 		void StartRun();
 		void Back();
@@ -42,6 +43,9 @@ namespace ly
 		ImageWidget mBossIcon;
 		Button mStartButton;
 		sf::RectangleShape mPanel;
-		bool mTransitioning;
+		// Set once the player leaves the briefing, so a double press cannot load two worlds.
+		bool mTransitioning = false;
 	};
 }
+
+#endif // ASTROGLADE_GAME_WIDGETS_SCOREBRIEFINGHUD_H

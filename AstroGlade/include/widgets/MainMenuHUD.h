@@ -1,8 +1,12 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_WIDGETS_MAINMENUHUD_H
+#define ASTROGLADE_GAME_WIDGETS_MAINMENUHUD_H
 
-#include "widgets/HUD.h"
+#include "framework/Delegate.h"
 #include "widgets/Button.h"
+#include "widgets/ControlsPanel.h"
+#include "widgets/HUD.h"
 #include "widgets/TextWidget.h"
+
 namespace ly
 {
 	class MainMenuHUD : public HUD
@@ -10,30 +14,28 @@ namespace ly
 	public:
 		MainMenuHUD();
 
-		virtual void Draw(sf::RenderWindow& windowRef) override;
-		virtual bool HandleEvent(const sf::Event& event) override;
+		void Draw(sf::RenderWindow& windowRef) override;
+		bool HandleEvent(const sf::Event& event) override;
+
 		Delegate<> onStartButtonClicked;
 		Delegate<> onQuitButtonClicked;
+
 	private:
-
-		virtual void Init(const sf::RenderWindow& windowRef) override;
-
-		TextWidget mTitleAstroText;
-		TextWidget mTitleGladeText;
-		TextWidget mControlsTitleText;
-		TextWidget mControlsKeysText;
-		TextWidget mControlsActionsText;
-		Button mStartButton;
-		Button mControlsButton;
-		Button mQuitButton;
-		Button mBackButton;
-		sf::RectangleShape mControlsPanel;
-		bool mShowingControls;
+		void Init(const sf::RenderWindow& windowRef) override;
 
 		void StartButtonClicked();
 		void ControlsButtonClicked();
 		void BackButtonClicked();
 		void QuitButtonClicked();
 		void SetControlsVisible(bool visible);
+
+		TextWidget mTitleAstroText;
+		TextWidget mTitleGladeText;
+		Button mStartButton;
+		Button mControlsButton;
+		Button mQuitButton;
+		ControlsPanel mControlsPanel;
 	};
 }
+
+#endif // ASTROGLADE_GAME_WIDGETS_MAINMENUHUD_H

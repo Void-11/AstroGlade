@@ -1,97 +1,73 @@
+#include <cmath>
+#include <initializer_list>
+#include <string>
+#include <utility>
+
 #include "framework/Actor.h"
 #include "gameplay/GameAudio.h"
-#include "widgets/GameplayHUD.h"
 #include "player/Player.h"
 #include "player/PlayerManager.h"
 #include "player/PlayerSpaceship.h"
+#include "widgets/GameplayHUD.h"
+#include "widgets/MenuStyle.h"
+
 namespace ly
 {
+	namespace
+	{
+		// Moves widget by offset, landing on whole pixels so that text glyphs stay crisp.
+		void MoveWidgetBy(Widget& widget, const sf::Vector2f& offset)
+		{
+			const sf::Vector2f location = widget.GetWidgetLocation() + offset;
+			widget.SetWidgetLocation({ std::round(location.x), std::round(location.y) });
+		}
+	}
+
 	GameplayHUD::GameplayHUD()
-		:mFramerateText{"Frame Rate:"},
-		mPlayerHealthBar{},
+		: mFramerateText{ "Frame Rate:" },
 		mPlayerLifeIcon{ "SpaceShooterRedux/PNG/playerShip_hud.png" },
 		mPlayerLifeText{ "" },
 		mPlayerScoreIcon{ "SpaceShooterRedux/PNG/Power-ups/star_gold.png" },
 		mPlayerScoreText{ "" },
-		mHealthyHealthBarColor{40,255,95,255},
-		mCriticalHealthBarColor{255,0,0,255},
-		mCriticalThreshold{0.3},
-		mWidgetSpaceing{10.f},
-		mWinLoseText{""},
-		mFinalScoreText{""},
-		mPauseText{"PAUSED", "SpaceShooterRedux/Bonus/Oxanium-ExtraBold.ttf"},
-		mControlsTitleText{"CONTROLS", "SpaceShooterRedux/Bonus/Oxanium-ExtraBold.ttf"},
-		mControlsKeysText{"W / UP\nA / LEFT\nS / DOWN\nD / RIGHT\nSPACE\nLEFT SHIFT\nESC"},
-		mControlsActionsText{"MOVE UP\nMOVE LEFT\nMOVE DOWN\nMOVE RIGHT\nSHOOT\nHOLD BOOST\nPAUSE/MENU"},
-		mResumeButton{">> RESUME"},
-		mRestartButton{">> RESTART"},
-		mControlsButton{">> CONTROLS"},
-		mQuitButton{">> QUIT"},
-		mReturnButton{">> RETURN"},
-		mShowingControls{false},
-		mIsPaused{false},
-		mWindowSize{},
-		mFrameRateClock{},
-		mFramesSinceRateUpdate{0},
-		mFrameRateUpdateInterval{0.25f}
+		mWinLoseText{ "", MenuStyle::kTitleFontPath },
+		mFinalScoreText{ "" },
+		mPauseText{ "PAUSED", MenuStyle::kTitleFontPath },
+		mResumeButton{ ">> RESUME" },
+		mRestartButton{ ">> RESTART" },
+		mControlsButton{ ">> CONTROLS" },
+		mQuitButton{ ">> QUIT" }
 	{
-		const sf::Color astroWhite{245, 248, 255, 255};
-		const sf::Color menuGreen{40, 255, 95, 255};
-		const sf::Color transparent{255, 255, 255, 0};
-		const sf::Color hoverGlow{0, 255, 90, 55};
-		const sf::Color downGlow{0, 180, 65, 90};
-
 		mFramerateText.SetTextSize(30);
 		mPlayerLifeText.SetTextSize(20);
 		mPlayerScoreText.SetTextSize(20);
 		mPlayerHealthBar.SetForegroundColor(mHealthyHealthBarColor);
-		mPlayerHealthBar.SetBackgroundColor({4, 10, 24, 220});
-		mPlayerHealthBar.SetTextColor({4, 10, 24, 255});
+		mPlayerHealthBar.SetBackgroundColor({ 4, 10, 24, 220 });
+		mPlayerHealthBar.SetTextColor(MenuStyle::kAstroWhite);
+		mPlayerHealthBar.SetTextOutline({ 4, 10, 24, 255 }, 2.f);
 
+		mScreenDim.setFillColor(MenuStyle::kScreenDim);
+		mWinLoseText.SetTextColor(MenuStyle::kMenuGreen);
 		mWinLoseText.SetVisibility(false);
+		mFinalScoreText.SetTextColor(MenuStyle::kAstroWhite);
 		mFinalScoreText.SetVisibility(false);
-		mPauseText.SetTextColor(menuGreen);
+		mPauseText.SetTextColor(MenuStyle::kMenuGreen);
 		mPauseText.SetVisibility(false);
-		mControlsTitleText.SetTextSize(36);
-		mControlsTitleText.SetTextColor(menuGreen);
-		mControlsTitleText.SetVisibility(false);
-		mControlsKeysText.SetTextSize(22);
-		mControlsKeysText.SetTextColor(menuGreen);
-		mControlsKeysText.SetVisibility(false);
-		mControlsActionsText.SetTextSize(22);
-		mControlsActionsText.SetTextColor(astroWhite);
-		mControlsActionsText.SetVisibility(false);
-		mResumeButton.SetTextSize(22);
-		mResumeButton.SetVisibility(false);
-		mRestartButton.SetTextSize(22);
-		mRestartButton.SetVisibility(false);
-		mControlsButton.SetTextSize(22);
-		mControlsButton.SetVisibility(false);
-		mQuitButton.SetTextSize(22);
-		mQuitButton.SetVisibility(false);
-		mReturnButton.SetTextSize(18);
-		mReturnButton.SetVisibility(false);
 
-		mResumeButton.SetButtonColors(transparent, hoverGlow, downGlow);
-		mRestartButton.SetButtonColors(transparent, hoverGlow, downGlow);
-		mControlsButton.SetButtonColors(transparent, hoverGlow, downGlow);
-		mQuitButton.SetButtonColors(transparent, hoverGlow, downGlow);
-		mReturnButton.SetButtonColors(transparent, hoverGlow, downGlow);
-
-		mResumeButton.SetTextColors(astroWhite, menuGreen, menuGreen);
-		mRestartButton.SetTextColors(astroWhite, menuGreen, menuGreen);
-		mControlsButton.SetTextColors(astroWhite, menuGreen, menuGreen);
-		mQuitButton.SetTextColors(astroWhite, menuGreen, menuGreen);
-		mReturnButton.SetTextColors(astroWhite, menuGreen, menuGreen);
-
-		mControlsPanel.setFillColor(sf::Color{0, 0, 0, 165});
-		mControlsPanel.setOutlineColor(sf::Color{0, 255, 90, 220});
-		mControlsPanel.setOutlineThickness(2.f);
+		for (Button* button : { &mResumeButton, &mRestartButton, &mControlsButton, &mQuitButton })
+		{
+			MenuStyle::ApplyMenuButtonStyle(*button, 22);
+			button->SetVisibility(false);
+		}
 	}
+
 	void GameplayHUD::Draw(sf::RenderWindow& windowRef)
 	{
+		if (mIsPaused || mIsGameFinished)
+		{
+			windowRef.draw(mScreenDim);
+		}
+
 		UpdateFrameRate();
-		mWindowSize = windowRef.getSize();
 		mFramerateText.NativeDraw(windowRef);
 		mPlayerHealthBar.NativeDraw(windowRef);
 		mPlayerLifeIcon.NativeDraw(windowRef);
@@ -102,28 +78,16 @@ namespace ly
 		mWinLoseText.NativeDraw(windowRef);
 		mFinalScoreText.NativeDraw(windowRef);
 		mPauseText.NativeDraw(windowRef);
-		if (mShowingControls)
-		{
-			windowRef.draw(mControlsPanel);
-		}
-		mControlsTitleText.NativeDraw(windowRef);
-		mControlsKeysText.NativeDraw(windowRef);
-		mControlsActionsText.NativeDraw(windowRef);
+		mControlsPanel.Draw(windowRef);
 		mResumeButton.NativeDraw(windowRef);
 		mRestartButton.NativeDraw(windowRef);
 		mControlsButton.NativeDraw(windowRef);
 		mQuitButton.NativeDraw(windowRef);
-		mReturnButton.NativeDraw(windowRef);
-	}
-
-	void GameplayHUD::Tick(float deltaTime)
-	{
-		(void)deltaTime;
 	}
 
 	bool GameplayHUD::HandleEvent(const sf::Event& event)
 	{
-		if (mShowingControls)
+		if (mControlsPanel.IsVisible())
 		{
 			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 			{
@@ -131,8 +95,7 @@ namespace ly
 				return true;
 			}
 
-			if (mReturnButton.HandleEvent(event)) return true;
-			return HUD::HandleEvent(event);
+			return mControlsPanel.HandleEvent(event) || HUD::HandleEvent(event);
 		}
 
 		if (mIsPaused)
@@ -146,84 +109,82 @@ namespace ly
 
 		return HUD::HandleEvent(event);
 	}
+
 	void GameplayHUD::Init(const sf::RenderWindow& windowRef)
 	{
-		auto windowSize = windowRef.getSize();
+		const sf::Vector2u windowSize = windowRef.getSize();
 		mWindowSize = windowSize;
-		mPlayerHealthBar.SetWidgetLocation(sf::Vector2f{ 20.f, windowSize.y - 50.f });
+
+		// The frame rate sits in the top left corner and the status row in the bottom left one, both mScreenMargin from the edges.
+		const sf::FloatRect framerateBounds = mFramerateText.GetBounds();
+		MoveWidgetBy(mFramerateText, { mScreenMargin - framerateBounds.left, mScreenMargin - framerateBounds.top });
+		mPlayerHealthBar.SetWidgetLocation(sf::Vector2f{
+			mScreenMargin,
+			static_cast<float>(windowSize.y) - mScreenMargin - mPlayerHealthBar.GetBounds().height
+		});
 		RefreshHealthBar();
 		ConnectPlayerStatus();
 
-		sf::Vector2f nextWidgetPos = mPlayerHealthBar.GetWidgetLocation();
-		const float rowCenterY = nextWidgetPos.y + mPlayerHealthBar.GetBounds().height / 2.f;
+		// The status row: health bar, life icon and count, then score icon and score, all centered on the middle of the bar.
+		const sf::FloatRect healthBarBounds = mPlayerHealthBar.GetBounds();
+		const float rowCenterY = healthBarBounds.top + healthBarBounds.height / 2.f;
+		float nextLeft = healthBarBounds.left + healthBarBounds.width + mWidgetSpacing;
 
-	nextWidgetPos += sf::Vector2f{ mPlayerHealthBar.GetBounds().width + mWidgetSpaceing, 0.f };
-		mPlayerLifeIcon.SetWidgetLocation({nextWidgetPos.x, rowCenterY - mPlayerLifeIcon.GetBounds().height / 2.f});
-
-	nextWidgetPos += sf::Vector2f{ mPlayerLifeIcon.GetBounds().width + mWidgetSpaceing, 0.f };
-		mPlayerLifeText.SetWidgetLocation(nextWidgetPos);
-
-	nextWidgetPos += sf::Vector2f{ mPlayerLifeText.GetBounds().width + mWidgetSpaceing * 4, -2.f };
-		mPlayerScoreIcon.SetWidgetLocation({nextWidgetPos.x, rowCenterY - mPlayerScoreIcon.GetBounds().height / 2.f});
-
-	nextWidgetPos += sf::Vector2f{ mPlayerScoreIcon.GetBounds().width + mWidgetSpaceing, 0.f };
-		mPlayerScoreText.SetWidgetLocation(nextWidgetPos);
-
-		mWinLoseText.SetTextSize(40);
-		//mWinLoseText.SetString("You Win!");
-	mWinLoseText.SetWidgetLocation({ windowSize.x / 2.f - mWinLoseText.GetBounds().width / 2.f, 100.f });
-		
-		//mFinalScoreText.SetString("score: " + std::to_string(100));
-		mFinalScoreText.SetTextSize(40);
-	mFinalScoreText.SetWidgetLocation({ windowSize.x / 2.f - mFinalScoreText.GetBounds().width / 2.f, 200.f });
-
-	mPauseText.SetTextSize(46);
-	mPauseText.SetWidgetLocation({ windowSize.x / 2.f - mPauseText.GetBounds().width / 2.f, 80.f });
-
-	mResumeButton.SetWidgetLocation({ windowSize.x / 2.f - mResumeButton.GetBounds().width / 2.f, windowSize.y / 2.f - 30.f });
-	mRestartButton.SetWidgetLocation(mResumeButton.GetWidgetLocation() + sf::Vector2f{ 0.f, 58.f });
-		mControlsButton.SetWidgetLocation(mRestartButton.GetWidgetLocation() + sf::Vector2f{ 0.f, 58.f });
-		mQuitButton.SetWidgetLocation(mControlsButton.GetWidgetLocation() + sf::Vector2f{ 0.f, 58.f });
-		const sf::Vector2f panelSize{ 640.f, 420.f };
-		const sf::Vector2f panelLocation{
-			windowSize.x / 2.f - panelSize.x / 2.f,
-			windowSize.y / 2.f - panelSize.y / 2.f
+		const std::initializer_list<std::pair<Widget*, float>> statusRow{
+			{ &mPlayerLifeIcon, mWidgetSpacing },
+			{ &mPlayerLifeText, mWidgetSpacing * 4.f },
+			{ &mPlayerScoreIcon, mWidgetSpacing },
+			{ &mPlayerScoreText, 0.f }
 		};
-		mControlsPanel.setSize(panelSize);
-		mControlsPanel.setPosition(panelLocation);
-		mControlsTitleText.SetWidgetLocation({ windowSize.x / 2.f - mControlsTitleText.GetBounds().width / 2.f, panelLocation.y + 45.f });
-		mControlsKeysText.SetWidgetLocation({ panelLocation.x + 150.f, panelLocation.y + 125.f });
-		mControlsActionsText.SetWidgetLocation({ panelLocation.x + 310.f, panelLocation.y + 125.f });
-		mReturnButton.SetWidgetLocation({ windowSize.x / 2.f - mReturnButton.GetBounds().width / 2.f, panelLocation.y + panelSize.y - 65.f });
+
+		for (const auto& [widget, spacingAfter] : statusRow)
+		{
+			const sf::FloatRect bounds = widget->GetBounds();
+			MoveWidgetBy(*widget, { nextLeft - bounds.left, rowCenterY - (bounds.top + bounds.height / 2.f) });
+			nextLeft += bounds.width + spacingAfter;
+		}
+
+		mScreenDim.setSize(sf::Vector2f{ windowSize });
+
+		// The game over banner takes the place of the pause title, with the final score below it.
+		mWinLoseText.SetTextSize(46);
+		mFinalScoreText.SetTextSize(30);
+		CenterGameOverTexts();
+
+		mPauseText.SetTextSize(46);
+		MenuStyle::CenterHorizontally(mPauseText, windowSize, 80.f);
+
+		const sf::Vector2f buttonStep{ 0.f, mMenuButtonSpacing };
+		MenuStyle::CenterHorizontally(mResumeButton, windowSize, static_cast<float>(windowSize.y) / 2.f - 30.f);
+		mRestartButton.SetWidgetLocation(mResumeButton.GetWidgetLocation() + buttonStep);
+		mControlsButton.SetWidgetLocation(mRestartButton.GetWidgetLocation() + buttonStep);
+		mQuitButton.SetWidgetLocation(mControlsButton.GetWidgetLocation() + buttonStep);
+
+		mControlsPanel.Layout(windowSize);
+
 		mResumeButton.onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::ResumeButtonClicked);
 		mRestartButton.onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::RestartButtonClicked);
 		mControlsButton.onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::ControlsButtonClicked);
 		mQuitButton.onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::QuitButtonClicked);
-		mReturnButton.onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::ReturnButtonClicked);
-	}
-	void GameplayHUD::PlayerHealthUpdated(float amt, float currentHealth, float maxHealth)
-	{
-		mPlayerHealthBar.UpdateValue(currentHealth, maxHealth);
-		if (currentHealth / maxHealth < mCriticalThreshold)
-		{
-			mPlayerHealthBar.SetForegroundColor(mCriticalHealthBarColor);
-		}
-		else
-		{
-			mPlayerHealthBar.SetForegroundColor(mHealthyHealthBarColor);
-		}
+		mControlsPanel.GetReturnButton().onButtonClicked.BindAction(GetWeakRef(), &GameplayHUD::ReturnButtonClicked);
 	}
 
-	void GameplayHUD::PlayerLifeCountUpdated(int amt)
+	void GameplayHUD::PlayerHealthUpdated([[maybe_unused]] float amt, float currentHealth, float maxHealth)
 	{
-		mPlayerLifeText.SetString(std::to_string(amt));
+		mPlayerHealthBar.UpdateValue(currentHealth, maxHealth);
+		const bool isCritical = currentHealth / maxHealth < mCriticalThreshold;
+		mPlayerHealthBar.SetForegroundColor(isCritical ? mCriticalHealthBarColor : mHealthyHealthBarColor);
+	}
+
+	void GameplayHUD::PlayerLifeCountUpdated(int lifeCount)
+	{
+		mPlayerLifeText.SetString(std::to_string(lifeCount));
 	}
 
 	void GameplayHUD::PlayerScoreUpdated(int newScore)
 	{
 		std::string scoreText = std::to_string(newScore);
-		Player* player = PlayerManager::Get().GetPlayer();
-		if (player && player->GetScoreMultiplier() > 1)
+		if (const Player* const player = PlayerManager::Get().GetPlayer(); player && player->GetScoreMultiplier() > 1)
 		{
 			scoreText += " x" + std::to_string(player->GetScoreMultiplier());
 		}
@@ -233,32 +194,34 @@ namespace ly
 
 	void GameplayHUD::RefreshHealthBar()
 	{
-		Player* player = PlayerManager::Get().GetPlayer();
-		if (player && !player->GetCurrentSpaceship().expired())
+		const Player* const player = PlayerManager::Get().GetPlayer();
+		if (!player)
 		{
-			weak<PlayerSpaceship> playerSpaceship = player->GetCurrentSpaceship();
-			playerSpaceship.lock()->onActorDestroyed.BindAction(GetWeakRef(), &GameplayHUD::PlayerSpaceshipDestoryed);
-			HealthComponent& healthComp = player->GetCurrentSpaceship().lock()->GetHealthComp();
+			return;
+		}
+
+		if (const shared<PlayerSpaceship> playerSpaceship = player->GetCurrentSpaceship().lock())
+		{
+			playerSpaceship->onActorDestroyed.BindAction(GetWeakRef(), &GameplayHUD::PlayerSpaceshipDestroyed);
+			HealthComponent& healthComp = playerSpaceship->GetHealthComp();
 			healthComp.onHealthChanged.BindAction(GetWeakRef(), &GameplayHUD::PlayerHealthUpdated);
-			PlayerHealthUpdated(0, healthComp.GetHealth(), healthComp.GetMaxHealth());
+			PlayerHealthUpdated(0.f, healthComp.GetHealth(), healthComp.GetMaxHealth());
 		}
 	}
 
 	void GameplayHUD::ConnectPlayerStatus()
 	{
-		Player* player = PlayerManager::Get().GetPlayer();
-		if (player)
+		if (Player* const player = PlayerManager::Get().GetPlayer())
 		{
-			int lifeCount = player->GetLifeCount();
-			mPlayerLifeText.SetString(std::to_string(lifeCount));
+			PlayerLifeCountUpdated(player->GetLifeCount());
 			player->onLifeChange.BindAction(GetWeakRef(), &GameplayHUD::PlayerLifeCountUpdated);
 
-			int playerScore = player->GetScore();
-			PlayerScoreUpdated(playerScore);
+			PlayerScoreUpdated(player->GetScore());
 			player->onScoreChange.BindAction(GetWeakRef(), &GameplayHUD::PlayerScoreUpdated);
 		}
 	}
-	void GameplayHUD::PlayerSpaceshipDestoryed(Actor* actor)
+
+	void GameplayHUD::PlayerSpaceshipDestroyed([[maybe_unused]] Actor* actor)
 	{
 		RefreshHealthBar();
 	}
@@ -266,10 +229,10 @@ namespace ly
 	void GameplayHUD::UpdateFrameRate()
 	{
 		++mFramesSinceRateUpdate;
-		float elapsedTime = mFrameRateClock.getElapsedTime().asSeconds();
+		const float elapsedTime = mFrameRateClock.getElapsedTime().asSeconds();
 		if (elapsedTime >= mFrameRateUpdateInterval)
 		{
-			int frameRate = static_cast<int>(mFramesSinceRateUpdate / elapsedTime + 0.5f);
+			const int frameRate = static_cast<int>(static_cast<float>(mFramesSinceRateUpdate) / elapsedTime + 0.5f);
 			mFramerateText.SetString("Frame Rate: " + std::to_string(frameRate));
 			mFramesSinceRateUpdate = 0;
 			mFrameRateClock.restart();
@@ -310,52 +273,44 @@ namespace ly
 	{
 		mIsPaused = paused;
 		SetControlsVisible(false);
-		mResumeButton.SetVisibility(paused);
-		mRestartButton.SetVisibility(paused);
-		mControlsButton.SetVisibility(paused);
-		mQuitButton.SetVisibility(paused);
-		mPauseText.SetVisibility(paused);
 	}
 
 	void GameplayHUD::SetControlsVisible(bool visible)
 	{
-		mShowingControls = visible;
-		mControlsTitleText.SetVisibility(visible);
-		mControlsKeysText.SetVisibility(visible);
-		mControlsActionsText.SetVisibility(visible);
-		mReturnButton.SetVisibility(visible);
+		mControlsPanel.SetVisible(visible);
 
-		mPauseText.SetVisibility(mIsPaused && !visible);
-		mResumeButton.SetVisibility(mIsPaused && !visible);
-		mRestartButton.SetVisibility(mIsPaused && !visible);
-		mControlsButton.SetVisibility(mIsPaused && !visible);
-		mQuitButton.SetVisibility(mIsPaused && !visible);
+		const bool showPauseMenu = mIsPaused && !visible;
+		mPauseText.SetVisibility(showPauseMenu);
+		for (Button* button : { &mResumeButton, &mRestartButton, &mControlsButton, &mQuitButton })
+		{
+			button->SetVisibility(showPauseMenu);
+		}
 	}
 
 	void GameplayHUD::GameFinished(bool playerWon)
 	{
-	mIsPaused = false;
-	SetControlsVisible(false);
-	mWinLoseText.SetVisibility(true);
-	mFinalScoreText.SetVisibility(true);
-	mPauseText.SetVisibility(false);
-	mResumeButton.SetVisibility(false);
-	mRestartButton.SetVisibility(true);
-	mControlsButton.SetVisibility(false);
-	mQuitButton.SetVisibility(true);
-		
-		int score = PlayerManager::Get().GetPlayer()->GetScore();
-		mFinalScoreText.SetString("score: " + std::to_string(score));
-		if (playerWon)
-		{
-			mWinLoseText.SetString("You Win!");
+		mIsPaused = false;
+		mIsGameFinished = true;
+		SetControlsVisible(false);
+		mWinLoseText.SetVisibility(true);
+		mFinalScoreText.SetVisibility(true);
 
-		}
-		else
-		{
-			mWinLoseText.SetString("You Lose!");
-		}
-	mWinLoseText.SetWidgetLocation({ mWindowSize.x / 2.f - mWinLoseText.GetBounds().width / 2.f, 100.f });
-	mFinalScoreText.SetWidgetLocation({ mWindowSize.x / 2.f - mFinalScoreText.GetBounds().width / 2.f, 200.f });
+		// Only restart and quit remain, so they move up into the first two menu slots instead of leaving a gap.
+		mRestartButton.SetWidgetLocation(mResumeButton.GetWidgetLocation());
+		mQuitButton.SetWidgetLocation(mResumeButton.GetWidgetLocation() + sf::Vector2f{ 0.f, mMenuButtonSpacing });
+		mRestartButton.SetVisibility(true);
+		mQuitButton.SetVisibility(true);
+
+		const Player* const player = PlayerManager::Get().GetPlayer();
+		const int score = player ? player->GetScore() : 0;
+		mFinalScoreText.SetString("SCORE: " + std::to_string(score));
+		mWinLoseText.SetString(playerWon ? "YOU WIN!" : "YOU LOSE!");
+		CenterGameOverTexts();
+	}
+
+	void GameplayHUD::CenterGameOverTexts()
+	{
+		MenuStyle::CenterHorizontally(mWinLoseText, mWindowSize, 80.f);
+		MenuStyle::CenterHorizontally(mFinalScoreText, mWindowSize, 160.f);
 	}
 }

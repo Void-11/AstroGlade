@@ -1,24 +1,32 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_WEAPON_LASERSHOOTER_H
+#define ASTROGLADE_GAME_WEAPON_LASERSHOOTER_H
+
+#include <string>
+
 #include <SFML/System.hpp>
+
 #include "weapon/Shooter.h"
 
 namespace ly
 {
+	// Fires a single laser from an offset relative to the owner. Higher levels shorten the cooldown.
 	class LaserShooter : public Shooter
 	{
 	public:
-		LaserShooter(Actor* owner,
+		explicit LaserShooter(Actor* owner,
 			float cooldownTime = 1.f,
 			const sf::Vector2f& localPositionOffset = { 0.f, 0.f },
 			float localRotationOffset = 0.f,
 			const std::string& laserTexturePath = "SpaceShooterRedux/PNG/Lasers/laserBlue01.png"
-			);
-		virtual bool IsOnCooldown() const override;
-		virtual void IncrementLevel(int amt = 1) override;
+		);
+
+		[[nodiscard]] bool IsOnCooldown() const override;
 
 		void SetLaserTexturePath(const std::string& laserTexturePath);
+
 	private:
-		virtual bool ShootImpl() override;
+		bool ShootImpl() override;
+
 		sf::Clock mCooldownClock;
 		float mCooldownTime;
 		sf::Vector2f mLocalPositionOffset;
@@ -26,3 +34,5 @@ namespace ly
 		std::string mLaserTexturePath;
 	};
 }
+
+#endif // ASTROGLADE_GAME_WEAPON_LASERSHOOTER_H

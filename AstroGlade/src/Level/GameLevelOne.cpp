@@ -1,41 +1,36 @@
-#include "Level/GameLevelOne.h"
-#include "Enemy/UFO.h"
-#include "Enemy/Vanguard.h"
+#include "Enemy/BossStage.h"
+#include "Enemy/ChaosStage.h"
 #include "Enemy/HexagonStage.h"
 #include "Enemy/TwinBladeStage.h"
 #include "Enemy/UFOStage.h"
 #include "Enemy/VanguardStage.h"
-#include "framework/Actor.h"
+#include "Level/GameLevelOne.h"
 #include "framework/Application.h"
-#include "framework/AssetManager.h"
 #include "framework/BackdropActor.h"
 #include "framework/BackgroundLayer.h"
 #include "framework/TimerManager.h"
-#include "framework/World.h"
 #include "gameplay/GameAudio.h"
-#include "gameplay/GameStage.h"
+#include "gameplay/ResolutionScale.h"
 #include "gameplay/WaitStage.h"
-#include "player/PlayerSpaceship.h"
-#include "Enemy/Hexagon.h"
-#include "Enemy/BossStage.h"
-#include "Enemy/ChaosStage.h"
-
 #include "player/PlayerManager.h"
-#include "widgets/GameplayHUD.h"
+#include "player/PlayerSpaceship.h"
 #include "weapon/ThreeWayShooter.h"
-
-#include <utility>
+#include "widgets/GameplayHUD.h"
 
 namespace ly
 {
-	GameLevelOne::GameLevelOne(Application* owningApp)
-		: World{owningApp},
-		mGameFinished{false},
-		mBossFightActive{false},
-		mRespawnTimerHandle{},
-		mRespawnDelay{1.5f}
+	namespace
 	{
-		
+		template<typename... StageTypes>
+		[[nodiscard]] bool IsAnyOf(const GameStage& stage)
+		{
+			return (... || (dynamic_cast<const StageTypes*>(&stage) != nullptr));
+		}
+	}
+
+	GameLevelOne::GameLevelOne(Application* owningApp)
+		: World{ owningApp }
+	{
 	}
 
 	void GameLevelOne::AllGameStageFinished()
@@ -45,7 +40,7 @@ namespace ly
 
 	void GameLevelOne::OnGameStageStarted(GameStage& startedStage)
 	{
-		mBossFightActive = dynamic_cast<BossStage*>(&startedStage) != nullptr;
+		mBossFightActive = IsAnyOf<BossStage>(startedStage);
 		if (mBossFightActive)
 		{
 			GameAudio::PlayBossMusic();
@@ -54,23 +49,16 @@ namespace ly
 
 	void GameLevelOne::OnGameStageFinished(GameStage& finishedStage)
 	{
-		bool combatStageFinished = dynamic_cast<VanguardStage*>(&finishedStage)
-			|| dynamic_cast<TwinBladeStage*>(&finishedStage)
-			|| dynamic_cast<HexagonStage*>(&finishedStage)
-			|| dynamic_cast<UFOStage*>(&finishedStage)
-			|| dynamic_cast<ChaosStage*>(&finishedStage);
-
-		if (combatStageFinished)
+		if (IsAnyOf<VanguardStage, TwinBladeStage, HexagonStage, UFOStage, ChaosStage>(finishedStage))
 		{
 			GameAudio::PlayStageClear();
-			Player* player = PlayerManager::Get().GetPlayer();
-			if (player)
+			if (Player* const player = PlayerManager::Get().GetPlayer())
 			{
 				player->IncreaseDefaultWeaponLevel();
 			}
 		}
 
-		if (dynamic_cast<BossStage*>(&finishedStage))
+		if (IsAnyOf<BossStage>(finishedStage))
 		{
 			mBossFightActive = false;
 		}
@@ -83,24 +71,27 @@ namespace ly
 
 		Player& newPlayer = PlayerManager::Get().CreateNewPlayer();
 		mPlayerSpaceship = newPlayer.SpawnSpaceship(this);
-	mPlayerSpaceship.lock()->onActorDestroyed.BindAction(GetWeakRef(), &GameLevelOne::PlayerSpaceshipDestroyed);
+		BindPlayerSpaceship();
+
 		mGameplayHUD = SpawnHUD<GameplayHUD>();
-		mGameplayHUD.lock()->onQuitBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::QuitGame);
-		mGameplayHUD.lock()->onRestartBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::Restart);
-		mGameplayHUD.lock()->onResumeBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::ResumeGame);
+		if (const shared<GameplayHUD> gameplayHUD = mGameplayHUD.lock())
+		{
+			gameplayHUD->onQuitBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::QuitGame);
+			gameplayHUD->onRestartBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::Restart);
+			gameplayHUD->onResumeBtnClicked.BindAction(GetWeakRef(), &GameLevelOne::ResumeGame);
+		}
 	}
 
-	void GameLevelOne::PlayerSpaceshipDestroyed(Actor* destroyedPlayerSpaceship)
+	void GameLevelOne::PlayerSpaceshipDestroyed([[maybe_unused]] Actor* destroyedPlayerSpaceship)
 	{
 		if (mGameFinished)
 		{
 			return;
 		}
 
-		Player* player = PlayerManager::Get().GetPlayer();
-		if (player && player->ConsumeLife())
+		if (Player* const player = PlayerManager::Get().GetPlayer(); player && player->ConsumeLife())
 		{
-			mRespawnTimerHandle = TimerManager::Get().SetTimer(GetWeakRef(), &GameLevelOne::RespawnPlayerSpaceship, mRespawnDelay);
+			TimerManager::Get().SetTimer(GetWeakRef(), &GameLevelOne::RespawnPlayerSpaceship, mRespawnDelay);
 		}
 		else
 		{
@@ -110,23 +101,23 @@ namespace ly
 
 	void GameLevelOne::InitGameStages()
 	{
-		AddStage(shared<WaitStage>{new WaitStage{this, 5.f}});
-		AddStage(shared<VanguardStage>{new VanguardStage{this}});
-		
-		AddStage(shared<WaitStage>{new WaitStage{this, 10.f}});
-		AddStage(shared<TwinBladeStage>{new TwinBladeStage{this}});
-		
-		AddStage(shared<WaitStage>{new WaitStage{this, 10.f}});
-		AddStage(shared<HexagonStage>{new HexagonStage{ this }});
+		AddStage(std::make_shared<WaitStage>(this, 5.f));
+		AddStage(std::make_shared<VanguardStage>(this));
 
-		AddStage(shared<WaitStage>{new WaitStage{this, 10.f}});
-		AddStage(shared<UFOStage>{new UFOStage{ this }});
+		AddStage(std::make_shared<WaitStage>(this, 10.f));
+		AddStage(std::make_shared<TwinBladeStage>(this));
 
-		AddStage(shared<WaitStage>{new WaitStage{this, 10.f}});
-		AddStage(shared<ChaosStage>{new ChaosStage{ this }});
+		AddStage(std::make_shared<WaitStage>(this, 10.f));
+		AddStage(std::make_shared<HexagonStage>(this));
 
-		AddStage(shared<WaitStage>{new WaitStage{ this, 10.f }});
-		AddStage(shared<BossStage>{new BossStage{ this }});
+		AddStage(std::make_shared<WaitStage>(this, 10.f));
+		AddStage(std::make_shared<UFOStage>(this));
+
+		AddStage(std::make_shared<WaitStage>(this, 10.f));
+		AddStage(std::make_shared<ChaosStage>(this));
+
+		AddStage(std::make_shared<WaitStage>(this, 10.f));
+		AddStage(std::make_shared<BossStage>(this));
 	}
 
 	bool GameLevelOne::DispatchEvent(const sf::Event& event)
@@ -143,25 +134,30 @@ namespace ly
 
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 		{
-			bool isPaused = !IsPaused();
-			SetPaused(isPaused);
 			GameAudio::PlayPauseToggle();
-			if (isPaused)
-			{
-				GameAudio::PauseMusic();
-			}
-			else
-			{
-				GameAudio::ResumeMusic();
-			}
-			if (!mGameplayHUD.expired())
-			{
-				mGameplayHUD.lock()->SetPause(isPaused);
-			}
+			SetPausedWithMusic(!IsPaused());
 			return true;
 		}
-		
+
 		return World::DispatchEvent(event);
+	}
+
+	void GameLevelOne::SetPausedWithMusic(bool paused)
+	{
+		SetPaused(paused);
+		if (paused)
+		{
+			GameAudio::PauseMusic();
+		}
+		else
+		{
+			GameAudio::ResumeMusic();
+		}
+
+		if (const shared<GameplayHUD> gameplayHUD = mGameplayHUD.lock())
+		{
+			gameplayHUD->SetPause(paused);
+		}
 	}
 
 	void GameLevelOne::ResumeGame()
@@ -171,12 +167,7 @@ namespace ly
 			return;
 		}
 
-		SetPaused(false);
-		GameAudio::ResumeMusic();
-		if (!mGameplayHUD.expired())
-		{
-			mGameplayHUD.lock()->SetPause(false);
-		}
+		SetPausedWithMusic(false);
 	}
 
 	void GameLevelOne::QuitGame()
@@ -215,9 +206,10 @@ namespace ly
 		{
 			GameAudio::PlayGameOver();
 		}
-		if (!mGameplayHUD.expired())
+
+		if (const shared<GameplayHUD> gameplayHUD = mGameplayHUD.lock())
 		{
-			mGameplayHUD.lock()->GameFinished(playerWon);
+			gameplayHUD->GameFinished(playerWon);
 		}
 	}
 
@@ -228,7 +220,7 @@ namespace ly
 			return;
 		}
 
-		Player* player = PlayerManager::Get().GetPlayer();
+		Player* const player = PlayerManager::Get().GetPlayer();
 		if (!player)
 		{
 			GameOver();
@@ -236,85 +228,95 @@ namespace ly
 		}
 
 		mPlayerSpaceship = player->SpawnSpaceship(this);
-		if (!mPlayerSpaceship.expired())
-		{
-			if (mBossFightActive)
-			{
-				ApplyBossRespawnLoadout(*mPlayerSpaceship.lock());
-			}
-
-			mPlayerSpaceship.lock()->onActorDestroyed.BindAction(GetWeakRef(), &GameLevelOne::PlayerSpaceshipDestroyed);
-			if (!mGameplayHUD.expired())
-			{
-				mGameplayHUD.lock()->RefreshHealthBar();
-			}
-		}
-		else
+		const shared<PlayerSpaceship> playerSpaceship = mPlayerSpaceship.lock();
+		if (!playerSpaceship)
 		{
 			GameOver();
+			return;
+		}
+
+		if (mBossFightActive)
+		{
+			ApplyBossRespawnLoadout(*playerSpaceship);
+		}
+
+		BindPlayerSpaceship();
+		if (const shared<GameplayHUD> gameplayHUD = mGameplayHUD.lock())
+		{
+			gameplayHUD->RefreshHealthBar();
+		}
+	}
+
+	void GameLevelOne::BindPlayerSpaceship()
+	{
+		if (const shared<PlayerSpaceship> playerSpaceship = mPlayerSpaceship.lock())
+		{
+			playerSpaceship->onActorDestroyed.BindAction(GetWeakRef(), &GameLevelOne::PlayerSpaceshipDestroyed);
 		}
 	}
 
 	void GameLevelOne::ApplyBossRespawnLoadout(PlayerSpaceship& playerSpaceship)
 	{
-		unique<Shooter> bossShooter{new ThreeWayShooter{&playerSpaceship, 0.4f, {50.f, 0.f}}};
+		auto bossShooter = std::make_unique<ThreeWayShooter>(&playerSpaceship, 0.4f, sf::Vector2f{ 50.f, 0.f });
 		bossShooter->SetCurrentLevel(3);
 		playerSpaceship.SetShooter(std::move(bossShooter));
 	}
 
 	void GameLevelOne::SpawnCosmetics()
 	{
-		auto windowSize = GetWindowSize();
-		float scaleX = windowSize.x / 600.f;
-		float scaleY = windowSize.y / 980.f;
+		const float scaleY = GetResolutionScale(GetWindowSize()).y;
 
-		auto backdropActor = SpawnActor<BackdropActor>("SpaceShooterRedux/Backgrounds/StellarDrift.png");
-		weak<BackgroundLayer> planets = SpawnActor<BackgroundLayer>();
-		planets.lock()->SetAssets(
-			{
-				"SpaceShooterRedux/PNG/Planets/Planet1.png",
-				"SpaceShooterRedux/PNG/Planets/Planet2.png",
-				"SpaceShooterRedux/PNG/Planets/Planet3.png",
-				"SpaceShooterRedux/PNG/Planets/Planet4.png",
-				"SpaceShooterRedux/PNG/Planets/Planet5.png",
-				"SpaceShooterRedux/PNG/Planets/Planet6.png",
-				"SpaceShooterRedux/PNG/Planets/Planet7.png"
-			}
-		);
+		SpawnActor<BackdropActor>("SpaceShooterRedux/Backgrounds/StellarDrift.png");
 
-		planets.lock()->SetSpriteCount(1);
-		planets.lock()->SetSizes(1, 1.5f);
-		planets.lock()->SetVelocities({0, 30.f * scaleY} ,{0, 80.f * scaleY});
+		if (const shared<BackgroundLayer> planets = SpawnActor<BackgroundLayer>().lock())
+		{
+			planets->SetAssets(
+				{
+					"SpaceShooterRedux/PNG/Planets/Planet1.png",
+					"SpaceShooterRedux/PNG/Planets/Planet2.png",
+					"SpaceShooterRedux/PNG/Planets/Planet3.png",
+					"SpaceShooterRedux/PNG/Planets/Planet4.png",
+					"SpaceShooterRedux/PNG/Planets/Planet5.png",
+					"SpaceShooterRedux/PNG/Planets/Planet6.png",
+					"SpaceShooterRedux/PNG/Planets/Planet7.png"
+				}
+			);
 
+			planets->SetSpriteCount(1);
+			planets->SetSizes(1.f, 1.5f);
+			planets->SetVelocities({ 0.f, 30.f * scaleY }, { 0.f, 80.f * scaleY });
+		}
 
-		weak<BackgroundLayer> meteors = SpawnActor<BackgroundLayer>();
-		meteors.lock()->SetAssets(
-			{
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_tiny1.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_tiny2.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_big2.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_big3.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_big4.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_med1.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_med3.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_small1.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_small2.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny1.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny2.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_big1.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_big2.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_big3.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_big4.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_med1.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_med2.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_small1.png",
-				"SpaceShooterRedux/PNG/Meteors/meteorGrey_small2.png"
-			}
-		);
+		if (const shared<BackgroundLayer> meteors = SpawnActor<BackgroundLayer>().lock())
+		{
+			meteors->SetAssets(
+				{
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_tiny1.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_tiny2.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_big2.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_big3.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_big4.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_med1.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_med3.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_small1.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_small2.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny1.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny2.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_big1.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_big2.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_big3.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_big4.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_med1.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_med2.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_small1.png",
+					"SpaceShooterRedux/PNG/Meteors/meteorGrey_small2.png"
+				}
+			);
 
-		meteors.lock()->SetSpriteCount(20);
-		meteors.lock()->SetSizes(.2f, .5f);
-		meteors.lock()->SetVelocities({ 0, 50.f * scaleY }, { 0, 200.f * scaleY });
+			meteors->SetSpriteCount(20);
+			meteors->SetSizes(0.2f, 0.5f);
+			meteors->SetVelocities({ 0.f, 50.f * scaleY }, { 0.f, 200.f * scaleY });
+		}
 	}
 }

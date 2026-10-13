@@ -15,24 +15,24 @@ namespace ly
 {
 	namespace
 	{
-		const char* const kMenuMusic = "Audio/Music/menu_claimed_by_the_void_loop.mp3";
-		const char* const kGameplayMusic = "Audio/Music/gameplay_specular_city.mp3";
-		const char* const kBossMusic = "Audio/Music/boss_brute_force_loop.mp3";
+		constexpr const char* kMenuMusic = "Audio/Music/menu_claimed_by_the_void_loop.mp3";
+		constexpr const char* kGameplayMusic = "Audio/Music/gameplay_specular_city.mp3";
+		constexpr const char* kBossMusic = "Audio/Music/boss_brute_force_loop.mp3";
 
-		const char* const kPlayerLaser = "Audio/SFX/KenneySciFi/laserSmall_000.ogg";
-		const char* const kPlayerThreeWay = "Audio/SFX/KenneySciFi/laserRetro_001.ogg";
-		const char* const kPlayerFrontalWiper = "Audio/SFX/KenneySciFi/laserLarge_001.ogg";
-		const char* const kEnemyLaser = "Audio/SFX/KenneySciFi/laserSmall_003.ogg";
-		const char* const kBossLaser = "Audio/SFX/KenneySciFi/laserLarge_004.ogg";
-		const char* const kEnemyHit = "Audio/SFX/KenneySciFi/impactMetal_000.ogg";
-		const char* const kEnemyDeath = "Audio/SFX/KenneySciFi/explosionCrunch_001.ogg";
-		const char* const kBossDeath = "Audio/SFX/KenneySciFi/lowFrequency_explosion_000.ogg";
+		constexpr const char* kPlayerLaser = "Audio/SFX/KenneySciFi/laserSmall_000.ogg";
+		constexpr const char* kPlayerThreeWay = "Audio/SFX/KenneySciFi/laserRetro_001.ogg";
+		constexpr const char* kPlayerFrontalWiper = "Audio/SFX/KenneySciFi/laserLarge_001.ogg";
+		constexpr const char* kEnemyLaser = "Audio/SFX/KenneySciFi/laserSmall_003.ogg";
+		constexpr const char* kBossLaser = "Audio/SFX/KenneySciFi/laserLarge_004.ogg";
+		constexpr const char* kEnemyHit = "Audio/SFX/KenneySciFi/impactMetal_000.ogg";
+		constexpr const char* kEnemyDeath = "Audio/SFX/KenneySciFi/explosionCrunch_001.ogg";
+		constexpr const char* kBossDeath = "Audio/SFX/KenneySciFi/lowFrequency_explosion_000.ogg";
 
-		const char* const kZap = "SpaceShooterRedux/Bonus/sfx_zap.ogg";
-		const char* const kShieldUp = "SpaceShooterRedux/Bonus/sfx_shieldUp.ogg";
-		const char* const kShieldDown = "SpaceShooterRedux/Bonus/sfx_shieldDown.ogg";
-		const char* const kTwoTone = "SpaceShooterRedux/Bonus/sfx_twoTone.ogg";
-		const char* const kLose = "SpaceShooterRedux/Bonus/sfx_lose.ogg";
+		constexpr const char* kZap = "SpaceShooterRedux/Bonus/sfx_zap.ogg";
+		constexpr const char* kShieldUp = "SpaceShooterRedux/Bonus/sfx_shieldUp.ogg";
+		constexpr const char* kShieldDown = "SpaceShooterRedux/Bonus/sfx_shieldDown.ogg";
+		constexpr const char* kTwoTone = "SpaceShooterRedux/Bonus/sfx_twoTone.ogg";
+		constexpr const char* kLose = "SpaceShooterRedux/Bonus/sfx_lose.ogg";
 
 		void PlaySound(const char* path, float volume, float pitch = 1.f, float cooldown = 0.f)
 		{

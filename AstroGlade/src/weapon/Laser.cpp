@@ -4,10 +4,9 @@
 namespace ly
 {
 	Laser::Laser(World* world, Actor* owner, const std::string& texturePath, float speed, float damage)
-		: Actor{world, texturePath},
-		mOwner{owner},
-		mSpeed{speed},
-		mDamage{damage}
+		: Actor{ world, texturePath },
+		mSpeed{ speed },
+		mDamage{ damage }
 	{
 		SetTeamID(owner->GetTeamID());
 	}

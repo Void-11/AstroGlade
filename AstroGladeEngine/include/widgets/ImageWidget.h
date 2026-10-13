@@ -1,5 +1,11 @@
-#pragma once
+#ifndef ASTROGLADE_ENGINE_WIDGETS_IMAGEWIDGET_H
+#define ASTROGLADE_ENGINE_WIDGETS_IMAGEWIDGET_H
+
+#include <string>
+
 #include <SFML/Graphics.hpp>
+
+#include "framework/Core.h"
 #include "widgets/Widget.h"
 
 namespace ly
@@ -7,16 +13,20 @@ namespace ly
 	class ImageWidget : public Widget
 	{
 	public:
-		ImageWidget(const std::string& imagePath);
+		explicit ImageWidget(const std::string& imagePath);
 
 		void SetImage(const shared<sf::Texture>& newTexture);
 		void SetImageScale(const sf::Vector2f& newScale);
-		virtual sf::FloatRect GetBounds() const override;
+		[[nodiscard]] sf::FloatRect GetBounds() const override;
+
 	private:
-		virtual void LocationUpdated(const sf::Vector2f& newLocation) override;
-		virtual void RotationUpdated(float newRotation) override;
-		virtual void Draw(sf::RenderWindow& winowRef) override;
+		void LocationUpdated(const sf::Vector2f& newLocation) override;
+		void RotationUpdated(float newRotation) override;
+		void Draw(sf::RenderWindow& windowRef) override;
+
 		shared<sf::Texture> mTexture;
 		sf::Sprite mSprite;
 	};
 }
+
+#endif // ASTROGLADE_ENGINE_WIDGETS_IMAGEWIDGET_H

@@ -1,35 +1,42 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_WIDGETS_GAMEPLAYHUD_H
+#define ASTROGLADE_GAME_WIDGETS_GAMEPLAYHUD_H
+
+#include "framework/Delegate.h"
+#include "widgets/Button.h"
+#include "widgets/ControlsPanel.h"
 #include "widgets/HUD.h"
+#include "widgets/ImageWidget.h"
 #include "widgets/TextWidget.h"
 #include "widgets/ValueGuage.h"
-#include "widgets/ImageWidget.h"
-#include "widgets/Button.h"
 
 namespace ly
 {
 	class Actor;
+
+	// The in-game overlay: health, lives, score and frame rate, plus the pause and game over menus.
 	class GameplayHUD : public HUD
 	{
 	public:
 		GameplayHUD();
 
-		virtual void Draw(sf::RenderWindow& windowRef) override;
-		virtual void Tick(float deltaTime) override;
-		virtual bool HandleEvent(const sf::Event& event) override;
+		void Draw(sf::RenderWindow& windowRef) override;
+		bool HandleEvent(const sf::Event& event) override;
 
 		void GameFinished(bool playerWon);
 		void SetPause(bool paused);
 		void RefreshHealthBar();
+
 		Delegate<> onRestartBtnClicked;
 		Delegate<> onQuitBtnClicked;
 		Delegate<> onResumeBtnClicked;
+
 	private:
-		virtual void Init(const sf::RenderWindow& windowRef) override;
+		void Init(const sf::RenderWindow& windowRef) override;
 		void ConnectPlayerStatus();
 		void PlayerHealthUpdated(float amt, float currentHealth, float maxHealth);
-		void PlayerLifeCountUpdated(int amt);
+		void PlayerLifeCountUpdated(int lifeCount);
 		void PlayerScoreUpdated(int newScore);
-		void PlayerSpaceshipDestoryed(Actor* actor);
+		void PlayerSpaceshipDestroyed(Actor* actor);
 		void UpdateFrameRate();
 		void ResumeButtonClicked();
 		void RestartButtonClicked();
@@ -37,6 +44,8 @@ namespace ly
 		void ReturnButtonClicked();
 		void QuitButtonClicked();
 		void SetControlsVisible(bool visible);
+		void CenterGameOverTexts();
+
 		TextWidget mFramerateText;
 		ValueGauge mPlayerHealthBar;
 		ImageWidget mPlayerLifeIcon;
@@ -45,30 +54,34 @@ namespace ly
 		ImageWidget mPlayerScoreIcon;
 		TextWidget mPlayerScoreText;
 
-		sf::Color mHealthyHealthBarColor;
-		sf::Color mCriticalHealthBarColor;
-		float mCriticalThreshold;
+		sf::Color mHealthyHealthBarColor{ 40, 255, 95, 255 };
+		sf::Color mCriticalHealthBarColor{ 255, 0, 0, 255 };
+		// The health bar turns red below this fraction of the maximum health.
+		float mCriticalThreshold = 0.3f;
 
-		float mWidgetSpaceing;
-	
+		float mWidgetSpacing = 10.f;
+		// Distance between the HUD and the window edges.
+		float mScreenMargin = 20.f;
+
+		sf::RectangleShape mScreenDim;
 		TextWidget mWinLoseText;
 		TextWidget mFinalScoreText;
 		TextWidget mPauseText;
-		TextWidget mControlsTitleText;
-		TextWidget mControlsKeysText;
-		TextWidget mControlsActionsText;
 		Button mResumeButton;
 		Button mRestartButton;
 		Button mControlsButton;
 		Button mQuitButton;
-		Button mReturnButton;
-		sf::RectangleShape mControlsPanel;
-		bool mShowingControls;
-		bool mIsPaused;
+		// Vertical distance between the tops of consecutive menu buttons.
+		float mMenuButtonSpacing = 58.f;
+		ControlsPanel mControlsPanel;
+		bool mIsPaused = false;
+		bool mIsGameFinished = false;
 
 		sf::Vector2u mWindowSize;
 		sf::Clock mFrameRateClock;
-		int mFramesSinceRateUpdate;
-		float mFrameRateUpdateInterval;
+		int mFramesSinceRateUpdate = 0;
+		float mFrameRateUpdateInterval = 0.25f;
 	};
 }
+
+#endif // ASTROGLADE_GAME_WIDGETS_GAMEPLAYHUD_H

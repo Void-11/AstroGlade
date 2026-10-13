@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ASTROGLADE_GAME_GAMEPLAY_GAMEAUDIO_H
+#define ASTROGLADE_GAME_GAMEPLAY_GAMEAUDIO_H
 
 namespace ly
 {
@@ -6,27 +7,29 @@ namespace ly
 	class Spaceship;
 	enum class RewardAudioType;
 
-	class GameAudio
+	// The game's music and sound effect cues, with their mixing levels, in one place.
+	namespace GameAudio
 	{
-	public:
-		static void PlayMenuMusic();
-		static void PlayGameplayMusic();
-		static void PlayBossMusic();
-		static void PauseMusic();
-		static void ResumeMusic();
-		static void StopMusic();
+		void PlayMenuMusic();
+		void PlayGameplayMusic();
+		void PlayBossMusic();
+		void PauseMusic();
+		void ResumeMusic();
+		void StopMusic();
 
-		static void PlayPlayerShoot(const Shooter& shooter);
-		static void PlayEnemyShoot();
-		static void PlayBossShoot();
-		static void PlayLaserCancel();
-		static void PlayShipHit(const Spaceship& spaceship);
-		static void PlayShipDeath(const Spaceship& spaceship);
-		static void PlayRewardPickup(RewardAudioType audioType);
-		static void PlayUIButton();
-		static void PlayPauseToggle();
-		static void PlayStageClear();
-		static void PlayWin();
-		static void PlayGameOver();
-	};
+		void PlayPlayerShoot(const Shooter& shooter);
+		void PlayEnemyShoot();
+		void PlayBossShoot();
+		void PlayLaserCancel();
+		void PlayShipHit(const Spaceship& spaceship);
+		void PlayShipDeath(const Spaceship& spaceship);
+		void PlayRewardPickup(RewardAudioType audioType);
+		void PlayUIButton();
+		void PlayPauseToggle();
+		void PlayStageClear();
+		void PlayWin();
+		void PlayGameOver();
+	}
 }
+
+#endif // ASTROGLADE_GAME_GAMEPLAY_GAMEAUDIO_H
